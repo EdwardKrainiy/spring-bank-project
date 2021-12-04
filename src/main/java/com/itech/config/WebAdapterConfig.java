@@ -21,13 +21,11 @@ public class WebAdapterConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/api/auth/**").permitAll()
-                .antMatchers("/swagger-ui.html").hasAnyRole(Role.MANAGER.name(), Role.USER.name())
+                .antMatchers("/swagger-ui.html").hasRole(Role.MANAGER.name())
                 .anyRequest()
                 .authenticated()
                 .and()
                 .httpBasic();
-
     }
 
     @Bean
@@ -37,7 +35,7 @@ public class WebAdapterConfig extends WebSecurityConfigurerAdapter {
                 User.builder()
                         .username("admin")
                         .password(encoder().encode("admin"))
-                        .roles("ADMIN")
+                        .roles(encoder().encode(Role.MANAGER.name()))
                         .build()
         );
     }
