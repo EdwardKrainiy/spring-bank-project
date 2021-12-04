@@ -20,7 +20,7 @@ public class AuthenticationController {
         return "Sign-in!";
     }
 
-    @GetMapping("/sign-up")
+    @PostMapping("/sign-up")
     public String signUp(@RequestParam("email") String email,
                        @RequestParam("password") String password){
         userService.createUser(new User(email, password));

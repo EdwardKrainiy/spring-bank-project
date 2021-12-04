@@ -16,7 +16,6 @@ import java.util.Objects;
 @Repository
 @EnableTransactionManagement
 @Transactional
-@ComponentScan("com.itech.config")
 
 public abstract class EntityRepository<TEntity> implements IRepository<TEntity> {
 

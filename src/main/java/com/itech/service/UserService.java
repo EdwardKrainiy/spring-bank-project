@@ -3,14 +3,11 @@ package com.itech.service;
 import com.itech.dao.UserRepository;
 import com.itech.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@ComponentScan("com.itech.service")
-
 public class UserService {
     @Autowired
     private UserRepository userRepository;
