@@ -3,6 +3,8 @@ package com.itech.config;
 import com.itech.model.Role;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -14,6 +16,7 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebAdapterConfig extends WebSecurityConfigurerAdapter {
 
     @Override
@@ -21,7 +24,11 @@ public class WebAdapterConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/swagger-ui.html").hasRole(Role.MANAGER.name())
+                .antMatchers(HttpMethod.GET, "/").permitAll()
+                .antMatchers(HttpMethod.GET, "/swagger-ui.html").hasRole(Role.MANAGER.name())
+                .antMatchers(HttpMethod.POST, "/api/auth/sign-in").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/auth/sign-up").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/auth/email-confirmation").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
@@ -33,11 +40,10 @@ public class WebAdapterConfig extends WebSecurityConfigurerAdapter {
     protected UserDetailsService userDetailsService() {
         return new InMemoryUserDetailsManager(
                 User.builder()
-                        .username("admin")
-                        .password(encoder().encode("admin"))
-                        .roles(encoder().encode(Role.MANAGER.name()))
-                        .build()
-        );
+                        .username("1234")
+                        .password(encoder().encode("1234"))
+                        .roles(Role.MANAGER.name())
+                        .build());
     }
 
     @Bean

@@ -33,5 +33,13 @@ public class User {
     public void setId(Long id) {
         this.id = id;
     }
+
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
+    public User() {
+    }
 }
 
