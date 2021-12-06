@@ -24,6 +24,7 @@ public class User {
     private String confirmation_token;
 
     @Column(name="role")
+    @Enumerated(EnumType.STRING)
     private Role role;
 
     @Column(name="activated")
