@@ -7,12 +7,14 @@ import com.itech.repository.UserRepository;
 import com.itech.service.UserService;
 import com.itech.utils.DtoMappingUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService{
+    private static final String VALID_EMAIL_ADDRESS_REGEX =  "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$";
+
     @Autowired
     private UserRepository userRepository;
 
@@ -23,14 +25,49 @@ public class UserServiceImpl implements UserService {
     private PasswordEncoder encoder;
 
     @Override
-    public String createUser(UserDto userDto) {
+    public ResponseEntity<?> createUser(UserDto userDto) {
+
         User mappedUser = dtoMappingUtils.DtoToUser(userDto);
 
-        if(userRepository.getUserByUsername(mappedUser.getUsername()) == null){
-            userRepository.save(new User(mappedUser.getUsername(), mappedUser.getPassword(), mappedUser.getEmail(), Role.USER));
-            return "Successful sign-up!";
+        if(mappedUser.getUsername() == null){
+            return ResponseEntity.badRequest()
+                    .body("Missing username!");
         }
-        else return "User with this username already exists!";
+
+        if(mappedUser.getPassword() == null){
+            return ResponseEntity.badRequest()
+                    .body("Missing password!");
+        }
+
+        if(mappedUser.getEmail() == null){
+            return ResponseEntity.badRequest()
+                    .body("Missing email!");
+        }
+
+        if(!mappedUser.getEmail().matches(VALID_EMAIL_ADDRESS_REGEX)){
+            return ResponseEntity.badRequest()
+                    .body("Incorrect email pattern!");
+        }
+
+        if(userRepository.getUserByUsername(mappedUser.getUsername()) != null){
+            return ResponseEntity.badRequest()
+                    .body("User with this username already exists!");
+        }
+
+        if(userRepository.getUserByEmail(mappedUser.getEmail()) != null){
+            return ResponseEntity.badRequest()
+                    .body("User with this email already exists!");
+        }
+
+        System.out.println(mappedUser.getPassword().length());
+
+        if(mappedUser.getPassword().length() > 10 || mappedUser.getPassword().length() == 0){
+            return ResponseEntity.badRequest()
+                            .body("Incorrect password length! Length must be from 0 to 10 symbols.");
+        }
+
+        userRepository.save(new User(mappedUser.getUsername(), encoder.encode(mappedUser.getPassword()), mappedUser.getEmail(), Role.USER));
+        return ResponseEntity.ok("Successful sign-up!");
     }
 
     @Override

@@ -27,7 +27,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/sign-up")
-    public String signUp(@RequestBody UserDto userDto){
+    public ResponseEntity<?> signUp(@RequestBody UserDto userDto){
         return userService.createUser(userDto);
     }
 

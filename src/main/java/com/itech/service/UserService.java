@@ -2,9 +2,10 @@ package com.itech.service;
 
 import com.itech.model.User;
 import com.itech.model.dto.UserDto;
+import org.springframework.http.ResponseEntity;
 
 public interface UserService {
-    String createUser(UserDto userDto);
+    ResponseEntity<?> createUser(UserDto userDto);
 
     User findUserByUsername(String username);
 
