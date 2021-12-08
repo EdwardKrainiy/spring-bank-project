@@ -1,12 +1,14 @@
-package com.itech.service.impl;
+package com.itech.service.user.impl;
 
 import com.itech.model.Role;
 import com.itech.model.User;
 import com.itech.model.dto.UserDto;
 import com.itech.repository.UserRepository;
-import com.itech.service.UserService;
+import com.itech.service.mail.EmailService;
+import com.itech.service.user.UserService;
 import com.itech.utils.DtoMappingUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,12 @@ public class UserServiceImpl implements UserService{
 
     @Autowired
     private PasswordEncoder encoder;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Value("${spring.mail.managermail}")
+    private static String managerEmail;
 
     @Override
     public ResponseEntity<?> createUser(UserDto userDto) {
@@ -67,6 +75,9 @@ public class UserServiceImpl implements UserService{
         }
 
         userRepository.save(new User(mappedUser.getUsername(), encoder.encode(mappedUser.getPassword()), mappedUser.getEmail(), Role.USER));
+
+        emailService.sendSimpleEmail("ekrayniy@inbox.ru", "Confirm email for user " + mappedUser.getUsername(), "This user is signing up. Confirm his email and activate the account.");
+
         return ResponseEntity.ok("Successful sign-up!");
     }
 

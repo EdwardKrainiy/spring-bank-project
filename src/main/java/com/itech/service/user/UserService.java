@@ -1,4 +1,4 @@
-package com.itech.service;
+package com.itech.service.user;
 
 import com.itech.model.User;
 import com.itech.model.dto.UserDto;

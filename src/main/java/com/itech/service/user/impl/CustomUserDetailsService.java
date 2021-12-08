@@ -1,4 +1,4 @@
-package com.itech.service.impl;
+package com.itech.service.user.impl;
 
 import com.itech.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

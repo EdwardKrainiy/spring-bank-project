@@ -2,7 +2,7 @@ package com.itech.contoller;
 
 import com.itech.model.dto.UserDto;
 import com.itech.security.jwt.authentication.JwtAuthenticationByUserDetails;
-import com.itech.service.UserService;
+import com.itech.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
