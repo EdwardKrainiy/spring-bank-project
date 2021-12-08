@@ -1,5 +1,6 @@
 package com.itech.security.jwt.authentication;
 
+import com.itech.model.dto.UserDto;
 import com.itech.security.jwt.provider.TokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,11 +21,11 @@ public class JwtAuthenticationByUserDetails {
     @Autowired
     private TokenProvider jwtTokenUtil;
 
-    public ResponseEntity<?> authenticate(Map<String, String> userDetails){
+    public ResponseEntity<?> authenticate(UserDto userDto){
         final Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        userDetails.get("username"),
-                        userDetails.get("password")
+                        userDto.getUsername(),
+                        userDto.getPassword()
                 )
         );
 

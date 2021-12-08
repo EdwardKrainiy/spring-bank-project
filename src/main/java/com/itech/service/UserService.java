@@ -1,9 +1,10 @@
 package com.itech.service;
 
 import com.itech.model.User;
+import com.itech.model.dto.UserDto;
 
 public interface UserService {
-    String createUser(String username, String password, String email);
+    String createUser(UserDto userDto);
 
     User findUserByUsername(String username);
 

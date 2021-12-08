@@ -1,8 +1,11 @@
 package com.itech.service.impl;
 
+import com.itech.model.Role;
 import com.itech.model.User;
+import com.itech.model.dto.UserDto;
 import com.itech.repository.UserRepository;
 import com.itech.service.UserService;
+import com.itech.utils.DtoMappingUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,12 +17,17 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Autowired
+    private DtoMappingUtils dtoMappingUtils;
+
+    @Autowired
     private PasswordEncoder encoder;
 
     @Override
-    public String createUser(String username, String password, String email) {
-        if(userRepository.getUserByUsername(username) == null){
-            userRepository.save(new User(username, encoder.encode(password), email));
+    public String createUser(UserDto userDto) {
+        User mappedUser = dtoMappingUtils.DtoToUser(userDto);
+
+        if(userRepository.getUserByUsername(mappedUser.getUsername()) == null){
+            userRepository.save(new User(mappedUser.getUsername(), mappedUser.getPassword(), mappedUser.getEmail(), Role.USER));
             return "Successful sign-up!";
         }
         else return "User with this username already exists!";

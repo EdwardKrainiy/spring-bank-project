@@ -30,10 +30,11 @@ public class User {
     @Column(name="activated")
     private boolean activated;
 
-    public User(String username, String password, String email) {
+    public User(String username, String password, String email, Role role) {
         this.username = username;
         this.password = password;
         this.email = email;
+        this.role = role;
     }
 
     public User() {
