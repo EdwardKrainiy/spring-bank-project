@@ -4,14 +4,16 @@ import com.itech.model.Role;
 import com.itech.model.User;
 import com.itech.model.dto.UserDto;
 import com.itech.repository.UserRepository;
+import com.itech.utils.JwtDecoder;
+import com.itech.security.jwt.provider.TokenProvider;
 import com.itech.service.mail.EmailService;
 import com.itech.service.user.UserService;
 import com.itech.utils.DtoMappingUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -29,8 +31,11 @@ public class UserServiceImpl implements UserService{
     @Autowired
     private EmailService emailService;
 
-    @Value("${spring.mail.managermail}")
-    private static String managerEmail;
+    @Autowired
+    private TokenProvider tokenProvider;
+
+    @Autowired
+    private JwtDecoder jwtDecoder;
 
     @Override
     public ResponseEntity<?> createUser(UserDto userDto) {
@@ -67,8 +72,6 @@ public class UserServiceImpl implements UserService{
                     .body("User with this email already exists!");
         }
 
-        System.out.println(mappedUser.getPassword().length());
-
         if(mappedUser.getPassword().length() > 10 || mappedUser.getPassword().length() == 0){
             return ResponseEntity.badRequest()
                             .body("Incorrect password length! Length must be from 0 to 10 symbols.");
@@ -76,7 +79,13 @@ public class UserServiceImpl implements UserService{
 
         userRepository.save(new User(mappedUser.getUsername(), encoder.encode(mappedUser.getPassword()), mappedUser.getEmail(), Role.USER));
 
-        emailService.sendSimpleEmail("ekrayniy@inbox.ru", "Confirm email for user " + mappedUser.getUsername(), "This user is signing up. Confirm his email and activate the account.");
+        Long createdUserId = userRepository.getUserByUsername(userDto.getUsername()).getId();
+
+        String confirmationToken = tokenProvider.generateConfirmToken(createdUserId);
+
+        emailService.sendSimpleEmail(userRepository.getUserByRole(Role.MANAGER).getEmail(),
+                "Confirm email for user " + mappedUser.getUsername(),
+                "This user is signing up. Confirm his email and activate the account following this link: " + "http://localhost:8080/api/auth/email-confirmation?token=" + confirmationToken);
 
         return ResponseEntity.ok("Successful sign-up!");
     }
@@ -96,5 +105,22 @@ public class UserServiceImpl implements UserService{
             }
         }
         return null;
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity<?> activateUser(String token) {
+        Long userId = jwtDecoder.getIdFromConfirmToken(token);
+
+        System.out.println(userId);
+
+        if(userId == null){
+            return ResponseEntity.badRequest().body("Incorrect user id!");
+        }
+        else{
+            userRepository.activateUser(userId);
+            return ResponseEntity.ok("User sucessfully activated!");
+        }
+
     }
 }

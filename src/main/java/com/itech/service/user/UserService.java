@@ -10,4 +10,6 @@ public interface UserService {
     User findUserByUsername(String username);
 
     User findUserByUsernameAndPassword(String username, String password);
+
+    ResponseEntity<?> activateUser(String token);
 }

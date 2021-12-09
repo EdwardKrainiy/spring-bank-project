@@ -32,7 +32,7 @@ public class AuthenticationController {
     }
 
     @GetMapping("/email-confirmation")
-        public void emailConfirmation(@RequestParam("userId") Long id,
-                                      @RequestParam("token") String token){
+        public ResponseEntity<?> emailConfirmation(@RequestParam("token") String token){
+        return userService.activateUser(token);
     }
 }

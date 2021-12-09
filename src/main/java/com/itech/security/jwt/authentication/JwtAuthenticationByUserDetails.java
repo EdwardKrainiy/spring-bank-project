@@ -10,8 +10,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-
 @Component
 public class JwtAuthenticationByUserDetails {
 
@@ -30,7 +28,7 @@ public class JwtAuthenticationByUserDetails {
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        final String token = jwtTokenUtil.generateToken(authentication);
+        final String token = jwtTokenUtil.generateAuthToken(authentication);
         return ResponseEntity.ok(token);
     }
 }
