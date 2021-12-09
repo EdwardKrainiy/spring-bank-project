@@ -119,8 +119,8 @@ public class UserServiceImpl implements UserService{
         }
         else{
             userRepository.activateUser(userId);
-            return ResponseEntity.ok("User sucessfully activated!");
+            emailService.sendSimpleEmail(userRepository.getById(userId).getEmail(), "Email confirmed", "Your email was confirmed successfully!");
+            return ResponseEntity.ok("User successfully activated!");
         }
-
     }
 }
