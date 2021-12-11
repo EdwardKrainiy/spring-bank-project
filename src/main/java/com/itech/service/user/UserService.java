@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 
 /**
  * UserService interface. Provides us different methods to work with User objects on Service layer.
- * @autor Edvard Krainiy on ${date}
+ * @author Edvard Krainiy on ${date}
  * @version 1.0
  */
 

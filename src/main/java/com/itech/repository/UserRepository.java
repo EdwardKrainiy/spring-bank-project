@@ -10,7 +10,7 @@ import java.util.Optional;
 
 /**
  * JPA repository class.
- * @autor Edvard Krainiy on ${date}
+ * @author Edvard Krainiy on ${date}
  * @version 1.0
  */
 

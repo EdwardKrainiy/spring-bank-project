@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Implementation of UserService interface. Provides us different methods of Service layer to work with Repository layer of User objects.
- * @autor Edvard Krainiy on ${date}
+ * @author Edvard Krainiy on ${date}
  * @version 1.0
  */
 

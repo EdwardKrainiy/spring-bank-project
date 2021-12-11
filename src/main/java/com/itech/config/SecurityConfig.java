@@ -18,7 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 /**
  * Security configuration class.
- * @autor Edvard Krainiy on ${date}
+ * @author Edvard Krainiy on ${date}
  * @version 1.0
  */
 

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * Authentication controller with sign-in, sign-up and email-confirmation endpoints.
- * @autor Edvard Krainiy on ${date}
+ * @author Edvard Krainiy on ${date}
  * @version 1.0
  */
 

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * JwtDecoder class, which contains methods to decode the JWT and obtain claims we need.
- * @autor Edvard Krainiy on ${date}
+ * @author Edvard Krainiy on ${date}
  * @version 1.0
  */
 

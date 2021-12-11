@@ -5,12 +5,11 @@ import com.itech.model.dto.UserDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 /**
  * DtoMapper interface, which contains methods to transform User and UserDto both ways.
- * @autor Edvard Krainiy on ${date}
+ * @author Edvard Krainiy on ${date}
  * @version 1.0
  */
 

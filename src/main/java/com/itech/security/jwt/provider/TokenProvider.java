@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 /**
  * TokenProvider class. Methods of this class creates and decodes tokens.
- * @autor Edvard Krainiy on ${date}
+ * @author Edvard Krainiy on ${date}
  * @version 1.0
  */
 

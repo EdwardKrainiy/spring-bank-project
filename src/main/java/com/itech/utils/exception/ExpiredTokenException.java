@@ -3,7 +3,9 @@ package com.itech.utils.exception;
 import org.springframework.http.ResponseEntity;
 
 /**
- * @author Edvard Krainiy
+ * ExpiredTokenException class.
+ * @author Edvard Krainiy on ${date}
+ * @version 1.0
  */
 public class ExpiredTokenException extends Exception{
     public ExpiredTokenException(){

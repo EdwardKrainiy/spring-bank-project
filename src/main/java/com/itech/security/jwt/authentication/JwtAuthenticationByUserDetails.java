@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * JwtAuthentication class.
- * @autor Edvard Krainiy on ${date}
+ * @author Edvard Krainiy on ${date}
  * @version 1.0
  */
 

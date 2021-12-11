@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * Implementation of EmailService interface. Provides us sending messages method.
- * @autor Edvard Krainiy on ${date}
+ * @author Edvard Krainiy on ${date}
  * @version 1.0
  */
 

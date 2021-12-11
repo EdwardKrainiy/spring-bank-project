@@ -7,7 +7,7 @@ import lombok.Setter;
 
 /**
  * User data-transfer object to manipulate with DB.
- * @autor Edvard Krainiy on ${date}
+ * @author Edvard Krainiy on ${date}
  * @version 1.0
  */
 
