@@ -10,6 +10,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+/**
+ * JwtAuthentication class.
+ * @autor Edvard Krainiy on ${date}
+ * @version 1.0
+ */
+
 @Component
 public class JwtAuthenticationByUserDetails {
 
@@ -19,7 +25,12 @@ public class JwtAuthenticationByUserDetails {
     @Autowired
     private TokenProvider jwtTokenUtil;
 
-    public ResponseEntity<?> authenticate(UserDto userDto){
+    /**
+     * Authenticate method.
+     * @param userDto User object which we need to check and authenticate.
+     * @return ResponseEntity Response, which contains message and HTTP code.
+     */
+    public ResponseEntity authenticate(UserDto userDto){
         final Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         userDto.getUsername(),

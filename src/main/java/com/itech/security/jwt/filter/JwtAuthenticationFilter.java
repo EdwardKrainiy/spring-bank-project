@@ -1,10 +1,12 @@
 package com.itech.security.jwt.filter;
 
 import com.itech.security.jwt.provider.TokenProvider;
+import com.itech.utils.exception.UserNotFoundException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,6 +19,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+
+/**
+ * JwtAuthenticationFilter class. Provides us filtering our token in HTTP request and authenticating user, which was coded in transferred token.
+ * @autor Edvard Krainiy on ${date}
+ * @version 1.0
+ */
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -35,24 +43,44 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private TokenProvider jwtTokenUtil;
 
+    /**
+     * JwtFilter method.
+     * @param req HTTP request, which contains our token.
+     * @param res HTTP response, which will contain authorized user.
+     * @param chain Contains list of filters, which will be applied.
+     * @throws IllegalArgumentException If token wasn't fetched because of incorrect key.
+     * @throws ExpiredJwtException If token is expired.
+     * @throws SignatureException If username or password is not valid.
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
+
         String header = req.getHeader(HEADER_STRING);
         String username = null;
         String authToken = null;
+
         if (header != null && header.startsWith(TOKEN_PREFIX)) {
-            authToken = header.replace(TOKEN_PREFIX,"");
+
+            authToken = header.replace(TOKEN_PREFIX, "");
+
             try {
                 username = jwtTokenUtil.getUsernameFromToken(authToken, SIGN_KEY);
+
             } catch (IllegalArgumentException e) {
                 logger.error("An error occurred while fetching Username from Token", e);
+                ResponseEntity.status(401).body("Token is not valid!");
+
             } catch (ExpiredJwtException e) {
                 logger.warn("The token has expired", e);
-            } catch(SignatureException e){
+                ResponseEntity.status(401).body("Token is expired!");
+
+            } catch (SignatureException e) {
                 logger.error("Authentication Failed. Username or Password not valid.");
+                ResponseEntity.status(401).body("Username or Password not valid!");
             }
         } else {
             logger.warn("Couldn't find bearer string, header will be ignored");
+
         }
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
@@ -66,7 +94,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         chain.doFilter(req, res);
+        ResponseEntity.ok("Successfully signing-in!");
     }
-
-
 }

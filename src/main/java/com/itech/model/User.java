@@ -1,9 +1,22 @@
 package com.itech.model;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
+
+/**
+ * Basic user class.
+ * @autor Edvard Krainiy on ${date}
+ * @version 1.0
+ */
 
 @Entity
 @Table(name="users")
+@Getter
+@Setter
+@NoArgsConstructor
 public class User {
 
     @Id
@@ -35,61 +48,6 @@ public class User {
         this.password = password;
         this.email = email;
         this.role = role;
-    }
-
-    public User() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getConfirmation_token() {
-        return confirmation_token;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setConfirmation_token(String confirmation_token) {
-        this.confirmation_token = confirmation_token;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
-    public boolean isActivated() {
-        return activated;
-    }
-
-    public void setActivated(boolean activated) {
-        this.activated = activated;
     }
 }
 

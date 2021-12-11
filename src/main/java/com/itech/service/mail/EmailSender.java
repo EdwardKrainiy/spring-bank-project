@@ -7,6 +7,12 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.Properties;
 
+/**
+ * EmailSender class. Configures JavaMailSender for sending messages.
+ * @autor Edvard Krainiy on ${date}
+ * @version 1.0
+ */
+
 public class EmailSender {
     @Value("${spring.mail.host}")
     private String hostAddress;
@@ -20,6 +26,10 @@ public class EmailSender {
     @Value("${spring.mail.password}")
     private String password;
 
+    /**
+     * getJavaMailSender method.
+     * @return Returns us configured javaMailSender bean.
+     */
     @Bean
     public JavaMailSender getJavaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
