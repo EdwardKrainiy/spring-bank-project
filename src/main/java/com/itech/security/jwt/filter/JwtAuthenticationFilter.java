@@ -1,7 +1,6 @@
 package com.itech.security.jwt.filter;
 
 import com.itech.security.jwt.provider.TokenProvider;
-import com.itech.utils.exception.UserNotFoundException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
 import org.springframework.beans.factory.annotation.Autowired;

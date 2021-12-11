@@ -1,6 +1,5 @@
 package com.itech.security.jwt.provider;
 
-import com.itech.utils.exception.UserNotFoundException;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
