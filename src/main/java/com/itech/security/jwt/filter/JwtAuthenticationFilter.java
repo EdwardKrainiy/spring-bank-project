@@ -76,6 +76,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         chain.doFilter(req, res);
-        ResponseEntity.ok("Successfully signing-in!");
     }
 }
