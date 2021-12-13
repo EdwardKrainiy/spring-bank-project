@@ -61,25 +61,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             authToken = header.replace(TOKEN_PREFIX, "");
 
-            try {
-                username = jwtTokenUtil.getUsernameFromToken(authToken, SIGN_KEY);
-
-            } catch (IllegalArgumentException e) {
-                logger.error("An error occurred while fetching Username from Token", e);
-                ResponseEntity.status(401).body("Token is not valid!");
-
-            } catch (ExpiredJwtException e) {
-                logger.warn("The token has expired", e);
-                ResponseEntity.status(401).body("Token is expired!");
-
-            } catch (SignatureException e) {
-                logger.error("Authentication Failed. Username or Password not valid.");
-                ResponseEntity.status(401).body("Username or Password not valid!");
-            }
-        } else {
-            logger.warn("Couldn't find bearer string, header will be ignored");
-
+            username = jwtTokenUtil.getUsernameFromToken(authToken, SIGN_KEY);
         }
+
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
             UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);

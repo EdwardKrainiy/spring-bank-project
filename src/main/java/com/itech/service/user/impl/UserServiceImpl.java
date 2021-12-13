@@ -78,14 +78,9 @@ public class UserServiceImpl implements UserService{
 
         String confirmationToken = tokenProvider.generateConfirmToken(createdUserId);
 
-        try {
-            emailService.sendEmail(userRepository.getUserByRole(Role.MANAGER).orElseThrow(() -> new UserNotFoundException(Role.MANAGER)).getEmail(),
-                    "Confirm email for user " + mappedUser.getUsername(),
-                    "This user is signing up. Confirm his email and activate the account following this link: " + "http://localhost:8080/api/auth/email-confirmation?token=" + confirmationToken);
-
-        } catch (UserNotFoundException exception){
-            exception.printStackTrace();
-        }
+        emailService.sendEmail(userRepository.getUserByRole(Role.MANAGER).orElseThrow(() -> new UserNotFoundException(Role.MANAGER)).getEmail(),
+                "Confirm email for user " + mappedUser.getUsername(),
+                "This user is signing up. Confirm his email and activate the account following this link: " + "http://localhost:8080/api/auth/email-confirmation?token=" + confirmationToken);
 
         return ResponseEntity.ok("Successful sign-up!");
     }
@@ -97,12 +92,8 @@ public class UserServiceImpl implements UserService{
      */
     @Override
     public User findUserByUsername(String username){
-        User user = null;
-        try{
-            user = userRepository.getUserByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
-        }catch (UserNotFoundException exception){
-            exception.printStackTrace();
-        }
+
+       User user = userRepository.getUserByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
        return user;
     }
 
@@ -114,21 +105,14 @@ public class UserServiceImpl implements UserService{
      */
     @Override
     public User findUserByUsernameAndPassword(String username, String password){
-        User foundUser = null;
-        try{
-            foundUser = userRepository.getUserByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
 
-            if(foundUser.getPassword().equals(password)){
-                return foundUser;
-            }
+        User foundUser = userRepository.getUserByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
 
-            else throw new IncorrectPasswordException(username);
-
-        } catch (UserNotFoundException | IncorrectPasswordException exception){
-            exception.printStackTrace();
+        if(foundUser.getPassword().equals(password)){
+            return foundUser;
         }
 
-        return foundUser;
+        else throw new IncorrectPasswordException(username);
     }
 
     /**
@@ -139,29 +123,9 @@ public class UserServiceImpl implements UserService{
     @Transactional
     @Override
     public ResponseEntity<String> activateUser(String token){
-        Long userId = null;
+        Long userId = jwtDecoder.getIdFromConfirmToken(token);
 
-        try{
-            userId = jwtDecoder.getIdFromConfirmToken(token);
-        } catch (ExpiredTokenException exception){
-            exception.getMessage();
-        }
-
-        if(userId == null){
-            return ResponseEntity.badRequest().body("Incorrect user id!");
-        }
-
-        else{
-            try{
-                User foundUser = userRepository.getUserById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-                foundUser.setActivated(true);
-                userRepository.save(foundUser);
-            }
-            catch (UserNotFoundException exception){
-                exception.getMessage();
-            }
-            emailService.sendEmail(userRepository.getById(userId).getEmail(), "Email confirmed", "Your email was confirmed successfully!");
-            return ResponseEntity.ok("User successfully activated!");
-        }
+        emailService.sendEmail(userRepository.getById(userId).getEmail(), "Email confirmed", "Your email was confirmed successfully!");
+        return ResponseEntity.ok("User successfully activated!");
     }
 }

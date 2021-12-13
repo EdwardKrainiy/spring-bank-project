@@ -1,11 +1,9 @@
 package com.itech.utils;
 
-import com.itech.security.jwt.provider.TokenProvider;
-import com.itech.utils.exception.ExpiredTokenException;
-import com.itech.utils.exception.UserValidationException;
+import com.itech.utils.exception.UserIdNotFoundException;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -19,23 +17,22 @@ public class JwtDecoder {
     @Value("${jwt.confirmation.key}")
     private String CONFIRMATION_KEY;
 
-    @Autowired
-    private TokenProvider tokenProvider;
-
     /**
      * getIdFromConfirmToken method. Gets id from transferred token.
      * @param token Transferred token of the user, whose id we need to obtain.
      * @return Long Obtained Id of User from token.
-     * @throws ExpiredTokenException If token was expired.
+     * @throws ExpiredJwtException If token was expired.
      */
-    public Long getIdFromConfirmToken(String token) throws ExpiredTokenException {
+    public Long getIdFromConfirmToken(String token) throws ExpiredJwtException {
 
         Claims confirmationClaims = Jwts.parser().setSigningKey(CONFIRMATION_KEY).parseClaimsJws(token).getBody();
 
-        if(tokenProvider.isTokenExpired(token, CONFIRMATION_KEY)){
-            throw new ExpiredTokenException();
+        Long userId = Long.parseLong(confirmationClaims.getSubject());
+
+        if(userId == null){
+            throw new UserIdNotFoundException("Id not found!");
         }
 
-        return Long.parseLong(confirmationClaims.getSubject());
+        return userId;
     }
 }
