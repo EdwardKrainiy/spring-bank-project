@@ -18,7 +18,7 @@ public class EmailServiceImpl implements EmailService {
     private JavaMailSender emailSender;
 
     /**
-     * sendSimpleEmail method.
+     * sendEmail method.
      * @param toAddress Adress we want to send the message.
      * @param subject Message subject.
      * @param message Text of the message.
