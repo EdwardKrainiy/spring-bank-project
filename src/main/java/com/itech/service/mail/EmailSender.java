@@ -9,8 +9,7 @@ import java.util.Properties;
 
 /**
  * EmailSender class. Configures JavaMailSender for sending messages.
- * @author Edvard Krainiy on ${date}
- * @version 1.0
+ * @author Edvard Krainiy on 12/9/2021
  */
 
 public class EmailSender {

@@ -8,8 +8,7 @@ import javax.persistence.*;
 
 /**
  * Basic user class.
- * @author Edvard Krainiy on ${date}
- * @version 1.0
+ * @author Edvard Krainiy on 12/3/2021
  */
 
 @Entity

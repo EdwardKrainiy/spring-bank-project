@@ -5,13 +5,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
- * ExpiredTokenException class.
- * @author Edvard Krainiy on 12/12/2021
+ * @author Edvard Krainiy on 12/13/2021
  */
 
 @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-public class ExpiredTokenException extends RuntimeException{
-    public ExpiredTokenException(){
-        super("This token is expired!");
+public class UserValidationException extends RuntimeException{
+    public UserValidationException(String message){
+        super(message);
     }
 }

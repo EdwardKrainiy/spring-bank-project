@@ -10,8 +10,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * CustomUserDetailsService class for authentication.
- * @author Edvard Krainiy on ${date}
- * @version 1.0
+ * @author Edvard Krainiy on 12/10/2021
  */
 
 @Service

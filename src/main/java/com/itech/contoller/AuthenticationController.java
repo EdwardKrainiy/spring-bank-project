@@ -11,8 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * Authentication controller with sign-in, sign-up and email-confirmation endpoints.
- * @author Edvard Krainiy on ${date}
- * @version 1.0
+ * @author Edvard Krainiy on 12/3/2021
  */
 
 @RestController
@@ -31,7 +30,7 @@ public class AuthenticationController {
      * @return ResponseEntity Response, which contains message and HTTP code.
      */
     @PostMapping("/sign-in")
-    public ResponseEntity signIn (@RequestBody UserDto userDto) throws AuthenticationException {
+    public ResponseEntity<String> signIn (@RequestBody UserDto userDto) throws AuthenticationException {
         return jwtAuthenticationByUserDetails.authenticate(userDto);
     }
 
@@ -41,13 +40,13 @@ public class AuthenticationController {
      * @return ResponseEntity Response, which contains message and HTTP code.
      */
     @PostMapping("/sign-up")
-    public ResponseEntity signUp(@RequestBody UserDto userDto){
-        ResponseEntity entity;
+    public ResponseEntity<String> signUp(@RequestBody UserDto userDto){
+        ResponseEntity<String> entity;
         try {
             entity = userService.createUser(userDto);
-        } catch (EmptyUsernameException | UserNotFoundException | EmptyPasswordException | EmptyEmailException | InvalidEmailException | UserExistsException | IncorrectPasswordLengthException e) {
-            e.printStackTrace();
-            entity = ResponseEntity.badRequest().body(e.getMessage());
+        } catch ( UserNotFoundException | UserValidationException | UserExistsException exception) {
+            exception.printStackTrace();
+            entity = ResponseEntity.badRequest().body(exception.getMessage());
         }
         return entity;
     }
@@ -58,7 +57,7 @@ public class AuthenticationController {
      * @return ResponseEntity Response, which contains message and HTTP code.
      */
     @GetMapping("/email-confirmation")
-        public ResponseEntity emailConfirmation(@RequestParam("token") String token){
+        public ResponseEntity<String> emailConfirmation(@RequestParam("token") String token){
         return userService.activateUser(token);
     }
 }

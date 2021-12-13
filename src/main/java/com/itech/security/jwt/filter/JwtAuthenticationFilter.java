@@ -21,8 +21,7 @@ import java.io.IOException;
 
 /**
  * JwtAuthenticationFilter class. Provides us filtering our token in HTTP request and authenticating user, which was coded in transferred token.
- * @author Edvard Krainiy on ${date}
- * @version 1.0
+ * @author Edvard Krainiy on 12/10/2021
  */
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {

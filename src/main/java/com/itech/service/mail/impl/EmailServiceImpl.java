@@ -8,8 +8,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * Implementation of EmailService interface. Provides us sending messages method.
- * @author Edvard Krainiy on ${date}
- * @version 1.0
+ * @author Edvard Krainiy on 12/9/2021
  */
 
 @Service
@@ -25,7 +24,7 @@ public class EmailServiceImpl implements EmailService {
      * @param message Text of the message.
      */
     @Override
-    public void sendSimpleEmail(String toAddress, String subject, String message){
+    public void sendEmail(String toAddress, String subject, String message){
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setTo(toAddress);
         simpleMailMessage.setSubject(subject);

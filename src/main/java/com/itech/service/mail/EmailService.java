@@ -2,10 +2,9 @@ package com.itech.service.mail;
 
 /**
  * EmailSender interface. Provides us different methods to work with MailSender.
- * @author Edvard Krainiy on ${date}
- * @version 1.0
+ * @author Edvard Krainiy on 12/10/2021
  */
 
 public interface EmailService {
-    void sendSimpleEmail(String toAddress, String subject, String message);
+    void sendEmail(String toAddress, String subject, String message);
 }

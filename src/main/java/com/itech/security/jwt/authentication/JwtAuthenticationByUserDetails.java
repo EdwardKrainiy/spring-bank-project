@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * JwtAuthentication class.
- * @author Edvard Krainiy on ${date}
+ * @author Edvard Krainiy on 12/10/2021
  * @version 1.0
  */
 
@@ -30,7 +30,7 @@ public class JwtAuthenticationByUserDetails {
      * @param userDto User object which we need to check and authenticate.
      * @return ResponseEntity Response, which contains message and HTTP code.
      */
-    public ResponseEntity authenticate(UserDto userDto){
+    public ResponseEntity<String> authenticate(UserDto userDto){
         final Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         userDto.getUsername(),

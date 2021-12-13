@@ -1,28 +1,19 @@
 package com.itech.model.dto;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 /**
  * User data-transfer object to manipulate with DB.
- * @author Edvard Krainiy on ${date}
- * @version 1.0
+ * @author Edvard Krainiy on 12/8/2021
  */
 
 @Data
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class UserDto {
     private String username;
     private String password;
     private String email;
-
-    public UserDto(String username, String password, String email) {
-        this.username = username;
-        this.password = password;
-        this.email = email;
-    }
 }

@@ -7,16 +7,15 @@ import org.springframework.http.ResponseEntity;
 
 /**
  * UserService interface. Provides us different methods to work with User objects on Service layer.
- * @author Edvard Krainiy on ${date}
- * @version 1.0
+ * @author Edvard Krainiy on 12/7/2021
  */
 
 public interface UserService {
-    ResponseEntity createUser(UserDto userDto) throws EmptyUsernameException, UserNotFoundException, EmptyPasswordException, EmptyEmailException, InvalidEmailException, UserExistsException, IncorrectPasswordLengthException;
+    ResponseEntity<String> createUser(UserDto userDto) throws UserNotFoundException, UserExistsException, UserValidationException;
 
     User findUserByUsername(String username) throws UserNotFoundException;
 
     User findUserByUsernameAndPassword(String username, String password) throws UserNotFoundException;
 
-    ResponseEntity activateUser(String token);
+    ResponseEntity<String> activateUser(String token);
 }
