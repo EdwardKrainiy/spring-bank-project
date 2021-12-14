@@ -12,14 +12,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(value = HttpStatus.NOT_FOUND)
 public class UserNotFoundException extends RuntimeException{
     public UserNotFoundException(String username){
-        super("User with username = " + username + " not found!");
+        super(String.format("User with username = %s not found!", username));
     }
 
     public UserNotFoundException(Long userId){
-        super("User with id = " + userId + " not found!");
+        super(String.format("User with id = %d not found!", userId));
     }
 
     public UserNotFoundException(Role role){
-        super("User with role = " + role + " not found!");
+        super(String.format("User with role = %s not found!", role));
     }
 }

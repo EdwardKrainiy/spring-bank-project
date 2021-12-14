@@ -11,6 +11,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(value = HttpStatus.BAD_REQUEST)
 public class IncorrectPasswordException extends RuntimeException{
     public IncorrectPasswordException(String username){
-        super("Incorrect password for user " + username + "!");
+        super(String.format("Incorrect password for username = %s!", username));
     }
 }

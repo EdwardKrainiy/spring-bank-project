@@ -20,49 +20,49 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = {IllegalArgumentException.class})
-    protected ResponseEntity<Object> handleIllegalArgumentException(RuntimeException ex) {
+    protected ResponseEntity<ApiError> handleIllegalArgumentException(RuntimeException ex) {
         ApiError exceptionError = new ApiError("An error occurred while fetching Username from Token", ex.getMessage());
         return new ResponseEntity<>(exceptionError, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(value = {ExpiredJwtException.class})
-    protected ResponseEntity<Object> handleExpiredJwtException(RuntimeException ex) {
+    protected ResponseEntity<ApiError> handleExpiredJwtException(RuntimeException ex) {
         ApiError exceptionError = new ApiError("The token has expired!", ex.getMessage());
         return new ResponseEntity<>(exceptionError, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(value = {SignatureException.class})
-    protected ResponseEntity<Object> handleSignatureException(RuntimeException ex){
+    protected ResponseEntity<ApiError> handleSignatureException(RuntimeException ex){
         ApiError exceptionError = new ApiError("Authentication Failed. Username or Password is not valid.", ex.getMessage());
         return new ResponseEntity<>(exceptionError, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(value = {UserNotFoundException.class})
-    protected ResponseEntity<Object> handleUserNotFoundException(RuntimeException ex){
+    protected ResponseEntity<ApiError> handleUserNotFoundException(RuntimeException ex){
         ApiError exceptionError = new ApiError(ex.getMessage());
         return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = {UserValidationException.class})
-    protected ResponseEntity<Object> handleUserValidationException(RuntimeException ex){
+    protected ResponseEntity<ApiError> handleUserValidationException(RuntimeException ex){
         ApiError exceptionError = new ApiError(ex.getMessage());
         return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = {UserExistsException.class})
-    protected ResponseEntity<Object> handleUserExistsException(RuntimeException ex){
+    protected ResponseEntity<ApiError> handleUserExistsException(RuntimeException ex){
         ApiError exceptionError = new ApiError(ex.getMessage());
         return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = {IncorrectPasswordException.class})
-    protected ResponseEntity<Object> handleIncorrectPasswordException(RuntimeException ex){
+    protected ResponseEntity<ApiError> handleIncorrectPasswordException(RuntimeException ex){
         ApiError exceptionError = new ApiError(ex.getMessage());
         return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = {NullPointerException.class})
-    protected ResponseEntity<Object> handleNullPointerException(RuntimeException ex){
+    protected ResponseEntity<ApiError> handleNullPointerException(RuntimeException ex){
         ApiError exceptionError = new ApiError(ex.getMessage());
         return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
     }

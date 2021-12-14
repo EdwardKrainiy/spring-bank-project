@@ -41,14 +41,8 @@ public class AuthenticationController {
      */
     @PostMapping("/sign-up")
     public ResponseEntity<String> signUp(@RequestBody UserDto userDto){
-        ResponseEntity<String> entity;
-        try {
-            entity = userService.createUser(userDto);
-        } catch ( UserNotFoundException | UserValidationException | UserExistsException exception) {
-            exception.printStackTrace();
-            entity = ResponseEntity.badRequest().body(exception.getMessage());
-        }
-        return entity;
+
+        return userService.createUser(userDto);
     }
 
     /**

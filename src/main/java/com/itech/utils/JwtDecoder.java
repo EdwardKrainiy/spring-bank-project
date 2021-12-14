@@ -7,6 +7,8 @@ import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 /**
  * JwtDecoder class, which contains methods to decode the JWT and obtain claims we need.
  * @author Edvard Krainiy on 12/11/2021
@@ -27,12 +29,8 @@ public class JwtDecoder {
 
         Claims confirmationClaims = Jwts.parser().setSigningKey(CONFIRMATION_KEY).parseClaimsJws(token).getBody();
 
-        Long userId = Long.parseLong(confirmationClaims.getSubject());
+        Optional<Long> userId = Optional.of(Long.parseLong(confirmationClaims.getSubject()));
 
-        if(userId == null){
-            throw new UserIdNotFoundException("Id not found!");
-        }
-
-        return userId;
+        return userId.orElseThrow(() ->  new UserIdNotFoundException("Id not found!"));
     }
 }
