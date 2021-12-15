@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
  */
 
 public interface UserService {
-    ResponseEntity<String> createUser(UserDto userDto) throws UserNotFoundException, UserExistsException, UserValidationException;
+    ResponseEntity.BodyBuilder createUser(UserDto userDto) throws UserNotFoundException, UserExistsException, UserValidationException;
 
     User findUserByUsername(String username) throws UserNotFoundException;
 

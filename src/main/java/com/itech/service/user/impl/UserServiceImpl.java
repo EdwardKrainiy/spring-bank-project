@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService{
      * @throws UserExistsException if user already exists.
      */
     @Override
-    public ResponseEntity<String> createUser(UserDto userDto) throws UserValidationException, UserNotFoundException, UserExistsException {
+    public ResponseEntity.BodyBuilder createUser(UserDto userDto) throws UserValidationException, UserNotFoundException, UserExistsException {
 
         User mappedUser = dtoMapper.toEntity(userDto);
 
@@ -82,7 +82,7 @@ public class UserServiceImpl implements UserService{
                 "Confirm email for user " + mappedUser.getUsername(),
                 "This user is signing up. Confirm his email and activate the account following this link: " + "http://localhost:8080/api/auth/email-confirmation?token=" + confirmationToken);
 
-        return ResponseEntity.ok("Successful sign-up!");
+        return ResponseEntity.status(201);
     }
 
     /**

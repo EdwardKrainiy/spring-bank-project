@@ -19,7 +19,7 @@ public class EmailServiceImpl implements EmailService {
 
     /**
      * sendEmail method.
-     * @param toAddress Adress we want to send the message.
+     * @param toAddress Address we want to send the message.
      * @param subject Message subject.
      * @param message Text of the message.
      */

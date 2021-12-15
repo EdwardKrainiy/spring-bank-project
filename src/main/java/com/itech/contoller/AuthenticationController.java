@@ -3,7 +3,6 @@ package com.itech.contoller;
 import com.itech.model.dto.UserDto;
 import com.itech.security.jwt.authentication.JwtAuthenticationByUserDetails;
 import com.itech.service.user.UserService;
-import com.itech.utils.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
@@ -40,8 +39,7 @@ public class AuthenticationController {
      * @return ResponseEntity Response, which contains message and HTTP code.
      */
     @PostMapping("/sign-up")
-    public ResponseEntity<String> signUp(@RequestBody UserDto userDto){
-
+    public ResponseEntity.BodyBuilder signUp(@RequestBody UserDto userDto){
         return userService.createUser(userDto);
     }
 

@@ -31,6 +31,6 @@ public class JwtDecoder {
 
         Optional<Long> userId = Optional.of(Long.parseLong(confirmationClaims.getSubject()));
 
-        return userId.orElseThrow(() ->  new UserIdNotFoundException("Id not found!"));
+        return userId.orElseThrow(() ->  new UserIdNotFoundException(String.format("User with id = %d not found!", userId)));
     }
 }
