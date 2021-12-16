@@ -1,0 +1,14 @@
+version: '3'
+services:
+  lab-db:
+    image: "postgres" # use latest official postgres version
+    container_name: postgres-lab-db
+    environment:
+      POSTGRES_PASSWORD: root
+      POSTGRES_USER: postgres
+    volumes:
+      - database-data:/var/lib/postgresql/data/
+    ports:
+      - '5432:5432'
+volumes:
+  database-data:
