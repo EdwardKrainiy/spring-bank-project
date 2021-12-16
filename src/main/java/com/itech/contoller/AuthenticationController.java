@@ -4,6 +4,7 @@ import com.itech.model.dto.UserDto;
 import com.itech.security.jwt.authentication.JwtAuthenticationByUserDetails;
 import com.itech.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +40,7 @@ public class AuthenticationController {
      * @return ResponseEntity Response, which contains message and HTTP code.
      */
     @PostMapping("/sign-up")
-    public ResponseEntity.BodyBuilder signUp(@RequestBody UserDto userDto){
+    public ResponseEntity<Void> signUp(@RequestBody UserDto userDto){
         return userService.createUser(userDto);
     }
 
@@ -49,7 +50,7 @@ public class AuthenticationController {
      * @return ResponseEntity Response, which contains message and HTTP code.
      */
     @GetMapping("/email-confirmation")
-        public ResponseEntity<String> emailConfirmation(@RequestParam("token") String token){
+        public ResponseEntity<Void> emailConfirmation(@RequestParam("token") String token){
         return userService.activateUser(token);
     }
 }

@@ -11,11 +11,11 @@ import org.springframework.http.ResponseEntity;
  */
 
 public interface UserService {
-    ResponseEntity.BodyBuilder createUser(UserDto userDto) throws UserNotFoundException, UserExistsException, UserValidationException;
+    ResponseEntity<Void> createUser(UserDto userDto) throws UserNotFoundException, UserExistsException, UserValidationException;
 
     User findUserByUsername(String username) throws UserNotFoundException;
 
     User findUserByUsernameAndPassword(String username, String password) throws UserNotFoundException;
 
-    ResponseEntity<String> activateUser(String token);
+    ResponseEntity<Void> activateUser(String token);
 }

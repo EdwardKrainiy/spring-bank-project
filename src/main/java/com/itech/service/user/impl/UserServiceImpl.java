@@ -11,6 +11,7 @@ import com.itech.service.user.UserService;
 import com.itech.utils.DtoMapper;
 import com.itech.utils.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -52,7 +53,7 @@ public class UserServiceImpl implements UserService{
      * @throws UserExistsException if user already exists.
      */
     @Override
-    public ResponseEntity.BodyBuilder createUser(UserDto userDto) throws UserValidationException, UserNotFoundException, UserExistsException {
+    public ResponseEntity<Void> createUser(UserDto userDto) throws UserValidationException, UserNotFoundException, UserExistsException {
 
         User mappedUser = dtoMapper.toEntity(userDto);
 
@@ -82,7 +83,7 @@ public class UserServiceImpl implements UserService{
                 "Confirm email for user " + mappedUser.getUsername(),
                 "This user is signing up. Confirm his email and activate the account following this link: " + "http://localhost:8080/api/auth/email-confirmation?token=" + confirmationToken);
 
-        return ResponseEntity.status(201);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /**
@@ -122,10 +123,10 @@ public class UserServiceImpl implements UserService{
      */
     @Transactional
     @Override
-    public ResponseEntity<String> activateUser(String token){
+    public ResponseEntity<Void> activateUser(String token){
         Long userId = jwtDecoder.getIdFromConfirmToken(token);
 
         emailService.sendEmail(userRepository.getById(userId).getEmail(), "Email confirmed", "Your email was confirmed successfully!");
-        return ResponseEntity.ok("User successfully activated!");
+        return ResponseEntity.ok().build();
     }
 }
