@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 /**
- * JPA repository class.
+ * JPA User repository  class.
  * @author Edvard Krainiy on 12/8/2021
  */
 

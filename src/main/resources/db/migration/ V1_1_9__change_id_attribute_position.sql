@@ -1,1 +1,0 @@
-ALTER TABLE users MODIFY COLUMN activated boolean after role
