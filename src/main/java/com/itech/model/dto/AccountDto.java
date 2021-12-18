@@ -4,8 +4,10 @@ import lombok.*;
 
 /**
  * Account data-transfer object to manipulate with DB.
+ *
  * @author Edvard Krainiy on 12/18/2021
  */
+
 @Data
 @Getter
 @Setter

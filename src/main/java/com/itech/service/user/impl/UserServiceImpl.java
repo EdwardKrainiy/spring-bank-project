@@ -1,13 +1,13 @@
 package com.itech.service.user.impl;
 
 import com.itech.model.Role;
-import com.itech.model.User;
+import com.itech.model.entity.User;
 import com.itech.model.dto.UserDto;
 import com.itech.repository.UserRepository;
 import com.itech.security.jwt.provider.TokenProvider;
 import com.itech.service.mail.EmailService;
 import com.itech.service.user.UserService;
-import com.itech.utils.DtoMapper;
+import com.itech.utils.mapper.UserDtoMapper;
 import com.itech.utils.JwtDecoder;
 import com.itech.utils.exception.user.IncorrectPasswordException;
 import com.itech.utils.exception.user.UserExistsException;
@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
     private JwtDecoder jwtDecoder;
 
     @Autowired
-    private DtoMapper dtoMapper;
+    private UserDtoMapper userDtoMapper;
 
     /**
      * createUser method. Saves our user on DB.
@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<Void> createUser(UserDto userDto) throws UserValidationException, UserNotFoundException, UserExistsException {
 
-        User mappedUser = dtoMapper.toEntity(userDto);
+        User mappedUser = userDtoMapper.toEntity(userDto);
 
         if (mappedUser.getUsername() == null) throw new UserValidationException("Missing username!");
 

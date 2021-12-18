@@ -1,6 +1,6 @@
 package com.itech.contoller;
 
-import com.itech.model.Account;
+import com.itech.model.entity.Account;
 import com.itech.model.dto.AccountDto;
 import com.itech.service.account.impl.AccountServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;

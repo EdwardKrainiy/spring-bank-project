@@ -1,6 +1,6 @@
 package com.itech.service.user;
 
-import com.itech.model.User;
+import com.itech.model.entity.User;
 import com.itech.model.dto.UserDto;
 import com.itech.utils.exception.user.UserExistsException;
 import com.itech.utils.exception.user.UserNotFoundException;

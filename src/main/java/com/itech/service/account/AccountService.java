@@ -1,6 +1,6 @@
 package com.itech.service.account;
 
-import com.itech.model.Account;
+import com.itech.model.entity.Account;
 import com.itech.model.dto.AccountDto;
 
 import java.util.List;

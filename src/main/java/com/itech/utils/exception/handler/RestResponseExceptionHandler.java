@@ -1,12 +1,16 @@
 package com.itech.utils.exception.handler;
 
 import com.itech.utils.exception.account.AccountNotFoundException;
+import com.itech.utils.exception.account.AccountValidationException;
 import com.itech.utils.exception.user.IncorrectPasswordException;
 import com.itech.utils.exception.user.UserExistsException;
 import com.itech.utils.exception.user.UserNotFoundException;
 import com.itech.utils.exception.user.UserValidationException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
+import org.iban4j.IbanFormatException;
+import org.iban4j.InvalidCheckDigitException;
+import org.iban4j.UnsupportedCountryException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -73,5 +77,17 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     protected ResponseEntity<ApiError> handleAccountNotFoundException(RuntimeException ex) {
         ApiError exceptionError = new ApiError(ex.getMessage());
         return new ResponseEntity<>(exceptionError, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(value = {AccountValidationException.class})
+    protected ResponseEntity<ApiError> handleAccountValidationException(RuntimeException ex) {
+        ApiError exceptionError = new ApiError(ex.getMessage());
+        return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = {IbanFormatException.class, InvalidCheckDigitException.class, UnsupportedCountryException.class})
+    protected ResponseEntity<ApiError> handleIbanExceptions(RuntimeException ex) {
+        ApiError exceptionError = new ApiError(ex.getMessage());
+        return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
     }
 }

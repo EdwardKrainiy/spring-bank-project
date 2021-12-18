@@ -30,7 +30,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) {
 
-        com.itech.model.User user = userRepository.getUserByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
+        com.itech.model.entity.User user = userRepository.getUserByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
         UserDetails userDetails = User.withUsername(user.getUsername()).password(user.getPassword()).authorities(user.getRole().name()).build();
 
         return userDetails;

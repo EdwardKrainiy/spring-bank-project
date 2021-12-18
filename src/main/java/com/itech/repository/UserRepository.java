@@ -1,7 +1,7 @@
 package com.itech.repository;
 
 import com.itech.model.Role;
-import com.itech.model.User;
+import com.itech.model.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

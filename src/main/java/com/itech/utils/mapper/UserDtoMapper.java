@@ -1,19 +1,17 @@
-package com.itech.utils;
+package com.itech.utils.mapper;
 
-import com.itech.model.Account;
-import com.itech.model.User;
-import com.itech.model.dto.AccountDto;
+import com.itech.model.entity.User;
 import com.itech.model.dto.UserDto;
 import org.mapstruct.Mapper;
 
 /**
  * DtoMapper interface, which contains methods to transform User and UserDto both ways.
  *
- * @author Edvard Krainiy on 12/9/2021
+ * @author Edvard Krainiy on 12/18/2021
  */
 
 @Mapper(componentModel = "spring")
-public interface DtoMapper {
+public interface UserDtoMapper {
 
     /**
      * UserToUserDto method. Converts User object to UserDto.

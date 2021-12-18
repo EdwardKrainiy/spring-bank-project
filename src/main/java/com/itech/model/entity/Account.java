@@ -1,5 +1,6 @@
-package com.itech.model;
+package com.itech.model.entity;
 
+import com.itech.model.Currency;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
