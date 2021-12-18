@@ -2,11 +2,14 @@ package com.itech.service.user;
 
 import com.itech.model.User;
 import com.itech.model.dto.UserDto;
-import com.itech.utils.exception.*;
+import com.itech.utils.exception.user.UserExistsException;
+import com.itech.utils.exception.user.UserNotFoundException;
+import com.itech.utils.exception.user.UserValidationException;
 import org.springframework.http.ResponseEntity;
 
 /**
  * UserService interface. Provides us different methods to work with User objects on Service layer.
+ *
  * @author Edvard Krainiy on 12/7/2021
  */
 

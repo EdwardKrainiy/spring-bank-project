@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 /**
  * Security configuration class.
+ *
  * @author Edvard Krainiy on 12/6/2021
  */
 
@@ -36,6 +37,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/api/auth/sign-in").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/auth/sign-up").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/auth/email-confirmation").hasAuthority(Role.MANAGER.name())
+                .antMatchers(HttpMethod.GET, "/api/accounts/**").hasAnyAuthority(Role.MANAGER.name(), Role.USER.name())
                 .antMatchers(HttpMethod.GET, "/swagger-ui.html").hasAuthority(Role.MANAGER.name())
                 .anyRequest()
                 .authenticated()
@@ -52,12 +54,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    protected PasswordEncoder encoder(){
+    protected PasswordEncoder encoder() {
         return new BCryptPasswordEncoder(12);
     }
 
     /**
      * Returns authenticationManagerBean() and adds this one to Application context.
+     *
      * @return authenticationManagerBean
      */
     @Override
@@ -68,10 +71,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     /**
      * Returns authenticationTokenFilterBean() and adds this one to Application context.
+     *
      * @return JwtAuthenticationFilterBean
      */
     @Bean
-    public JwtAuthenticationFilter authenticationTokenFilterBean(){
+    public JwtAuthenticationFilter authenticationTokenFilterBean() {
         return new JwtAuthenticationFilter();
     }
 }

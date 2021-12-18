@@ -1,6 +1,6 @@
 package com.itech.utils;
 
-import com.itech.utils.exception.UserIdNotFoundException;
+import com.itech.utils.exception.user.UserIdNotFoundException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -11,6 +11,7 @@ import java.util.Optional;
 
 /**
  * JwtDecoder class, which contains methods to decode the JWT and obtain claims we need.
+ *
  * @author Edvard Krainiy on 12/11/2021
  */
 
@@ -21,6 +22,7 @@ public class JwtDecoder {
 
     /**
      * getIdFromConfirmToken method. Gets id from transferred token.
+     *
      * @param token Transferred token of the user, whose id we need to obtain.
      * @return Long Obtained Id of User from token.
      * @throws ExpiredJwtException If token was expired.
@@ -31,6 +33,6 @@ public class JwtDecoder {
 
         Optional<Long> userId = Optional.of(Long.parseLong(confirmationClaims.getSubject()));
 
-        return userId.orElseThrow(() ->  new UserIdNotFoundException(String.format("User with id = %d not found!", userId)));
+        return userId.orElseThrow(() -> new UserIdNotFoundException(String.format("User with id = %d not found!", userId)));
     }
 }

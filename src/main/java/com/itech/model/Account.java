@@ -4,18 +4,17 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
 /**
  * Basic Account class.
+ *
  * @author Edvard Krainiy on 12/16/2021
  */
 
 @Entity
-@Table(name="accounts")
+@Table(name = "accounts")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -27,8 +26,9 @@ public class Account {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "user_id")
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Column(name = "amount")
     private double amount;
@@ -39,8 +39,4 @@ public class Account {
 
     @Column(name = "account_number")
     private String accountNumber;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id", nullable = false, insertable = false, updatable = false)
-    private User userOfAccount;
 }

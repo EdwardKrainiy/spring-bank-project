@@ -9,11 +9,12 @@ import java.util.Set;
 
 /**
  * Basic user class.
+ *
  * @author Edvard Krainiy on 12/3/2021
  */
 
 @Entity
-@Table(name="users")
+@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -36,14 +37,14 @@ public class User {
     @Column(name = "confirmation_token")
     private String confirmation_token;
 
-    @Column(name="role")
+    @Column(name = "role")
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Column(name="activated")
+    @Column(name = "activated")
     private boolean activated;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "userOfAccount")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private Set<Account> accounts;
 
     public User(String username, String password, String email, Role role) {
