@@ -33,7 +33,7 @@ public class User {
     private String email;
 
     @Column(name = "confirmation_token")
-    private String confirmation_token;
+    private String confirmationToken;
 
     @Column(name="role")
     @Enumerated(EnumType.STRING)
@@ -47,6 +47,14 @@ public class User {
         this.password = password;
         this.email = email;
         this.role = role;
+    }
+
+    public User(String username, String password, String email, Role role, String confirmationToken) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.role = role;
+        this.confirmationToken = confirmationToken;
     }
 }
 

@@ -11,4 +11,4 @@ CREATE TABLE users (
 
 ALTER TABLE users ADD CONSTRAINT unique_username UNIQUE (username);
 
-INSERT INTO users (username, password, email, role, activated) VALUEs ('Edvard Krainiy', 'managerpassword', 'ekrayniy@inbox.ru', 'MANAGER', true);
+INSERT INTO users (username, password, email, role, activated) VALUEs ('Edvard Krainiy', '$2a$12$U3BKK3oQef1QaXZ7IUpZx.FX1W/3xLxK.9wFpKHVMshpm8nEUEBUK', 'ekrayniy@inbox.ru', 'MANAGER', true);

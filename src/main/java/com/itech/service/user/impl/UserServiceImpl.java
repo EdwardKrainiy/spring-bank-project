@@ -10,6 +10,7 @@ import com.itech.service.mail.EmailService;
 import com.itech.service.user.UserService;
 import com.itech.utils.DtoMapper;
 import com.itech.utils.exception.*;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -74,10 +75,15 @@ public class UserServiceImpl implements UserService{
 
         if(mappedUser.getPassword().length() > 20 || mappedUser.getPassword().length() < 5) throw new UserValidationException("Incorrect password length! It must be from 5 to 20");
 
+        User createdUser = new User(mappedUser.getUsername(), encoder.encode(mappedUser.getPassword()), mappedUser.getEmail(), Role.USER);
 
-        Long createdUserId = userRepository.save(new User(mappedUser.getUsername(), encoder.encode(mappedUser.getPassword()), mappedUser.getEmail(), Role.USER)).getId();
+        Long createdUserId = userRepository.save(createdUser).getId();
 
         String confirmationToken = tokenProvider.generateConfirmToken(createdUserId);
+
+        createdUser.setConfirmationToken(confirmationToken);
+
+        userRepository.save(createdUser);
 
         emailService.sendEmail(userRepository.getUserByRole(Role.MANAGER).orElseThrow(() -> new UserNotFoundException(Role.MANAGER)).getEmail(),
                 "Confirm email for user " + mappedUser.getUsername(),
@@ -126,7 +132,18 @@ public class UserServiceImpl implements UserService{
     public ResponseEntity<Void> activateUser(String token){
         Long userId = jwtDecoder.getIdFromConfirmToken(token);
 
-        emailService.sendEmail(userRepository.getById(userId).getEmail(), "Email confirmed", "Your email was confirmed successfully!");
+        User activatedUser = userRepository.getById(userId);
+
+        if(activatedUser.getConfirmationToken() == null){
+            throw new UserValidationException("This user is already activated!");
+        }
+
+        activatedUser.setConfirmationToken(null);
+        activatedUser.setActivated(true);
+
+        userRepository.save(activatedUser);
+
+        emailService.sendEmail(activatedUser.getEmail(), "Email confirmed", "Your email was confirmed successfully!");
         return ResponseEntity.ok().build();
     }
 }
