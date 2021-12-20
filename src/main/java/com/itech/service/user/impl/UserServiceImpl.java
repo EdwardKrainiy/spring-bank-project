@@ -14,6 +14,7 @@ import com.itech.utils.exception.UserExistsException;
 import com.itech.utils.exception.UserNotFoundException;
 import com.itech.utils.exception.UserValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,7 +31,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserServiceImpl implements UserService {
     private static final String VALID_EMAIL_ADDRESS_REGEX = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$";
 
-    private static final String VALID_USERNAME_ADDRESS_REGEX = "^([a-zA-Z])+([\\\\w]{2,})+$";
+    private static final String VALID_USERNAME_ADDRESS_REGEX = "^[a-zA-Z0-9._-]{3,}$";
+
+    @Value("${spring.mail.confirmation.message}")
+    private String confirmMessage;
 
     @Autowired
     private UserRepository userRepository;
@@ -98,7 +102,7 @@ public class UserServiceImpl implements UserService {
 
         emailService.sendEmail(userRepository.getUserByRole(Role.MANAGER).orElseThrow(() -> new UserNotFoundException(Role.MANAGER)).getEmail(),
                 "Confirm email for user " + mappedUser.getUsername(),
-                "This user is signing up. Confirm his email and activate the account following this link: " + "http://localhost:8080/api/auth/email-confirmation?token=" + confirmationToken);
+                confirmMessage + confirmationToken);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
