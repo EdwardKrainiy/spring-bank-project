@@ -1,1 +1,0 @@
-INSERT INTO users (username, password, email, role) VALUEs ('Edvard Krainiy', 'managerpassword', 'ekrayniy@inbox.ru', 'MANAGER')

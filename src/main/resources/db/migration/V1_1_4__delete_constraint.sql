@@ -1,2 +1,0 @@
-ALTER TABLE users
-drop constraint unique_username
