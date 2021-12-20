@@ -1,7 +1,7 @@
 package com.itech.service.account;
 
 import com.itech.model.entity.Account;
-import com.itech.model.dto.AccountDto;
+import com.itech.model.dto.AccountCreateDto;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ public interface AccountService {
 
     Account findAccountByAccountId(Long accountId);
 
-    Long createAccount(AccountDto accountDto);
+    Long createAccount(AccountCreateDto accountCreateDto);
 
     void deleteAccountByAccountId(Long accountId);
 }

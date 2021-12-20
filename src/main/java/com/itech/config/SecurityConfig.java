@@ -36,16 +36,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/api/auth/sign-in").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/auth/sign-up").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/auth/email-confirmation").hasAuthority(Role.MANAGER.name())
-                .antMatchers(HttpMethod.GET, "/api/accounts/**").hasAnyAuthority(Role.MANAGER.name(), Role.USER.name())
-                .antMatchers(HttpMethod.GET, "/swagger-ui.html").hasAuthority(Role.MANAGER.name())
+                .antMatchers("/api/auth/email-confirmation").hasAuthority(Role.MANAGER.name())
+                .antMatchers( "/api/accounts/**").hasAnyAuthority(Role.MANAGER.name(), Role.USER.name())
+                .antMatchers( "/swagger-ui.html").hasAnyAuthority(Role.MANAGER.name(), Role.USER.name())
                 .anyRequest()
-                .authenticated()
-                .and()
-                .httpBasic();
+                .authenticated();
 
         http.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
-
     }
 
     @Override

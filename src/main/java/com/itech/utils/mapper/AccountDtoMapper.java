@@ -1,7 +1,7 @@
 package com.itech.utils.mapper;
 
+import com.itech.model.dto.AccountCreateDto;
 import com.itech.model.entity.Account;
-import com.itech.model.dto.AccountDto;
 import org.mapstruct.Mapper;
 
 /**
@@ -9,7 +9,7 @@ import org.mapstruct.Mapper;
  */
 @Mapper(componentModel = "spring")
 public interface AccountDtoMapper {
-    Account toEntity(AccountDto accountDto);
+    Account toEntity(AccountCreateDto accountCreateDto);
 
-    AccountDto toDto(Account account);
+    AccountCreateDto toDto(Account account);
 }

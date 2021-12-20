@@ -1,9 +1,10 @@
 package com.itech.contoller;
 
+import com.itech.model.dto.AccountCreateDto;
 import com.itech.model.entity.Account;
-import com.itech.model.dto.AccountDto;
 import com.itech.service.account.impl.AccountServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -52,13 +53,13 @@ public class AccountController {
     /**
      * createAccount endpoint.
      *
-     * @param accountDto Data-transfer object of account that will be transformed to Account and put into DB.
+     * @param accountCreateDto Data-transfer object of account that will be transformed to Account and put into DB.
      * @return ResponseEntity<Long> 201 HTTP code and id of created account.
      */
     @Transactional
     @PostMapping
-    public ResponseEntity<Long> createAccount(@RequestBody AccountDto accountDto) {
-        return ResponseEntity.status(201).body(accountService.createAccount(accountDto));
+    public ResponseEntity<Long> createAccount(@RequestBody AccountCreateDto accountCreateDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createAccount(accountCreateDto));
     }
 
     /**
@@ -71,6 +72,6 @@ public class AccountController {
     @DeleteMapping("{id}")
     public ResponseEntity<Void> deleteAccountById(@PathVariable("id") Long accountId) {
         accountService.deleteAccountByAccountId(accountId);
-        return ResponseEntity.status(204).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

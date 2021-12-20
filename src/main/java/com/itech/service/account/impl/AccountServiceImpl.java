@@ -1,22 +1,17 @@
 package com.itech.service.account.impl;
 
+import com.itech.model.dto.AccountCreateDto;
 import com.itech.model.entity.Account;
 import com.itech.model.Currency;
-import com.itech.model.EUCountry;
-import com.itech.model.dto.AccountDto;
 import com.itech.repository.AccountRepository;
 import com.itech.service.account.AccountService;
 import com.itech.utils.mapper.AccountDtoMapper;
 import com.itech.utils.exception.account.AccountNotFoundException;
 import com.itech.utils.exception.account.AccountValidationException;
-import org.iban4j.CountryCode;
 import org.iban4j.Iban;
-import org.iban4j.IbanUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 
 /**
@@ -63,34 +58,19 @@ public class AccountServiceImpl implements AccountService {
     /**
      * createAccount method. Creates account from JSON object in RequestBody and saves into DB.
      *
-     * @param accountDto Account transfer object, which we need to save. This one will be converted into Account object, passed some checks and will be saved on DB.
+     * @param accountCreateDto Account transfer object, which we need to save. This one will be converted into Account object, passed some checks and will be saved on DB.
      * @return Long Id of created account.
      */
 
     @Override
-    public Long createAccount(AccountDto accountDto) {
-        Account accountEntity = accountDtoMapper.toEntity(accountDto);
+    public Long createAccount(AccountCreateDto accountCreateDto) {
+        Account accountEntity = accountDtoMapper.toEntity(accountCreateDto);
 
         Currency accountCurrency = accountEntity.getCurrency();
 
         if(accountCurrency == null) throw new AccountValidationException("Missing currency!");
 
-        Iban iban = null;
-
-        ArrayList<EUCountry> euCountriesCodes = new ArrayList<>(EnumSet.allOf(EUCountry.class));
-
-        switch (accountCurrency){
-            case BYN: iban = Iban.random(CountryCode.BY);
-                break;
-            case USD: iban = Iban.random(CountryCode.US);
-                break;
-            case EUR:
-                int randomCountry = (int)Math.floor(Math.random() * euCountriesCodes.size());
-                iban = Iban.random(CountryCode.valueOf(euCountriesCodes.get(randomCountry).toString()));
-                break;
-        }
-
-        IbanUtil.validate(iban.toString());
+        Iban iban = Iban.random(accountCurrency.getCountryCode());
 
         accountEntity.setAccountNumber(iban.toString());
 
