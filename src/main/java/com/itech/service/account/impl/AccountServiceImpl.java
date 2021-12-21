@@ -1,17 +1,24 @@
 package com.itech.service.account.impl;
 
-import com.itech.model.dto.AccountCreateDto;
-import com.itech.model.entity.Account;
 import com.itech.model.Currency;
+import com.itech.model.dto.AccountCreateDto;
+import com.itech.model.dto.AccountDto;
+import com.itech.model.dto.AccountUpdateDto;
+import com.itech.model.entity.Account;
 import com.itech.repository.AccountRepository;
 import com.itech.service.account.AccountService;
-import com.itech.utils.mapper.AccountDtoMapper;
+import com.itech.utils.IbanGenerator;
 import com.itech.utils.exception.account.AccountNotFoundException;
 import com.itech.utils.exception.account.AccountValidationException;
-import org.iban4j.Iban;
+import com.itech.utils.mapper.AccountCreateDtoMapper;
+import com.itech.utils.mapper.AccountDtoMapper;
+import com.itech.utils.mapper.AccountUpdateDtoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,63 +36,94 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     private AccountDtoMapper accountDtoMapper;
 
+    @Autowired
+    private AccountCreateDtoMapper accountCreateDtoMapper;
+
+    @Autowired
+    private AccountUpdateDtoMapper accountUpdateDtoMapper;
+
+    @Autowired
+    private IbanGenerator ibanGenerator;
+
     /**
      * findAllAccounts method. Finds all accounts from DB.
      *
-     * @return List<Account> List of all found accounts.
+     * @return ResponseEntity<List < AccountDto>> ResponseEntity with HTTP code and list of all found accounts.
      */
 
     @Override
-    public List<Account> findAllAccounts() {
+    public ResponseEntity<List<AccountDto>> findAllAccounts() {
         List<Account> accounts = accountRepository.findAll();
         if (accounts.isEmpty()) throw new AccountNotFoundException();
 
-        return accounts;
+        List<AccountDto> accountDtos = new ArrayList<>();
+        for (Account account : accounts) accountDtos.add(accountDtoMapper.toDto(account));
+
+        return ResponseEntity.ok(accountDtos);
     }
 
     /**
      * findAccountByAccountId. Finds account by id.
      *
      * @param accountId Id of account we need to find.
-     * @return Account Found account entity.
+     * @return ResponseEntity<AccountDto> ResponseEntity with HTTP code and found account entity.
      */
 
     @Override
-    public Account findAccountByAccountId(Long accountId) {
-        return accountRepository.findAccountById(accountId).orElseThrow(AccountNotFoundException::new);
+    public ResponseEntity<AccountDto> findAccountByAccountId(Long accountId) {
+        return ResponseEntity.ok(accountDtoMapper.toDto(accountRepository.findAccountById(accountId).orElseThrow(AccountNotFoundException::new)));
     }
 
     /**
      * createAccount method. Creates account from JSON object in RequestBody and saves into DB.
      *
      * @param accountCreateDto Account transfer object, which we need to save. This one will be converted into Account object, passed some checks and will be saved on DB.
-     * @return Long Id of created account.
+     * @return ResponseEntity<Long> ResponseEntity with HTTP code and id of created account.
      */
 
     @Override
-    public Long createAccount(AccountCreateDto accountCreateDto) {
-        Account accountEntity = accountDtoMapper.toEntity(accountCreateDto);
+    public ResponseEntity<Long> createAccount(AccountCreateDto accountCreateDto) {
+        Account accountEntity = accountCreateDtoMapper.toEntity(accountCreateDto);
 
         Currency accountCurrency = accountEntity.getCurrency();
 
-        if(accountCurrency == null) throw new AccountValidationException("Missing currency!");
+        if (accountCurrency == null) throw new AccountValidationException("Missing currency!");
 
-        Iban iban = Iban.random(accountCurrency.getCountryCode());
+        accountEntity.setAccountNumber(ibanGenerator.generateIban(accountCurrency.getCountryCode()));
 
-        accountEntity.setAccountNumber(iban.toString());
+        return ResponseEntity.status(HttpStatus.CREATED).body(accountRepository.save(accountEntity).getId());
+    }
 
-        return accountRepository.save(accountEntity).getId();
+    /**
+     * updateAccount method. Updates account by id and accountUpdateDto entity.
+     *
+     * @param accountUpdateDto Account transfer object, which we need to update. This one will be converted into Account object, passed some checks and will be updated on DB.
+     * @param accountId        Id of account we need to update.
+     * @return ResponseEntity<Long> ResponseEntity with HTTP code and id of updated account.
+     */
+
+    @Override
+    public ResponseEntity<Void> updateAccount(AccountUpdateDto accountUpdateDto, Long accountId) {
+        Account updateAccount = accountUpdateDtoMapper.toEntity(accountUpdateDto);
+        updateAccount.setId(accountId);
+        updateAccount.setAccountNumber(ibanGenerator.generateIban(accountUpdateDto.getCurrency().getCountryCode()));
+        accountRepository.save(updateAccount);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     /**
      * deleteAccountByAccountId method. Deletes account by id.
      *
-     * @param accountId If of account we need to delete.
+     * @param accountId Id of account we need to delete.
+     * @return ResponseEntity<Void> 204 HTTP code.
      */
 
     @Override
-    public void deleteAccountByAccountId(Long accountId) {
+    public ResponseEntity<Void> deleteAccountByAccountId(Long accountId) {
         Account foundAccountToDelete = accountRepository.findAccountById(accountId).orElseThrow(AccountNotFoundException::new);
         accountRepository.deleteAccountById(foundAccountToDelete.getId());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
+
 }

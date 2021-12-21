@@ -1,10 +1,10 @@
 package com.itech.contoller;
 
 import com.itech.model.dto.AccountCreateDto;
-import com.itech.model.entity.Account;
+import com.itech.model.dto.AccountDto;
+import com.itech.model.dto.AccountUpdateDto;
 import com.itech.service.account.impl.AccountServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +32,7 @@ public class AccountController {
 
     @GetMapping
     @ResponseBody
-    public List<Account> getAllAccounts() {
+    public ResponseEntity<List<AccountDto>> getAllAccounts() {
         return accountService.findAllAccounts();
     }
 
@@ -40,12 +40,12 @@ public class AccountController {
      * getAccountById endpoint.
      *
      * @param accountId id of account we want to get.
-     * @return Account Entity of account that we found.
+     * @return ResponseEntity<AccountDto> Response with HTTP code and AccountDto of account that we found.
      */
 
     @GetMapping("{id}")
     @ResponseBody
-    public Account getAccountById(@PathVariable("id") Long accountId) {
+    public ResponseEntity<AccountDto> getAccountById(@PathVariable("id") Long accountId) {
         return accountService.findAccountByAccountId(accountId);
     }
 
@@ -59,7 +59,22 @@ public class AccountController {
     @Transactional
     @PostMapping
     public ResponseEntity<Long> createAccount(@RequestBody AccountCreateDto accountCreateDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createAccount(accountCreateDto));
+        return accountService.createAccount(accountCreateDto);
+    }
+
+    /**
+     * updateAccount endpoint.
+     *
+     * @param accountUpdateDto Data-transfer object of account that will be transformed to Account and updated.
+     * @param accountId        Id of account we need to update.
+     * @return ResponseEntity<Void> 204 HTTP code.
+     */
+
+    @Transactional
+    @PutMapping("{id}")
+    public ResponseEntity<Void> updateAccount(@RequestBody AccountUpdateDto accountUpdateDto,
+                                              @PathVariable("id") Long accountId) {
+        return accountService.updateAccount(accountUpdateDto, accountId);
     }
 
     /**
@@ -71,7 +86,6 @@ public class AccountController {
     @Transactional
     @DeleteMapping("{id}")
     public ResponseEntity<Void> deleteAccountById(@PathVariable("id") Long accountId) {
-        accountService.deleteAccountByAccountId(accountId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return accountService.deleteAccountByAccountId(accountId);
     }
 }

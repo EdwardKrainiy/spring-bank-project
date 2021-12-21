@@ -1,7 +1,7 @@
 package com.itech.utils.mapper;
 
-import com.itech.model.entity.User;
 import com.itech.model.dto.UserDto;
+import com.itech.model.entity.User;
 import org.mapstruct.Mapper;
 
 /**

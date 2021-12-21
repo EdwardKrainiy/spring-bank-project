@@ -1,15 +1,28 @@
 package com.itech.utils.mapper;
 
-import com.itech.model.dto.AccountCreateDto;
+import com.itech.model.dto.AccountDto;
 import com.itech.model.entity.Account;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
 
 /**
- * @author Edvard Krainiy on 12/18/2021
+ * AccountDtoMapper interface, which contains method to transform Account to AccountDto.
+ *
+ * @author Edvard Krainiy on 12/21/2021
  */
 @Mapper(componentModel = "spring")
 public interface AccountDtoMapper {
-    Account toEntity(AccountCreateDto accountCreateDto);
-
-    AccountCreateDto toDto(Account account);
+    /**
+     * toDto method. Converts Account object to AccountDto.
+     *
+     * @param account Account object we need to convert.
+     * @return AccountDto Obtained AccountDto entity.
+     */
+    @Mappings({
+            @Mapping(source = "account.user.username", target = "username"),
+            @Mapping(source = "account.currency", target = "currency"),
+            @Mapping(source = "account.accountNumber", target = "iban")
+    })
+    AccountDto toDto(Account account);
 }

@@ -37,8 +37,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/api/auth/sign-in").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/auth/sign-up").permitAll()
                 .antMatchers("/api/auth/email-confirmation").hasAuthority(Role.MANAGER.name())
-                .antMatchers( "/api/accounts/**").hasAnyAuthority(Role.MANAGER.name(), Role.USER.name())
-                .antMatchers( "/swagger-ui.html").hasAnyAuthority(Role.MANAGER.name(), Role.USER.name())
+                .antMatchers("/api/accounts/**").hasAnyAuthority(Role.MANAGER.name(), Role.USER.name())
+                .antMatchers("/swagger-ui.html").hasAnyAuthority(Role.MANAGER.name(), Role.USER.name())
                 .anyRequest()
                 .authenticated();
 
