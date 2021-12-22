@@ -4,6 +4,7 @@ import lombok.*;
 
 /**
  * User data-transfer object to manipulate with DB.
+ *
  * @author Edvard Krainiy on 12/8/2021
  */
 

@@ -11,6 +11,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
  * Swagger configuration class.
+ *
  * @author Edvard Krainiy on 12/6/2021
  */
 
@@ -29,11 +30,11 @@ public class SwaggerConfig {
                 .paths(PathSelectors.any())
                 .build()
                 .apiInfo(new ApiInfoBuilder()
-                                .title("Bank web application")
-                                .description("Free to use")
-                                .contact( new springfox.documentation.service.Contact("Krainiy Edvard", "https://www.linkedin.com/in/edvard-krainiy-5b2b13221/", "a@b.com"))
-                                .version("1.0")
-                                .license("API License")
-                                .build());
+                        .title("Bank web application")
+                        .description("Free to use")
+                        .contact(new springfox.documentation.service.Contact("Krainiy Edvard", "https://www.linkedin.com/in/edvard-krainiy-5b2b13221/", "a@b.com"))
+                        .version("1.0")
+                        .license("API License")
+                        .build());
     }
 }

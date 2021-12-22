@@ -5,7 +5,6 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,6 +20,7 @@ import java.io.IOException;
 
 /**
  * JwtAuthenticationFilter class. Provides us filtering our token in HTTP request and authenticating user, which was coded in transferred token.
+ *
  * @author Edvard Krainiy on 12/10/2021
  */
 
@@ -43,12 +43,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     /**
      * JwtFilter method.
-     * @param req HTTP request, which contains our token.
-     * @param res HTTP response, which will contain authorized user.
+     *
+     * @param req   HTTP request, which contains our token.
+     * @param res   HTTP response, which will contain authorized user.
      * @param chain Contains list of filters, which will be applied.
      * @throws IllegalArgumentException If token wasn't fetched because of incorrect key.
-     * @throws ExpiredJwtException If token is expired.
-     * @throws SignatureException If username or password is not valid.
+     * @throws ExpiredJwtException      If token is expired.
+     * @throws SignatureException       If username or password is not valid.
      */
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {

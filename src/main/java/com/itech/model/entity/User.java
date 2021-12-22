@@ -1,18 +1,21 @@
-package com.itech.model;
+package com.itech.model.entity;
 
+import com.itech.model.Role;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Set;
 
 /**
  * Basic user class.
+ *
  * @author Edvard Krainiy on 12/3/2021
  */
 
 @Entity
-@Table(name="users")
+@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -35,12 +38,15 @@ public class User {
     @Column(name = "confirmation_token")
     private String confirmationToken;
 
-    @Column(name="role")
+    @Column(name = "role")
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Column(name="activated")
+    @Column(name = "activated")
     private boolean activated;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    private Set<Account> accounts;
 
     public User(String username, String password, String email, Role role) {
         this.username = username;

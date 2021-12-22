@@ -18,38 +18,38 @@ import java.util.stream.Collectors;
 
 /**
  * TokenProvider class. Methods of this class creates and decodes tokens.
+ *
  * @author Edvard Krainiy on 12/10/2021
  */
 
 @Component
 public class TokenProvider implements Serializable {
 
+    @Value("${jwt.authorities.key}")
+    public String AUTHORITIES_KEY;
     @Value("${jwt.token.validity}")
     private long TOKEN_VALIDITY;
-
     @Value("${jwt.signing.key}")
     private String SIGNING_KEY;
-
     @Value("${jwt.confirmation.key}")
     private String CONFIRMATION_KEY;
 
-    @Value("${jwt.authorities.key}")
-    public String AUTHORITIES_KEY;
-
     /**
      * getUsernameFromToken method.
+     *
      * @param token Token, from which we want to obtain username.
-     * @param key Secret key to decode our token correctly.
+     * @param key   Secret key to decode our token correctly.
      * @return username Returns obtained username.
      */
-    public String getUsernameFromToken(String token, String key){
+    public String getUsernameFromToken(String token, String key) {
         return getClaimFromToken(token, Claims::getSubject, key);
     }
 
     /**
      * getExpirationDateFromToken method.
+     *
      * @param token Token, from which we want to obtain expDate.
-     * @param key Secret key to decode our token correctly.
+     * @param key   Secret key to decode our token correctly.
      * @return expirationDate Returns obtained date.
      */
     public Date getExpirationDateFromToken(String token, String key) {
@@ -58,8 +58,9 @@ public class TokenProvider implements Serializable {
 
     /**
      * getSubjectFromToken method.
+     *
      * @param token Token, from which we want to obtain subject.
-     * @param key Secret key to decode our token correctly.
+     * @param key   Secret key to decode our token correctly.
      * @return subject Returns obtained subject.
      */
     public String getSubjectFromToken(String token, String key) {
@@ -68,20 +69,22 @@ public class TokenProvider implements Serializable {
 
     /**
      * getClaimFromToken method.
-     * @param token Token, from which we want to obtain any info(claim).
+     *
+     * @param token          Token, from which we want to obtain any info(claim).
      * @param claimsResolver Function, that said our method about what information to get.
-     * @param key Secret key to decode our token correctly.
+     * @param key            Secret key to decode our token correctly.
      * @return T Returns obtained info.
      */
-    public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver, String key){
+    public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver, String key) {
         final Claims claims = getAllClaimsFromToken(token, key);
         return claimsResolver.apply(claims);
     }
 
     /**
      * getAllClaimsFromToken method.
+     *
      * @param token Token, from which we want to obtain all infos(claims).
-     * @param key Secret key to decode our token correctly.
+     * @param key   Secret key to decode our token correctly.
      * @return claims Returns list of all infos, which was coded into the token.
      */
     private Claims getAllClaimsFromToken(String token, String key) {
@@ -93,8 +96,9 @@ public class TokenProvider implements Serializable {
 
     /**
      * isTokenExpired method.
+     *
      * @param token Token, from which we want to check for expiration date.
-     * @param key Secret key to decode our token correctly.
+     * @param key   Secret key to decode our token correctly.
      * @return boolean Checks and returns info about expiration of our token.
      */
     public Boolean isTokenExpired(String token, String key) {
@@ -104,6 +108,7 @@ public class TokenProvider implements Serializable {
 
     /**
      * generateAuthToken method. Generates JWT to authenticate.
+     *
      * @param authentication Contains info about user, which want to authenticate.
      * @return String Returns us generated JWT for authentication.
      */
@@ -116,30 +121,32 @@ public class TokenProvider implements Serializable {
                 .setSubject(authentication.getName())
                 .claim(AUTHORITIES_KEY, authorities)
                 .setIssuedAt(new Date(System.currentTimeMillis())) // Дата создания токена
-                .setExpiration(new Date(System.currentTimeMillis() + TOKEN_VALIDITY*1000)) //Дата истечения токена
+                .setExpiration(new Date(System.currentTimeMillis() + TOKEN_VALIDITY * 1000)) //Дата истечения токена
                 .signWith(SignatureAlgorithm.HS256, SIGNING_KEY) //Ключ расшифровки
                 .compact();
     }
 
     /**
      * generateConfirmToken method. Generates JWT to confirm email.
+     *
      * @param userId Id of user we need to confirm and activate.
      * @return String Returns us generated JWT for confirmation.
      */
-    public String generateConfirmToken(Long userId){
+    public String generateConfirmToken(Long userId) {
         return Jwts.builder()
                 .setSubject(userId.toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + TOKEN_VALIDITY*100))
+                .setExpiration(new Date(System.currentTimeMillis() + TOKEN_VALIDITY * 100))
                 .signWith(SignatureAlgorithm.HS256, CONFIRMATION_KEY)
                 .compact();
     }
 
     /**
      * validateToken method. Validates our token.
-     * @param token Token, which we need to validate.
+     *
+     * @param token       Token, which we need to validate.
      * @param userDetails Contains all info about user.
-     * @param key Secret key to decode our token correctly.
+     * @param key         Secret key to decode our token correctly.
      * @return Boolean Checks and returns info about validity of our token.
      */
     public Boolean validateToken(String token, UserDetails userDetails, String key) {
@@ -149,7 +156,8 @@ public class TokenProvider implements Serializable {
 
     /**
      * getAuthenticationToken method. Generates UsernamePasswordAuthenticationToken from token.
-     * @param token Token, which we need to transform.
+     *
+     * @param token       Token, which we need to transform.
      * @param userDetails Contains all info about user.
      * @return UsernamePasswordAuthenticationToken Returns UsernamePasswordAuthenticationToken for authentication.
      */

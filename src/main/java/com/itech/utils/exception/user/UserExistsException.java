@@ -1,4 +1,4 @@
-package com.itech.utils.exception;
+package com.itech.utils.exception.user;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(value = HttpStatus.BAD_REQUEST)
 public class UserExistsException extends RuntimeException{
-    public UserExistsException(){
+    public UserExistsException() {
         super("This user already exists!");
     }
 }

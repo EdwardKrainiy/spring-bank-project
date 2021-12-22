@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * Custom API Errors class.
+ *
  * @author Edvard Krainiy on 12/13/2021
  */
 @Data
@@ -15,7 +16,8 @@ public class ApiError {
     private String message;
     private String debugMessage;
 
-    public ApiError(String message){
+    public ApiError(String message) {
         this.message = message;
+        this.debugMessage = "-";
     }
 }
