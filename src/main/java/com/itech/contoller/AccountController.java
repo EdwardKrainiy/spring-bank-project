@@ -31,7 +31,6 @@ public class AccountController {
      */
 
     @GetMapping
-    @ResponseBody
     public ResponseEntity<List<AccountDto>> getAllAccounts() {
         return accountService.findAllAccounts();
     }
@@ -44,7 +43,6 @@ public class AccountController {
      */
 
     @GetMapping("{id}")
-    @ResponseBody
     public ResponseEntity<AccountDto> getAccountById(@PathVariable("id") Long accountId) {
         return accountService.findAccountByAccountId(accountId);
     }
