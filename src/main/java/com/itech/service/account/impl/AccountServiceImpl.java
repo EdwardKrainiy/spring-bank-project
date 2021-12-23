@@ -1,6 +1,6 @@
 package com.itech.service.account.impl;
 
-import com.itech.model.Currency;
+import com.itech.model.enumeration.Currency;
 import com.itech.model.dto.AccountCreateDto;
 import com.itech.model.dto.AccountDto;
 import com.itech.model.dto.AccountUpdateDto;

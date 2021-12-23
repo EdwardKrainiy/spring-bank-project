@@ -1,6 +1,6 @@
 package com.itech.utils.exception.user;
 
-import com.itech.model.Role;
+import com.itech.model.enumeration.Role;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 

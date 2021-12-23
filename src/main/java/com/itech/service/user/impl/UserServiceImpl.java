@@ -1,6 +1,6 @@
 package com.itech.service.user.impl;
 
-import com.itech.model.Role;
+import com.itech.model.enumeration.Role;
 import com.itech.model.dto.UserDto;
 import com.itech.model.entity.User;
 import com.itech.repository.UserRepository;

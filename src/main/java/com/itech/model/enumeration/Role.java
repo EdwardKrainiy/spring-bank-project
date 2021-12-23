@@ -1,4 +1,4 @@
-package com.itech.model;
+package com.itech.model.enumeration;
 /**
  * Enum, which contains all roles we need in app.
  * @author Edvard Krainiy on 12/3/2021

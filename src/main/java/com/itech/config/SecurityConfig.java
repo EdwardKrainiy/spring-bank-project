@@ -1,6 +1,6 @@
 package com.itech.config;
 
-import com.itech.model.Role;
+import com.itech.model.enumeration.Role;
 import com.itech.security.jwt.filter.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

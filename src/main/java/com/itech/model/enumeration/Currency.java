@@ -1,4 +1,4 @@
-package com.itech.model;
+package com.itech.model.enumeration;
 
 import org.iban4j.CountryCode;
 

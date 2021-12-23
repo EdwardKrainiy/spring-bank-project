@@ -1,6 +1,6 @@
 package com.itech.model.entity;
 
-import com.itech.model.Role;
+import com.itech.model.enumeration.Role;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

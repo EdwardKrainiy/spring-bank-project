@@ -1,6 +1,6 @@
 package com.itech.model.dto;
 
-import com.itech.model.Currency;
+import com.itech.model.enumeration.Currency;
 import lombok.*;
 
 /**
