@@ -26,8 +26,9 @@ public class Transaction {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "user_id")
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Column(name = "issued_at")
     @Temporal(TemporalType.TIMESTAMP)
@@ -36,8 +37,4 @@ public class Transaction {
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private TransactionStatus status;
-
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
-    private User user;
 }

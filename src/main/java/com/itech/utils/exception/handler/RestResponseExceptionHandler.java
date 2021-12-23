@@ -2,6 +2,7 @@ package com.itech.utils.exception.handler;
 
 import com.itech.utils.exception.account.AccountNotFoundException;
 import com.itech.utils.exception.account.AccountValidationException;
+import com.itech.utils.exception.transaction.TransactionNotFoundException;
 import com.itech.utils.exception.user.IncorrectPasswordException;
 import com.itech.utils.exception.user.UserExistsException;
 import com.itech.utils.exception.user.UserNotFoundException;
@@ -43,18 +44,6 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
         return new ResponseEntity<>(exceptionError, HttpStatus.UNAUTHORIZED);
     }
 
-    @ExceptionHandler(value = {UserNotFoundException.class})
-    protected ResponseEntity<ApiError> handleUserNotFoundException(UserNotFoundException ex) {
-        ApiError exceptionError = new ApiError(ex.getMessage());
-        return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(value = {UserValidationException.class})
-    protected ResponseEntity<ApiError> handleUserValidationException(UserValidationException ex) {
-        ApiError exceptionError = new ApiError(ex.getMessage());
-        return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
-    }
-
     @ExceptionHandler(value = {UserExistsException.class})
     protected ResponseEntity<ApiError> handleUserExistsException(UserExistsException ex) {
         ApiError exceptionError = new ApiError(ex.getMessage());
@@ -73,14 +62,14 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
         return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(value = {AccountNotFoundException.class})
-    protected ResponseEntity<ApiError> handleAccountNotFoundException(AccountNotFoundException ex) {
+    @ExceptionHandler(value = {AccountNotFoundException.class, TransactionNotFoundException.class, UserNotFoundException.class})
+    protected ResponseEntity<ApiError> handleEntityNotFoundException(RuntimeException ex) {
         ApiError exceptionError = new ApiError(ex.getMessage());
         return new ResponseEntity<>(exceptionError, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(value = {AccountValidationException.class})
-    protected ResponseEntity<ApiError> handleAccountValidationException(AccountValidationException ex) {
+    @ExceptionHandler(value = {AccountValidationException.class, UserValidationException.class})
+    protected ResponseEntity<ApiError> handleEntityValidationException(RuntimeException ex) {
         ApiError exceptionError = new ApiError(ex.getMessage());
         return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
     }

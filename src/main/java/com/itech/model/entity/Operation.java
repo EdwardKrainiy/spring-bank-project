@@ -25,11 +25,13 @@ public class Operation {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "account_id")
-    private Long accountId;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "account_id")
+    private Account account;
 
-    @Column(name = "transaction_id")
-    private Long transactionId;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "transaction_id")
+    private Transaction transaction;
 
     @Column(name = "amount")
     private double amount;
@@ -37,13 +39,5 @@ public class Operation {
     @Column(name = "operation_type")
     @Enumerated(EnumType.STRING)
     private OperationType operationType;
-
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "transaction_id")
-    private Transaction transaction;
-
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "account_id")
-    private Account account;
 
 }
