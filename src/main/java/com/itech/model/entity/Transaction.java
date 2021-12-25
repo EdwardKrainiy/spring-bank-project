@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Basic Transaction class.
@@ -37,4 +38,7 @@ public class Transaction {
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private TransactionStatus status;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "transaction")
+    private Set<Operation> operations;
 }

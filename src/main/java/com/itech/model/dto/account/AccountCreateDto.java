@@ -1,8 +1,10 @@
-package com.itech.model.dto;
+package com.itech.model.dto.account;
 
 import lombok.*;
 
 /**
+ * Account data-transfer object to manipulate with DB.
+ *
  * @author Edvard Krainiy on 12/18/2021
  */
 
@@ -11,10 +13,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AccountDto {
-    private Long id;
-    private String username;
-    private double amount;
+public class AccountCreateDto {
     private String currency;
-    private String iban;
+    private double amount;
 }

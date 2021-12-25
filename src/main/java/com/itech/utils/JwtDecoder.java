@@ -1,10 +1,12 @@
 package com.itech.utils;
 
-import com.itech.utils.exception.user.UserIdNotFoundException;
+import com.itech.utils.exception.EntityIdNotFoundException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -33,6 +35,15 @@ public class JwtDecoder {
 
         Optional<Long> userId = Optional.of(Long.parseLong(confirmationClaims.getSubject()));
 
-        return userId.orElseThrow(() -> new UserIdNotFoundException(String.format("User with id = %d not found!", userId)));
+        return userId.orElseThrow(() -> new EntityIdNotFoundException(String.format("User with id = %d not found!", userId)));
+    }
+
+    public String getUsernameOfLoggedUser(){
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof UserDetails) {
+            return ((UserDetails)principal).getUsername();
+        } else {
+            return principal.toString();
+        }
     }
 }

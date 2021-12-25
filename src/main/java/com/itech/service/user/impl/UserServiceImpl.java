@@ -1,18 +1,18 @@
 package com.itech.service.user.impl;
 
 import com.itech.model.enumeration.Role;
-import com.itech.model.dto.UserDto;
+import com.itech.model.dto.user.UserDto;
 import com.itech.model.entity.User;
 import com.itech.repository.UserRepository;
 import com.itech.security.jwt.provider.TokenProvider;
 import com.itech.service.mail.EmailService;
 import com.itech.service.user.UserService;
 import com.itech.utils.JwtDecoder;
-import com.itech.utils.exception.user.IncorrectPasswordException;
-import com.itech.utils.exception.user.UserExistsException;
-import com.itech.utils.exception.user.UserNotFoundException;
-import com.itech.utils.exception.user.UserValidationException;
-import com.itech.utils.mapper.UserDtoMapper;
+import com.itech.utils.exception.EntityNotFoundException;
+import com.itech.utils.exception.EntityValidationException;
+import com.itech.utils.exception.IncorrectPasswordException;
+import com.itech.utils.exception.EntityExistsException;
+import com.itech.utils.mapper.user.UserDtoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -59,36 +59,36 @@ public class UserServiceImpl implements UserService {
      *
      * @param userDto User transfer object, which we need to save. This one will be converted into User object, passed some checks and will be saved on DB.
      * @return ResponseEntity Response, which contains message and HTTP code. If something will be wrong, it will throw different Exceptions, which will tell about mistakes and errors.
-     * @throws UserValidationException All user validation errors, like missing email or password, invalid email or others.
-     * @throws UserNotFoundException   If user wasn't found.
-     * @throws UserExistsException     if user already exists.
+     * @throws EntityValidationException All user validation errors, like missing email or password, invalid email or others.
+     * @throws EntityNotFoundException   If user wasn't found.
+     * @throws EntityExistsException     if user already exists.
      */
     @Override
-    public ResponseEntity<Void> createUser(UserDto userDto) throws UserValidationException, UserNotFoundException, UserExistsException {
+    public ResponseEntity<Void> createUser(UserDto userDto) throws EntityValidationException, EntityExistsException, EntityExistsException {
 
         User mappedUser = userDtoMapper.toEntity(userDto);
 
-        if (mappedUser.getUsername() == null) throw new UserValidationException("Missing username!");
+        if (mappedUser.getUsername() == null) throw new EntityValidationException("Missing username!");
 
 
-        if (mappedUser.getPassword() == null) throw new UserValidationException("Missing password!");
+        if (mappedUser.getPassword() == null) throw new EntityValidationException("Missing password!");
 
 
-        if (mappedUser.getEmail() == null) throw new UserValidationException("Missing email!");
+        if (mappedUser.getEmail() == null) throw new EntityValidationException("Missing email!");
 
         if (!mappedUser.getUsername().matches(VALID_USERNAME_ADDRESS_REGEX))
-            throw new UserValidationException("Username is not valid!");
+            throw new EntityValidationException("Username is not valid!");
 
         if (!mappedUser.getEmail().matches(VALID_EMAIL_ADDRESS_REGEX))
-            throw new UserValidationException("Email is not valid!");
+            throw new EntityValidationException("Email is not valid!");
 
 
         if (userRepository.getUserByUsername(mappedUser.getUsername()).isPresent() || userRepository.getUserByEmail(mappedUser.getEmail()).isPresent())
-            throw new UserExistsException();
+            throw new EntityExistsException("This user already exists!");
 
 
         if (mappedUser.getPassword().length() > 20 || mappedUser.getPassword().length() < 5)
-            throw new UserValidationException("Incorrect password length! It must be from 5 to 20");
+            throw new EntityValidationException("Incorrect password length! It must be from 5 to 20");
 
         User createdUser = new User(mappedUser.getUsername(), encoder.encode(mappedUser.getPassword()), mappedUser.getEmail(), Role.USER);
 
@@ -100,7 +100,7 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(createdUser);
 
-        emailService.sendEmail(userRepository.getUserByRole(Role.MANAGER).orElseThrow(() -> new UserNotFoundException(Role.MANAGER)).getEmail(),
+        emailService.sendEmail(userRepository.getUserByRole(Role.MANAGER).orElseThrow(() -> new EntityNotFoundException("User not found!")).getEmail(),
                 "Confirm email for user " + mappedUser.getUsername(),
                 confirmMessage + confirmationToken);
 
@@ -115,7 +115,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public User findUserByUsername(String username) {
-        User user = userRepository.getUserByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
+        User user = userRepository.getUserByUsername(username).orElseThrow(() -> new EntityNotFoundException("User not found!"));
         return user;
     }
 
@@ -129,7 +129,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findUserByUsernameAndPassword(String username, String password) {
 
-        User foundUser = userRepository.getUserByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
+        User foundUser = userRepository.getUserByUsername(username).orElseThrow(() -> new EntityNotFoundException("User not found!"));
 
         if (foundUser.getPassword().equals(password)) {
             return foundUser;
@@ -150,7 +150,7 @@ public class UserServiceImpl implements UserService {
         User activatedUser = userRepository.getById(userId);
 
         if (activatedUser.getConfirmationToken() == null) {
-            throw new UserValidationException("This user is already activated!");
+            throw new EntityValidationException("This user is already activated!");
         }
 
         activatedUser.setConfirmationToken(null);

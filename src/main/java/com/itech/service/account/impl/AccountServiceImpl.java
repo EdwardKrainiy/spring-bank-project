@@ -1,18 +1,18 @@
 package com.itech.service.account.impl;
 
 import com.itech.model.enumeration.Currency;
-import com.itech.model.dto.AccountCreateDto;
-import com.itech.model.dto.AccountDto;
-import com.itech.model.dto.AccountUpdateDto;
+import com.itech.model.dto.account.AccountCreateDto;
+import com.itech.model.dto.account.AccountDto;
+import com.itech.model.dto.account.AccountUpdateDto;
 import com.itech.model.entity.Account;
 import com.itech.repository.AccountRepository;
 import com.itech.service.account.AccountService;
 import com.itech.utils.IbanGenerator;
-import com.itech.utils.exception.account.AccountNotFoundException;
-import com.itech.utils.exception.account.AccountValidationException;
-import com.itech.utils.mapper.AccountCreateDtoMapper;
-import com.itech.utils.mapper.AccountDtoMapper;
-import com.itech.utils.mapper.AccountUpdateDtoMapper;
+import com.itech.utils.exception.EntityNotFoundException;
+import com.itech.utils.exception.EntityValidationException;
+import com.itech.utils.mapper.account.AccountCreateDtoMapper;
+import com.itech.utils.mapper.account.AccountDtoMapper;
+import com.itech.utils.mapper.account.AccountUpdateDtoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,7 +54,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public ResponseEntity<List<AccountDto>> findAllAccounts() {
         List<Account> accounts = accountRepository.findAll();
-        if (accounts.isEmpty()) throw new AccountNotFoundException();
+        if (accounts.isEmpty()) throw new EntityNotFoundException("Account not found!");
 
         List<AccountDto> accountDtos = new ArrayList<>();
         for (Account account : accounts) accountDtos.add(accountDtoMapper.toDto(account));
@@ -71,7 +71,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public ResponseEntity<AccountDto> findAccountByAccountId(Long accountId) {
-        return ResponseEntity.ok(accountDtoMapper.toDto(accountRepository.findAccountById(accountId).orElseThrow(AccountNotFoundException::new)));
+        return ResponseEntity.ok(accountDtoMapper.toDto(accountRepository.findAccountById(accountId).orElseThrow(() -> new EntityNotFoundException("Account not found!"))));
     }
 
     /**
@@ -87,7 +87,7 @@ public class AccountServiceImpl implements AccountService {
 
         Currency accountCurrency = accountEntity.getCurrency();
 
-        if (accountCurrency == null) throw new AccountValidationException("Missing currency!");
+        if (accountCurrency == null) throw new EntityValidationException("Missing currency!");
 
         accountEntity.setAccountNumber(ibanGenerator.generateIban(accountCurrency.getCountryCode()));
 
@@ -120,7 +120,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public ResponseEntity<Void> deleteAccountByAccountId(Long accountId) {
-        Account foundAccountToDelete = accountRepository.findAccountById(accountId).orElseThrow(AccountNotFoundException::new);
+        Account foundAccountToDelete = accountRepository.findAccountById(accountId).orElseThrow(() -> new EntityNotFoundException("Account not found!"));
         accountRepository.deleteAccountById(foundAccountToDelete.getId());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

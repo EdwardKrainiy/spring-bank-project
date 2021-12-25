@@ -1,6 +1,6 @@
 package com.itech.contoller;
 
-import com.itech.model.dto.UserDto;
+import com.itech.model.dto.user.UserDto;
 import com.itech.security.jwt.authentication.JwtAuthenticationByUserDetails;
 import com.itech.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,6 @@ public class AuthenticationController {
      */
     @PostMapping("/sign-in")
     public ResponseEntity<String> signIn(@RequestBody UserDto userDto) throws AuthenticationException {
-        System.out.println(userDto.getPassword());
         return jwtAuthenticationByUserDetails.authenticate(userDto);
     }
 

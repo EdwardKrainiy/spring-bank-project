@@ -1,4 +1,4 @@
-package com.itech.model.dto;
+package com.itech.model.dto.user;
 
 import lombok.*;
 

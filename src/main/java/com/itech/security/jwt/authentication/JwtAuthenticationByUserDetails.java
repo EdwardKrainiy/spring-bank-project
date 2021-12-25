@@ -1,6 +1,6 @@
 package com.itech.security.jwt.authentication;
 
-import com.itech.model.dto.UserDto;
+import com.itech.model.dto.user.UserDto;
 import com.itech.security.jwt.provider.TokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

@@ -1,6 +1,6 @@
-package com.itech.utils.mapper;
+package com.itech.utils.mapper.transaction;
 
-import com.itech.model.dto.TransactionDto;
+import com.itech.model.dto.transaction.TransactionDto;
 import com.itech.model.entity.Transaction;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

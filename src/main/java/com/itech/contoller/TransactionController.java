@@ -1,12 +1,13 @@
 package com.itech.contoller;
 
-import com.itech.model.dto.TransactionDto;
-import com.itech.model.entity.Transaction;
+import com.itech.model.dto.transaction.TransactionCreateDto;
+import com.itech.model.dto.transaction.TransactionDto;
 import com.itech.service.transaction.impl.TransactionServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -19,12 +20,17 @@ public class TransactionController {
     private TransactionServiceImpl transactionService;
 
     @GetMapping("{id}")
-    public ResponseEntity<TransactionDto> getTransactionById(@PathVariable("id") Long transactionId){
+    public ResponseEntity<TransactionDto> getTransactionById(@PathVariable("id") Long transactionId) {
         return transactionService.findTransactionById(transactionId);
     }
 
     @GetMapping()
-    public ResponseEntity<List<TransactionDto>> getAllTransactions(){
+    public ResponseEntity<List<TransactionDto>> getAllTransactions() {
         return transactionService.findAllTransactions();
+    }
+
+    @PostMapping()
+    public ResponseEntity<Long> createTransaction(@Valid @RequestBody TransactionCreateDto transactionCreateDto) {
+        return transactionService.createTransaction(transactionCreateDto);
     }
 }

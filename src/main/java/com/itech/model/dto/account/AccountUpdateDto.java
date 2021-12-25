@@ -1,4 +1,4 @@
-package com.itech.model.dto;
+package com.itech.model.dto.account;
 
 import com.itech.model.enumeration.Currency;
 import lombok.*;

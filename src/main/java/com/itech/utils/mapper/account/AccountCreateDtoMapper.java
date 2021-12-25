@@ -1,6 +1,6 @@
-package com.itech.utils.mapper;
+package com.itech.utils.mapper.account;
 
-import com.itech.model.dto.AccountCreateDto;
+import com.itech.model.dto.account.AccountCreateDto;
 import com.itech.model.entity.Account;
 import org.mapstruct.Mapper;
 

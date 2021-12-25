@@ -1,8 +1,8 @@
 package com.itech.service.account;
 
-import com.itech.model.dto.AccountCreateDto;
-import com.itech.model.dto.AccountDto;
-import com.itech.model.dto.AccountUpdateDto;
+import com.itech.model.dto.account.AccountCreateDto;
+import com.itech.model.dto.account.AccountDto;
+import com.itech.model.dto.account.AccountUpdateDto;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
