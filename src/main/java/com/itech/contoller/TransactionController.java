@@ -5,6 +5,8 @@ import com.itech.model.dto.transaction.TransactionDto;
 import com.itech.service.transaction.impl.TransactionServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -33,4 +35,5 @@ public class TransactionController {
     public ResponseEntity<Long> createTransaction(@Valid @RequestBody TransactionCreateDto transactionCreateDto) {
         return transactionService.createTransaction(transactionCreateDto);
     }
+
 }

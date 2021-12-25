@@ -21,7 +21,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
+import javax.validation.Valid;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -69,7 +71,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public ResponseEntity<Long> createTransaction(TransactionCreateDto transactionCreateDto) {
+    public ResponseEntity<Long> createTransaction(@Validated TransactionCreateDto transactionCreateDto) {
         User foundUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("User not found!"));
 
         LocalDateTime currentDate = LocalDateTime.now();
@@ -92,14 +94,11 @@ public class TransactionServiceImpl implements TransactionService {
 
         transaction.setOperations(operations);
 
-        transactionRepository.save(transaction);
-
-        return completeTransaction(transaction, operations);
+        return ResponseEntity.ok(transactionRepository.save(transaction).getId());
     }
 
     @Override
-    @Transactional
-    public ResponseEntity<Long> completeTransaction(Transaction transaction, Set<Operation> operations) {
+    public ResponseEntity<Long> completeTransaction(Transaction transaction, Set<@Valid Operation> operations) {
         for(Operation operation: operations){
             LocalDate date = Instant.ofEpochMilli(transaction.getIssuedAt().getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
             if(!date.isBefore(LocalDate.now().plusDays(1))) {
@@ -109,7 +108,7 @@ public class TransactionServiceImpl implements TransactionService {
             }
             switch (operation.getOperationType()){
                 case DEBIT:
-
+                    
                 case CREDIT:
             }
 

@@ -15,10 +15,13 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OperationCreateDto {
-    @NotNull
+
+    @NotNull(message = "Account number is empty!")
     private String accountNumber;
-    @NotNull
+
+    @NotNull(message = "Amount is empty!")
     private double amount;
-    @NotNull
+
+    @NotNull(message = "Operation Type number is empty!")
     private OperationType operationType;
 }

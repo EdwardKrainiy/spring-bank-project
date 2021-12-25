@@ -1,19 +1,24 @@
 package com.itech.utils.exception.handler;
 
+import com.itech.utils.exception.EntityExistsException;
 import com.itech.utils.exception.EntityNotFoundException;
 import com.itech.utils.exception.EntityValidationException;
 import com.itech.utils.exception.IncorrectPasswordException;
-import com.itech.utils.exception.EntityExistsException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
 import org.iban4j.IbanFormatException;
 import org.iban4j.InvalidCheckDigitException;
 import org.iban4j.UnsupportedCountryException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import javax.persistence.PostRemove;
 
 /**
  * Exception handler class.
@@ -23,8 +28,14 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler {
 
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request)     {
+        ApiError apiError = new ApiError("Validation not passed!", ex.getMessage());
+        return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(value = {IllegalArgumentException.class})
-    protected ResponseEntity<ApiError> handleIllegalArgumentException(RuntimeException ex) {
+    protected ResponseEntity<ApiError> handleException(RuntimeException ex) {
         ApiError exceptionError = new ApiError("An error occurred while fetching Username from Token", ex.getMessage());
         return new ResponseEntity<>(exceptionError, HttpStatus.UNAUTHORIZED);
     }
