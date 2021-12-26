@@ -3,6 +3,7 @@ package com.itech.service.transaction.impl;
 import com.itech.model.dto.operation.OperationCreateDto;
 import com.itech.model.dto.transaction.TransactionCreateDto;
 import com.itech.model.dto.transaction.TransactionDto;
+import com.itech.model.entity.Account;
 import com.itech.model.entity.Operation;
 import com.itech.model.entity.Transaction;
 import com.itech.model.entity.User;
@@ -18,9 +19,9 @@ import com.itech.utils.exception.EntityNotFoundException;
 import com.itech.utils.exception.EntityValidationException;
 import com.itech.utils.mapper.transaction.TransactionDtoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
@@ -28,8 +29,10 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Edvard Krainiy on 12/23/2021
@@ -71,7 +74,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public ResponseEntity<Long> createTransaction(@Validated TransactionCreateDto transactionCreateDto) {
+    public ResponseEntity<Long> createTransaction(TransactionCreateDto transactionCreateDto) {
         User foundUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("User not found!"));
 
         LocalDateTime currentDate = LocalDateTime.now();
@@ -83,7 +86,9 @@ public class TransactionServiceImpl implements TransactionService {
 
         Set<Operation> operations = new LinkedHashSet<>();
 
-        for(OperationCreateDto operationCreateDto: transactionCreateDto.getOperations()){
+        Set<OperationCreateDto> dtoOperations = transactionCreateDto.getOperations();
+
+        for (OperationCreateDto operationCreateDto : dtoOperations) {
             Operation operation = new Operation();
             operation.setAccount(accountRepository.findAccountByAccountNumber(operationCreateDto.getAccountNumber()).orElseThrow(() -> new EntityNotFoundException("Account not found!")));
             operation.setTransaction(transaction);
@@ -94,25 +99,59 @@ public class TransactionServiceImpl implements TransactionService {
 
         transaction.setOperations(operations);
 
-        return ResponseEntity.ok(transactionRepository.save(transaction).getId());
+        return completeTransaction(transaction, operations);
     }
 
     @Override
-    public ResponseEntity<Long> completeTransaction(Transaction transaction, Set<@Valid Operation> operations) {
-        for(Operation operation: operations){
+    public ResponseEntity<Long> completeTransaction(Transaction transaction, Set<Operation> operations) {
+        double sumOfAmounts = 0;
+
+        boolean isDebitOperationsExists = false;
+        boolean isCreditOperationsExists = false;
+
+        List<Account> accounts = new ArrayList<>();
+
+        for (Operation operation : operations) {
             LocalDate date = Instant.ofEpochMilli(transaction.getIssuedAt().getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
-            if(!date.isBefore(LocalDate.now().plusDays(1))) {
+            if (!date.isBefore(LocalDate.now().plusDays(1))) {
                 transaction.setStatus(TransactionStatus.REJECTED);
                 transactionRepository.save(transaction);
                 throw new EntityValidationException("Time of transaction is over!");
             }
-            switch (operation.getOperationType()){
-                case DEBIT:
-                    
-                case CREDIT:
-            }
 
+            Account operationAccount;
+
+            switch (operation.getOperationType()){
+                case CREDIT:
+                    operationAccount = operation.getAccount().clone();
+                    operationAccount.setAmount(operationAccount.getAmount() + operation.getAmount());
+                    accounts.add(operationAccount);
+
+                    isDebitOperationsExists = true;
+                    sumOfAmounts = sumOfAmounts + operation.getAmount();
+                    break;
+                case DEBIT:
+                    operationAccount = operation.getAccount().clone();
+                    if(operationAccount.getAmount() - operation.getAmount() < 0) throw new EntityValidationException("DEBIT amount is more than stored in this account.");
+                    operationAccount.setAmount(operationAccount.getAmount() - operation.getAmount());
+                    accounts.add(operationAccount);
+
+                    isCreditOperationsExists = true;
+                    sumOfAmounts = sumOfAmounts - operation.getAmount();
+                    break;
+            }
         }
-        return ResponseEntity.ok(Long.parseLong("-1"));
+
+        if(!isCreditOperationsExists || !isDebitOperationsExists || sumOfAmounts != 0){
+            transaction.setStatus(TransactionStatus.REJECTED);
+            transactionRepository.save(transaction);
+            throw new EntityValidationException("Incorrect structure of request. It must be at least 1 DEBIT and 1 CREDIT operations, and sum of CREDIT minus sum of DEBIT operation amounts must equals 0.");
+        }
+
+        accountRepository.saveAll(accounts);
+
+        transaction.setStatus(TransactionStatus.CREATED);
+
+        return ResponseEntity.status(201).body(transactionRepository.save(transaction).getId());
     }
 }

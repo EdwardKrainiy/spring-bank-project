@@ -20,7 +20,7 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Account {
+public class Account implements Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,4 +40,15 @@ public class Account {
 
     @Column(name = "account_number")
     private String accountNumber;
+
+    @Override
+    public Account clone() {
+        try {
+            Account clone = (Account) super.clone();
+            // TODO: copy mutable state here, so the clone can't change the internals of the original
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
 }

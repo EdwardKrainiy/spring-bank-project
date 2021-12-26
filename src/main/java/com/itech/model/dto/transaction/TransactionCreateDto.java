@@ -21,5 +21,6 @@ import java.util.Set;
 public class TransactionCreateDto {
     @NotEmpty(message = "Operations is empty!")
     @Size(min = 2, message = "Minimal size of operations is 2!")
-    private Set<@Valid OperationCreateDto> operations;
+
+    private @Valid Set<OperationCreateDto> operations;
 }

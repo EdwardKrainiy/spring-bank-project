@@ -2,6 +2,8 @@ package com.itech.model.dto.operation;
 
 import lombok.*;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * @author Edvard Krainiy on 12/23/2021
  */
@@ -12,8 +14,12 @@ import lombok.*;
 @AllArgsConstructor
 public class OperationDto {
     private Long id;
+
     private Long accountId;
+
     private Long transactionId;
+
     private Double amount;
+
     private String operationType;
 }

@@ -3,6 +3,7 @@ package com.itech.model.dto.operation;
 import com.itech.model.enumeration.OperationType;
 import lombok.*;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 
@@ -19,7 +20,7 @@ public class OperationCreateDto {
     @NotNull(message = "Account number is empty!")
     private String accountNumber;
 
-    @NotNull(message = "Amount is empty!")
+    @Min(value = 1, message = "Amount is empty!")
     private double amount;
 
     @NotNull(message = "Operation Type number is empty!")
