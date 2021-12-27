@@ -7,7 +7,6 @@ import com.itech.model.entity.Account;
 import com.itech.model.entity.Operation;
 import com.itech.model.entity.Transaction;
 import com.itech.model.entity.User;
-import com.itech.model.enumeration.OperationType;
 import com.itech.model.enumeration.TransactionStatus;
 import com.itech.repository.AccountRepository;
 import com.itech.repository.OperationRepository;
@@ -19,12 +18,9 @@ import com.itech.utils.exception.EntityNotFoundException;
 import com.itech.utils.exception.EntityValidationException;
 import com.itech.utils.mapper.transaction.TransactionDtoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -104,6 +100,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public ResponseEntity<Long> completeTransaction(Transaction transaction, Set<Operation> operations) {
+        transaction.setStatus(TransactionStatus.REJECTED);
         double sumOfAmounts = 0;
 
         boolean isDebitOperationsExists = false;
@@ -114,14 +111,13 @@ public class TransactionServiceImpl implements TransactionService {
         for (Operation operation : operations) {
             LocalDate date = Instant.ofEpochMilli(transaction.getIssuedAt().getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
             if (!date.isBefore(LocalDate.now().plusDays(1))) {
-                transaction.setStatus(TransactionStatus.REJECTED);
                 transactionRepository.save(transaction);
                 throw new EntityValidationException("Time of transaction is over!");
             }
 
             Account operationAccount;
 
-            switch (operation.getOperationType()){
+            switch (operation.getOperationType()) {
                 case CREDIT:
                     operationAccount = operation.getAccount().clone();
                     operationAccount.setAmount(operationAccount.getAmount() + operation.getAmount());
@@ -132,7 +128,10 @@ public class TransactionServiceImpl implements TransactionService {
                     break;
                 case DEBIT:
                     operationAccount = operation.getAccount().clone();
-                    if(operationAccount.getAmount() - operation.getAmount() < 0) throw new EntityValidationException("DEBIT amount is more than stored in this account.");
+                    if (operationAccount.getAmount() - operation.getAmount() < 0) {
+                        transactionRepository.save(transaction);
+                        throw new EntityValidationException("DEBIT amount is more than stored in this account.");
+                    }
                     operationAccount.setAmount(operationAccount.getAmount() - operation.getAmount());
                     accounts.add(operationAccount);
 
@@ -142,8 +141,7 @@ public class TransactionServiceImpl implements TransactionService {
             }
         }
 
-        if(!isCreditOperationsExists || !isDebitOperationsExists || sumOfAmounts != 0){
-            transaction.setStatus(TransactionStatus.REJECTED);
+        if (!isCreditOperationsExists || !isDebitOperationsExists || sumOfAmounts != 0) {
             transactionRepository.save(transaction);
             throw new EntityValidationException("Incorrect structure of request. It must be at least 1 DEBIT and 1 CREDIT operations, and sum of CREDIT minus sum of DEBIT operation amounts must equals 0.");
         }
