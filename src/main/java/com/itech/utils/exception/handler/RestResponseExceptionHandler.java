@@ -1,9 +1,6 @@
 package com.itech.utils.exception.handler;
 
-import com.itech.utils.exception.EntityExistsException;
-import com.itech.utils.exception.EntityNotFoundException;
-import com.itech.utils.exception.EntityValidationException;
-import com.itech.utils.exception.IncorrectPasswordException;
+import com.itech.utils.exception.*;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
 import org.iban4j.IbanFormatException;
@@ -19,7 +16,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import javax.persistence.PostRemove;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,7 +28,7 @@ import java.util.Map;
 public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request)     {
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
@@ -84,8 +80,8 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
         return new ResponseEntity<>(exceptionError, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(value = {EntityValidationException.class})
-    protected ResponseEntity<ApiError> handleEntityValidationException(RuntimeException ex) {
+    @ExceptionHandler(value = {ValidationException.class})
+    protected ResponseEntity<ApiError> handleValidationException(RuntimeException ex) {
         ApiError exceptionError = new ApiError(ex.getMessage());
         return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
     }

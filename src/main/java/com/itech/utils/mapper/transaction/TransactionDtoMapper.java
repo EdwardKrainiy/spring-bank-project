@@ -7,15 +7,17 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
 /**
+ * TransactionDtoMapper interface, which contains method to transform Transaction to TransactionDto.
+ *
  * @author Edvard Krainiy on 12/23/2021
  */
 
 @Mapper(componentModel = "spring")
 public interface TransactionDtoMapper {
     /**
-     * toDto method. Converts Account object to AccountCreateDto.
+     * toDto method. Converts Transaction object to TransactionDto.
      *
-     * @param transaction Account object we need to convert.
+     * @param transaction Transaction object we need to convert.
      * @return TransactionDto Obtained TransactionDto entity.
      */
     @Mappings({

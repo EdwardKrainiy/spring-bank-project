@@ -8,10 +8,7 @@ import com.itech.security.jwt.provider.TokenProvider;
 import com.itech.service.mail.EmailService;
 import com.itech.service.user.UserService;
 import com.itech.utils.JwtDecoder;
-import com.itech.utils.exception.EntityNotFoundException;
-import com.itech.utils.exception.EntityValidationException;
-import com.itech.utils.exception.IncorrectPasswordException;
-import com.itech.utils.exception.EntityExistsException;
+import com.itech.utils.exception.*;
 import com.itech.utils.mapper.user.UserDtoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.Valid;
+
 /**
  * Implementation of UserService interface. Provides us different methods of Service layer to work with Repository layer of User objects.
  *
@@ -29,10 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserServiceImpl implements UserService {
-    private static final String VALID_EMAIL_ADDRESS_REGEX = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$";
-
-    private static final String VALID_USERNAME_ADDRESS_REGEX = "^[a-zA-Z0-9._-]{3,}$";
-
     @Value("${spring.mail.confirmation.message}")
     private String confirmMessage;
 
@@ -64,31 +59,12 @@ public class UserServiceImpl implements UserService {
      * @throws EntityExistsException     if user already exists.
      */
     @Override
-    public ResponseEntity<Void> createUser(UserDto userDto) throws EntityValidationException, EntityExistsException, EntityExistsException {
+    public ResponseEntity<Void> createUser(UserDto userDto){
 
-        User mappedUser = userDtoMapper.toEntity(userDto);
-
-        if (mappedUser.getUsername() == null) throw new EntityValidationException("Missing username!");
-
-
-        if (mappedUser.getPassword() == null) throw new EntityValidationException("Missing password!");
-
-
-        if (mappedUser.getEmail() == null) throw new EntityValidationException("Missing email!");
-
-        if (!mappedUser.getUsername().matches(VALID_USERNAME_ADDRESS_REGEX))
-            throw new EntityValidationException("Username is not valid!");
-
-        if (!mappedUser.getEmail().matches(VALID_EMAIL_ADDRESS_REGEX))
-            throw new EntityValidationException("Email is not valid!");
-
+        @Valid User mappedUser = userDtoMapper.toEntity(userDto);
 
         if (userRepository.getUserByUsername(mappedUser.getUsername()).isPresent() || userRepository.getUserByEmail(mappedUser.getEmail()).isPresent())
-            throw new EntityExistsException("This user already exists!");
-
-
-        if (mappedUser.getPassword().length() > 20 || mappedUser.getPassword().length() < 5)
-            throw new EntityValidationException("Incorrect password length! It must be from 5 to 20");
+            throw new ValidationException("This user already exists!");
 
         User createdUser = new User(mappedUser.getUsername(), encoder.encode(mappedUser.getPassword()), mappedUser.getEmail(), Role.USER);
 
@@ -115,8 +91,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public User findUserByUsername(String username) {
-        User user = userRepository.getUserByUsername(username).orElseThrow(() -> new EntityNotFoundException("User not found!"));
-        return user;
+        return userRepository.getUserByUsername(username).orElseThrow(() -> new EntityNotFoundException("User not found!"));
     }
 
     /**
@@ -150,7 +125,7 @@ public class UserServiceImpl implements UserService {
         User activatedUser = userRepository.getById(userId);
 
         if (activatedUser.getConfirmationToken() == null) {
-            throw new EntityValidationException("This user is already activated!");
+            throw new ValidationException("This user is already activated!");
         }
 
         activatedUser.setConfirmationToken(null);

@@ -2,10 +2,6 @@ package com.itech.service.user;
 
 import com.itech.model.entity.User;
 import com.itech.model.dto.user.UserDto;
-import com.itech.utils.exception.EntityExistsException;
-import com.itech.utils.exception.EntityIdNotFoundException;
-import com.itech.utils.exception.EntityNotFoundException;
-import com.itech.utils.exception.EntityValidationException;
 import org.springframework.http.ResponseEntity;
 
 /**
@@ -15,11 +11,11 @@ import org.springframework.http.ResponseEntity;
  */
 
 public interface UserService {
-    ResponseEntity<Void> createUser(UserDto userDto) throws EntityIdNotFoundException, EntityExistsException, EntityValidationException;
+    ResponseEntity<Void> createUser(UserDto userDto);
 
-    User findUserByUsername(String username) throws EntityNotFoundException;
+    User findUserByUsername(String username);
 
-    User findUserByUsernameAndPassword(String username, String password) throws EntityNotFoundException;
+    User findUserByUsernameAndPassword(String username, String password);
 
     ResponseEntity<Void> activateUser(String token);
 }

@@ -1,5 +1,6 @@
 package com.itech.model.dto.user;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 /**
@@ -9,12 +10,15 @@ import lombok.*;
  */
 
 @Data
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDto {
+    @JsonProperty("Username")
     private String username;
+
+    @JsonProperty("Password")
     private String password;
+
+    @JsonProperty("Email")
     private String email;
 }

@@ -3,6 +3,8 @@ package com.itech.model.enumeration;
 import org.iban4j.CountryCode;
 
 /**
+ * Enum, which contains all currencies we need in app.
+ *
  * @author Edvard Krainiy on 16/12/2021
  */
 public enum Currency {

@@ -5,11 +5,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  * UserExistsException class.
+ *
  * @author Edvard Krainiy on 12/12/2021
  */
 
 @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-public class EntityExistsException extends RuntimeException{
+public class EntityExistsException extends RuntimeException {
     public EntityExistsException(String message) {
         super(message);
     }

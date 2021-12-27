@@ -10,14 +10,15 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * TransactionService interface. Provides us different methods to work with Transaction objects on Service layer.
+ *
  * @author Edvard Krainiy on 12/23/2021
  */
 public interface TransactionService {
-    ResponseEntity<TransactionDto> findTransactionById(Long transactionId);
+    TransactionDto findTransactionById(Long transactionId);
 
-    ResponseEntity<List<TransactionDto>> findAllTransactions();
+    List<TransactionDto> findAllTransactions();
 
-    ResponseEntity<Long> createTransaction(TransactionCreateDto transactionCreateDto);
+    Long createTransaction(TransactionCreateDto transactionCreateDto);
 
-    ResponseEntity<Long> completeTransaction(Transaction transaction, Set<Operation> operations);
 }

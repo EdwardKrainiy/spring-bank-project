@@ -1,6 +1,6 @@
 package com.itech.utils;
 
-import com.itech.utils.exception.EntityIdNotFoundException;
+import com.itech.utils.exception.EntityNotFoundException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -35,7 +35,7 @@ public class JwtDecoder {
 
         Optional<Long> userId = Optional.of(Long.parseLong(confirmationClaims.getSubject()));
 
-        return userId.orElseThrow(() -> new EntityIdNotFoundException(String.format("User with id = %d not found!", userId)));
+        return userId.orElseThrow(() -> new EntityNotFoundException(String.format("User with id = %d not found!", userId)));
     }
 
     public String getUsernameOfLoggedUser(){

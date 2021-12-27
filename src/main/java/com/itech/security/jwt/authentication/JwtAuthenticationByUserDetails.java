@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
  * JwtAuthentication class.
  *
  * @author Edvard Krainiy on 12/10/2021
- * @version 1.0
  */
 
 @Component

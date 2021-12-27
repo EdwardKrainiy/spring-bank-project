@@ -9,7 +9,7 @@ import com.itech.repository.AccountRepository;
 import com.itech.service.account.AccountService;
 import com.itech.utils.IbanGenerator;
 import com.itech.utils.exception.EntityNotFoundException;
-import com.itech.utils.exception.EntityValidationException;
+import com.itech.utils.exception.ValidationException;
 import com.itech.utils.mapper.account.AccountCreateDtoMapper;
 import com.itech.utils.mapper.account.AccountDtoMapper;
 import com.itech.utils.mapper.account.AccountUpdateDtoMapper;
@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,11 +84,9 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public ResponseEntity<Long> createAccount(AccountCreateDto accountCreateDto) {
-        Account accountEntity = accountCreateDtoMapper.toEntity(accountCreateDto);
+        @Valid Account accountEntity = accountCreateDtoMapper.toEntity(accountCreateDto);
 
         Currency accountCurrency = accountEntity.getCurrency();
-
-        if (accountCurrency == null) throw new EntityValidationException("Missing currency!");
 
         accountEntity.setAccountNumber(ibanGenerator.generateIban(accountCurrency.getCountryCode()));
 

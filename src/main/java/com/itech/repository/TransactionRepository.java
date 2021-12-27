@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * JPA Transaction repository class.
+ *
  * @author Edvard Krainiy on 12/23/2021
  */
 @Repository

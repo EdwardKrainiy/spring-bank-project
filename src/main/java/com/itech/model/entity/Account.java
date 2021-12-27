@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 /**
  * Basic Account class.
@@ -20,7 +21,7 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Account implements Cloneable {
+public class Account{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,6 +35,7 @@ public class Account implements Cloneable {
     @Column(name = "amount")
     private double amount;
 
+    @NotNull(message = "Missing currency!")
     @Column(name = "currency")
     @Enumerated(EnumType.STRING)
     private Currency currency;
