@@ -2,6 +2,7 @@ package com.itech.service.transaction;
 
 import com.itech.model.entity.Operation;
 import com.itech.model.entity.Transaction;
+import com.itech.model.enumeration.TransactionStatus;
 import com.itech.repository.TransactionRepository;
 import com.itech.utils.exception.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,25 +28,27 @@ public class TransactionServiceUtil {
      * changeAccountAmount method. Changes amount on all accounts.
      *
      * @param operations Set of operations, which are required to obtain Account objects.
-     * @param isDtoValid Flag, that shows us validity of Dto.
-     * @throws EntityValidationException If isDtoValid is false.
+     * @param Transaction Transaction object, which we need to write in our DB.
+     * @throws ValidationException If isDtoValid is false.
      */
 
     @Transactional
-    public void changeAccountAmount(Set<Operation> operations, boolean isDtoValid) throws ValidationException {
+    public void changeAccountAmount(Set<Operation> operations, Transaction transaction) throws ValidationException {
         for (Operation operation : operations) {
             switch (operation.getOperationType()) {
                 case CREDIT:
-                    operation.getAccount().setAmount(operation.getAccount().getAmount() + operation.getAmount());
-                    break;
-                case DEBIT:
                     operation.getAccount().setAmount(operation.getAccount().getAmount() - operation.getAmount());
                     break;
+                case DEBIT:
+                    operation.getAccount().setAmount(operation.getAccount().getAmount() + operation.getAmount());
+                    break;
             }
-        }
 
-        if (!isDtoValid) {
-            throw new ValidationException("Incorrect structure of request. It must be at least 1 DEBIT and 1 CREDIT operations, and sum of CREDIT minus sum of DEBIT operation amounts must equals 0.");
+            if (operation.getAccount().getAmount() - operation.getAmount() < 0) {
+                transaction.setStatus(TransactionStatus.REJECTED);
+                transactionRepository.save(transaction);
+                throw new ValidationException("CREDIT amount is more than stored in this account.");
+            }
         }
     }
 
@@ -66,21 +69,17 @@ public class TransactionServiceUtil {
         for (Operation operation : operations) {
             LocalDate date = Instant.ofEpochMilli(transaction.getIssuedAt().getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
             if (!date.isBefore(LocalDate.now().plusDays(1))) {
+                transaction.setStatus(TransactionStatus.REJECTED);
                 transactionRepository.save(transaction);
                 throw new ValidationException("Time of transaction is over!");
             }
 
             switch (operation.getOperationType()) {
-                case CREDIT:
+                case DEBIT:
                     isDebitOperationsExists = true;
                     sumOfAmounts = sumOfAmounts + operation.getAmount();
                     break;
-                case DEBIT:
-                    if (operation.getAccount().getAmount() - operation.getAmount() < 0) {
-                        transactionRepository.save(transaction);
-                        throw new ValidationException("DEBIT amount is more than stored in this account.");
-                    }
-
+                case CREDIT:
                     isCreditOperationsExists = true;
                     sumOfAmounts = sumOfAmounts - operation.getAmount();
                     break;

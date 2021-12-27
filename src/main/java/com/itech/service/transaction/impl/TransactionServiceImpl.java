@@ -67,7 +67,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     /**
-     *findAllTransactions method. Finds all transactions, stored in DB.
+     * findAllTransactions method. Finds all transactions, stored in DB.
      *
      * @return List<TransactionDto> List of all found transactionDto objects.
      */
@@ -111,8 +111,12 @@ public class TransactionServiceImpl implements TransactionService {
             operation.setTransaction(transaction);
             operation.setOperationType(operationCreateDto.getOperationType());
             operation.setAmount(operationCreateDto.getAmount());
-            operations.add(operationRepository.save(operation));
+            operations.add(operation);
         }
+
+        if(!transactionServiceUtil.checkRequestDtoValidity(operations, transaction)) throw new ValidationException("Incorrect structure of request. It must be at least 1 DEBIT and 1 CREDIT operations, and sum of CREDIT minus sum of DEBIT operation amounts must equals 0.");
+
+        operationRepository.saveAll(operations);
 
         transaction.setOperations(operations);
 
@@ -128,18 +132,15 @@ public class TransactionServiceImpl implements TransactionService {
      */
 
     private Long completeTransaction(Transaction transaction, Set<Operation> operations) {
-        transaction.setStatus(TransactionStatus.REJECTED);
-
-        boolean isDtoValid = transactionServiceUtil.checkRequestDtoValidity(operations, transaction);
+        transaction.setStatus(TransactionStatus.CREATED);
 
         try {
-            transactionServiceUtil.changeAccountAmount(operations, isDtoValid);
+            transactionServiceUtil.changeAccountAmount(operations, transaction);
         } catch (ValidationException exception) {
+            transaction.setStatus(TransactionStatus.REJECTED);
             transactionRepository.save(transaction);
-            throw new ValidationException("Incorrect structure of request. It must be at least 1 DEBIT and 1 CREDIT operations, and sum of CREDIT minus sum of DEBIT operation amounts must equals 0.");
+            throw new ValidationException("CREDIT amount is more than stored in this account.");
         }
-
-        transaction.setStatus(TransactionStatus.CREATED);
 
         return transactionRepository.save(transaction).getId();
     }
