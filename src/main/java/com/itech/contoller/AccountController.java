@@ -5,6 +5,7 @@ import com.itech.model.dto.account.AccountDto;
 import com.itech.model.dto.account.AccountUpdateDto;
 import com.itech.service.account.impl.AccountServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +33,7 @@ public class AccountController {
 
     @GetMapping
     public ResponseEntity<List<AccountDto>> getAllAccounts() {
-        return accountService.findAllAccounts();
+        return ResponseEntity.ok(accountService.findAllAccounts());
     }
 
     /**
@@ -44,7 +45,7 @@ public class AccountController {
 
     @GetMapping("{id}")
     public ResponseEntity<AccountDto> getAccountById(@PathVariable("id") Long accountId) {
-        return accountService.findAccountByAccountId(accountId);
+        return ResponseEntity.ok(accountService.findAccountByAccountId(accountId));
     }
 
 
@@ -57,7 +58,7 @@ public class AccountController {
     @Transactional
     @PostMapping
     public ResponseEntity<Long> createAccount(@RequestBody AccountCreateDto accountCreateDto) {
-        return accountService.createAccount(accountCreateDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createAccount(accountCreateDto));
     }
 
     /**
@@ -72,7 +73,8 @@ public class AccountController {
     @PutMapping("{id}")
     public ResponseEntity<Void> updateAccount(@RequestBody AccountUpdateDto accountUpdateDto,
                                               @PathVariable("id") Long accountId) {
-        return accountService.updateAccount(accountUpdateDto, accountId);
+        accountService.updateAccount(accountUpdateDto, accountId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     /**
@@ -84,6 +86,7 @@ public class AccountController {
     @Transactional
     @DeleteMapping("{id}")
     public ResponseEntity<Void> deleteAccountById(@PathVariable("id") Long accountId) {
-        return accountService.deleteAccountByAccountId(accountId);
+        accountService.deleteAccountByAccountId(accountId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

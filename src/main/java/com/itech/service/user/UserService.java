@@ -11,11 +11,11 @@ import org.springframework.http.ResponseEntity;
  */
 
 public interface UserService {
-    ResponseEntity<Void> createUser(UserDto userDto);
+    void createUser(UserDto userDto);
 
     User findUserByUsername(String username);
 
     User findUserByUsernameAndPassword(String username, String password);
 
-    ResponseEntity<Void> activateUser(String token);
+    void activateUser(String token);
 }

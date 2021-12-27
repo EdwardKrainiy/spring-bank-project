@@ -53,14 +53,14 @@ public class AccountServiceImpl implements AccountService {
      */
 
     @Override
-    public ResponseEntity<List<AccountDto>> findAllAccounts() {
+    public List<AccountDto> findAllAccounts() {
         List<Account> accounts = accountRepository.findAll();
         if (accounts.isEmpty()) throw new EntityNotFoundException("Account not found!");
 
         List<AccountDto> accountDtos = new ArrayList<>();
         for (Account account : accounts) accountDtos.add(accountDtoMapper.toDto(account));
 
-        return ResponseEntity.ok(accountDtos);
+        return accountDtos;
     }
 
     /**
@@ -71,8 +71,8 @@ public class AccountServiceImpl implements AccountService {
      */
 
     @Override
-    public ResponseEntity<AccountDto> findAccountByAccountId(Long accountId) {
-        return ResponseEntity.ok(accountDtoMapper.toDto(accountRepository.findAccountById(accountId).orElseThrow(() -> new EntityNotFoundException("Account not found!"))));
+    public AccountDto findAccountByAccountId(Long accountId) {
+        return accountDtoMapper.toDto(accountRepository.findAccountById(accountId).orElseThrow(() -> new EntityNotFoundException("Account not found!")));
     }
 
     /**
@@ -83,14 +83,14 @@ public class AccountServiceImpl implements AccountService {
      */
 
     @Override
-    public ResponseEntity<Long> createAccount(AccountCreateDto accountCreateDto) {
+    public Long createAccount(AccountCreateDto accountCreateDto) {
         @Valid Account accountEntity = accountCreateDtoMapper.toEntity(accountCreateDto);
 
         Currency accountCurrency = accountEntity.getCurrency();
 
         accountEntity.setAccountNumber(ibanGenerator.generateIban(accountCurrency.getCountryCode()));
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(accountRepository.save(accountEntity).getId());
+        return accountRepository.save(accountEntity).getId();
     }
 
     /**
@@ -102,12 +102,11 @@ public class AccountServiceImpl implements AccountService {
      */
 
     @Override
-    public ResponseEntity<Void> updateAccount(AccountUpdateDto accountUpdateDto, Long accountId) {
+    public void updateAccount(AccountUpdateDto accountUpdateDto, Long accountId) {
         Account updateAccount = accountUpdateDtoMapper.toEntity(accountUpdateDto);
         updateAccount.setId(accountId);
         updateAccount.setAccountNumber(ibanGenerator.generateIban(accountUpdateDto.getCurrency().getCountryCode()));
         accountRepository.save(updateAccount);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     /**
@@ -118,11 +117,8 @@ public class AccountServiceImpl implements AccountService {
      */
 
     @Override
-    public ResponseEntity<Void> deleteAccountByAccountId(Long accountId) {
+    public void deleteAccountByAccountId(Long accountId) {
         Account foundAccountToDelete = accountRepository.findAccountById(accountId).orElseThrow(() -> new EntityNotFoundException("Account not found!"));
         accountRepository.deleteAccountById(foundAccountToDelete.getId());
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
-
-
 }

@@ -13,13 +13,13 @@ import java.util.List;
  * @author Edvard Krainiy on 12/18/2021
  */
 public interface AccountService {
-    ResponseEntity<List<AccountDto>> findAllAccounts();
+    List<AccountDto> findAllAccounts();
 
-    ResponseEntity<AccountDto> findAccountByAccountId(Long accountId);
+    AccountDto findAccountByAccountId(Long accountId);
 
-    ResponseEntity<Long> createAccount(AccountCreateDto accountCreateDto);
+    Long createAccount(AccountCreateDto accountCreateDto);
 
-    ResponseEntity<Void> deleteAccountByAccountId(Long accountId);
+    void deleteAccountByAccountId(Long accountId);
 
-    ResponseEntity<Void> updateAccount(AccountUpdateDto accountUpdateDto, Long accountId);
+    void updateAccount(AccountUpdateDto accountUpdateDto, Long accountId);
 }

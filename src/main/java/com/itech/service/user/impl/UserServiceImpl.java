@@ -54,12 +54,11 @@ public class UserServiceImpl implements UserService {
      *
      * @param userDto User transfer object, which we need to save. This one will be converted into User object, passed some checks and will be saved on DB.
      * @return ResponseEntity Response, which contains message and HTTP code. If something will be wrong, it will throw different Exceptions, which will tell about mistakes and errors.
-     * @throws EntityValidationException All user validation errors, like missing email or password, invalid email or others.
      * @throws EntityNotFoundException   If user wasn't found.
      * @throws EntityExistsException     if user already exists.
      */
     @Override
-    public ResponseEntity<Void> createUser(UserDto userDto){
+    public void createUser(UserDto userDto){
 
         @Valid User mappedUser = userDtoMapper.toEntity(userDto);
 
@@ -79,8 +78,6 @@ public class UserServiceImpl implements UserService {
         emailService.sendEmail(userRepository.getUserByRole(Role.MANAGER).orElseThrow(() -> new EntityNotFoundException("User not found!")).getEmail(),
                 "Confirm email for user " + mappedUser.getUsername(),
                 confirmMessage + confirmationToken);
-
-        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /**
@@ -119,7 +116,7 @@ public class UserServiceImpl implements UserService {
      */
     @Transactional
     @Override
-    public ResponseEntity<Void> activateUser(String token) {
+    public void activateUser(String token) {
         Long userId = jwtDecoder.getIdFromConfirmToken(token);
 
         User activatedUser = userRepository.getById(userId);
@@ -134,6 +131,5 @@ public class UserServiceImpl implements UserService {
         userRepository.save(activatedUser);
 
         emailService.sendEmail(activatedUser.getEmail(), "Email confirmed", "Your email was confirmed successfully!");
-        return ResponseEntity.ok().build();
     }
 }
