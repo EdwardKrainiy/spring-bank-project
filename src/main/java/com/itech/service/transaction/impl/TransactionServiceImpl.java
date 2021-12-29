@@ -1,11 +1,13 @@
 package com.itech.service.transaction.impl;
 
 import com.itech.model.dto.operation.OperationCreateDto;
+import com.itech.model.dto.operation.OperationDto;
 import com.itech.model.dto.transaction.TransactionCreateDto;
 import com.itech.model.dto.transaction.TransactionDto;
 import com.itech.model.entity.Operation;
 import com.itech.model.entity.Transaction;
 import com.itech.model.entity.User;
+import com.itech.model.enumeration.OperationType;
 import com.itech.model.enumeration.TransactionStatus;
 import com.itech.repository.AccountRepository;
 import com.itech.repository.OperationRepository;
@@ -16,8 +18,10 @@ import com.itech.service.transaction.TransactionServiceUtil;
 import com.itech.utils.JwtDecoder;
 import com.itech.utils.exception.EntityNotFoundException;
 import com.itech.utils.exception.ValidationException;
+import com.itech.utils.mapper.operation.OperationDtoMapper;
 import com.itech.utils.mapper.transaction.TransactionDtoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -40,6 +44,9 @@ public class TransactionServiceImpl implements TransactionService {
     private TransactionDtoMapper transactionDtoMapper;
 
     @Autowired
+    private OperationDtoMapper operationDtoMapper;
+
+    @Autowired
     private AccountRepository accountRepository;
 
     @Autowired
@@ -53,6 +60,8 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Autowired
     private TransactionServiceUtil transactionServiceUtil;
+
+
 
     /**
      * findTransactionById method. Finds transaction by transactionId.
@@ -91,7 +100,7 @@ public class TransactionServiceImpl implements TransactionService {
      */
 
     @Override
-    public Long createTransaction(TransactionCreateDto transactionCreateDto) {
+    public TransactionDto createTransaction(TransactionCreateDto transactionCreateDto) {
         User foundUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("User not found!"));
 
         LocalDateTime currentDate = LocalDateTime.now();
@@ -109,12 +118,19 @@ public class TransactionServiceImpl implements TransactionService {
             Operation operation = new Operation();
             operation.setAccount(accountRepository.findAccountByAccountNumber(operationCreateDto.getAccountNumber()).orElseThrow(() -> new EntityNotFoundException("Account not found!")));
             operation.setTransaction(transaction);
-            operation.setOperationType(operationCreateDto.getOperationType());
+
+            if(operationCreateDto.getOperationType().equals("DEBIT") || operationCreateDto.getOperationType().equals("CREDIT"))
+            {
+                operation.setOperationType(OperationType.valueOf(operationCreateDto.getOperationType()));
+
+            } else throw new ValidationException("Incorrect Operation Type!");
+
             operation.setAmount(operationCreateDto.getAmount());
             operations.add(operation);
         }
 
         if(!transactionServiceUtil.checkRequestDtoValidity(operations, transaction)) throw new ValidationException("Incorrect structure of request. It must be at least 1 DEBIT and 1 CREDIT operations, and sum of CREDIT minus sum of DEBIT operation amounts must equals 0.");
+
 
         operationRepository.saveAll(operations);
 
@@ -128,10 +144,10 @@ public class TransactionServiceImpl implements TransactionService {
      *
      * @param transaction Transaction object, which we need to write to DB.
      * @param operations Set of operations we need to check request dto validity and to change account amount.
-     * @return Long Id of created Transaction.
+     * @return TransactionDto Dto of created Transaction.
      */
 
-    private Long completeTransaction(Transaction transaction, Set<Operation> operations) {
+    private TransactionDto completeTransaction(Transaction transaction, Set<Operation> operations) {
         transaction.setStatus(TransactionStatus.CREATED);
 
         try {
@@ -142,7 +158,14 @@ public class TransactionServiceImpl implements TransactionService {
             throw new ValidationException("CREDIT amount is more than stored in this account.");
         }
 
-        return transactionRepository.save(transaction).getId();
+        Transaction createdTransaction = transactionRepository.save(transaction);
+
+        TransactionDto dtoOfCreateTransaction = transactionDtoMapper.toDto(createdTransaction);
+
+        Set<OperationDto> operationDtos = operationDtoMapper.toDtos(operations);
+
+        dtoOfCreateTransaction.setOperations(operationDtos);
+        return dtoOfCreateTransaction;
     }
 
 }

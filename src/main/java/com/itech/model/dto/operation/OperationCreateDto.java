@@ -31,5 +31,5 @@ public class OperationCreateDto {
 
     @JsonProperty("OperationType")
     @NotNull(message = "Operation Type number is empty!")
-    private OperationType operationType;
+    private String operationType;
 }

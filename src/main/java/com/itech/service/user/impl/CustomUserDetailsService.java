@@ -3,6 +3,7 @@ package com.itech.service.user.impl;
 import com.itech.repository.UserRepository;
 import com.itech.utils.exception.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

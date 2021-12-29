@@ -2,6 +2,7 @@ package com.itech.contoller;
 
 import com.itech.model.dto.transaction.TransactionCreateDto;
 import com.itech.model.dto.transaction.TransactionDto;
+import com.itech.model.entity.Transaction;
 import com.itech.service.transaction.impl.TransactionServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -53,7 +54,7 @@ public class TransactionController {
      */
 
     @PostMapping
-    public ResponseEntity<Long> createTransaction(@Valid @RequestBody TransactionCreateDto transactionCreateDto) {
+    public ResponseEntity<TransactionDto> createTransaction(@Valid @RequestBody TransactionCreateDto transactionCreateDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(transactionService.createTransaction(transactionCreateDto));
     }
 

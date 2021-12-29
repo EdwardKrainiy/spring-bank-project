@@ -37,15 +37,15 @@ public class TransactionServiceUtil {
         for (Operation operation : operations) {
             switch (operation.getOperationType()) {
                 case CREDIT:
+                    if (operation.getAccount().getAmount() - operation.getAmount() < 0) {
+                        throw new ValidationException("CREDIT amount is more than stored in this account.");
+                    }
+
                     operation.getAccount().setAmount(operation.getAccount().getAmount() - operation.getAmount());
                     break;
                 case DEBIT:
                     operation.getAccount().setAmount(operation.getAccount().getAmount() + operation.getAmount());
                     break;
-            }
-
-            if (operation.getAccount().getAmount() - operation.getAmount() < 0) {
-                throw new ValidationException("CREDIT amount is more than stored in this account.");
             }
         }
     }
@@ -81,6 +81,8 @@ public class TransactionServiceUtil {
                     isCreditOperationsExists = true;
                     sumOfAmounts = sumOfAmounts - operation.getAmount();
                     break;
+                default:
+                    throw new ValidationException("Operation Type is incorrect!");
             }
         }
         return isCreditOperationsExists && isDebitOperationsExists && sumOfAmounts == 0;
