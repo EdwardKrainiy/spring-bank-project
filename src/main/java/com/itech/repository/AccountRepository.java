@@ -18,4 +18,5 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     List<Account> findAll();
     Optional<Account> findAccountById(Long id);
     void deleteAccountById(Long id);
+    Optional<Account> findAccountByAccountNumber(String accountNumber);
 }

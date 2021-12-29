@@ -1,6 +1,6 @@
 package com.itech.config;
 
-import com.itech.model.Role;
+import com.itech.model.enumeration.Role;
 import com.itech.security.jwt.filter.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -38,6 +38,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/api/auth/sign-up").permitAll()
                 .antMatchers("/api/auth/email-confirmation").hasAuthority(Role.MANAGER.name())
                 .antMatchers("/api/accounts/**").hasAnyAuthority(Role.MANAGER.name(), Role.USER.name())
+                .antMatchers("/api/transactions/**").hasAnyAuthority(Role.MANAGER.name(), Role.USER.name())
                 .antMatchers("/swagger-ui.html").hasAnyAuthority(Role.MANAGER.name(), Role.USER.name())
                 .anyRequest()
                 .authenticated();

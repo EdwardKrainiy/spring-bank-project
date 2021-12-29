@@ -1,6 +1,6 @@
 package com.itech.security.jwt.authentication;
 
-import com.itech.model.dto.UserDto;
+import com.itech.model.dto.user.UserDto;
 import com.itech.security.jwt.provider.TokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
  * JwtAuthentication class.
  *
  * @author Edvard Krainiy on 12/10/2021
- * @version 1.0
  */
 
 @Component

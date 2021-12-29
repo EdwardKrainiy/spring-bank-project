@@ -1,12 +1,13 @@
 package com.itech.model.entity;
 
-import com.itech.model.Currency;
+import com.itech.model.enumeration.Currency;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 /**
  * Basic Account class.
@@ -20,7 +21,7 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Account {
+public class Account{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,10 +35,22 @@ public class Account {
     @Column(name = "amount")
     private double amount;
 
+    @NotNull(message = "Missing currency!")
     @Column(name = "currency")
     @Enumerated(EnumType.STRING)
     private Currency currency;
 
     @Column(name = "account_number")
     private String accountNumber;
+
+    @Override
+    public Account clone() {
+        try {
+            Account clone = (Account) super.clone();
+            // TODO: copy mutable state here, so the clone can't change the internals of the original
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
 }

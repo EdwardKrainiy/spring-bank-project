@@ -1,8 +1,14 @@
 package com.itech.utils.exception.handler;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Custom API Errors class.
@@ -13,11 +19,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ApiError {
-    private String message;
-    private String debugMessage;
+    @JsonProperty("Code")
+    private String code;
+    @JsonProperty("Errors")
+    private List<String> errors;
 
-    public ApiError(String message) {
-        this.message = message;
-        this.debugMessage = "-";
+    public ApiError(String code, String error){
+        this.code = code;
+        this.errors = Arrays.asList(error);
     }
 }
