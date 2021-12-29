@@ -28,7 +28,7 @@ public class TransactionServiceUtil {
      * changeAccountAmount method. Changes amount on all accounts.
      *
      * @param operations Set of operations, which are required to obtain Account objects.
-     * @param Transaction Transaction object, which we need to write in our DB.
+     * @param transaction Transaction object, which we need to write in our DB.
      * @throws ValidationException If isDtoValid is false.
      */
 
@@ -45,8 +45,6 @@ public class TransactionServiceUtil {
             }
 
             if (operation.getAccount().getAmount() - operation.getAmount() < 0) {
-                transaction.setStatus(TransactionStatus.REJECTED);
-                transactionRepository.save(transaction);
                 throw new ValidationException("CREDIT amount is more than stored in this account.");
             }
         }
