@@ -1,9 +1,12 @@
 package com.itech.contoller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itech.model.dto.account.AccountCreateDto;
 import com.itech.model.dto.account.AccountDto;
 import com.itech.model.dto.account.AccountUpdateDto;
 import com.itech.service.account.impl.AccountServiceImpl;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,11 +22,15 @@ import java.util.List;
  */
 
 @RestController
+@Log4j2
 @RequestMapping("/api/accounts")
 public class AccountController {
 
     @Autowired
     private AccountServiceImpl accountService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     /**
      * getAllAccounts endpoint.
@@ -57,7 +64,8 @@ public class AccountController {
      */
     @Transactional
     @PostMapping
-    public ResponseEntity<Long> createAccount(@RequestBody AccountCreateDto accountCreateDto) {
+    public ResponseEntity<Long> createAccount(@RequestBody AccountCreateDto accountCreateDto) throws JsonProcessingException {
+        log.info("createAccount method call. RequestBody: {}", objectMapper.writeValueAsString(accountCreateDto));
         return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createAccount(accountCreateDto));
     }
 
@@ -72,7 +80,9 @@ public class AccountController {
     @Transactional
     @PutMapping("{id}")
     public ResponseEntity<Void> updateAccount(@RequestBody AccountUpdateDto accountUpdateDto,
-                                              @PathVariable("id") Long accountId) {
+                                              @PathVariable("id") Long accountId) throws JsonProcessingException {
+        log.info("updateAccount method call. RequestBody: {}", objectMapper.writeValueAsString(accountUpdateDto));
+
         accountService.updateAccount(accountUpdateDto, accountId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

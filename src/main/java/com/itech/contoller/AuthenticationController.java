@@ -1,8 +1,11 @@
 package com.itech.contoller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itech.model.dto.user.UserDto;
 import com.itech.security.jwt.authentication.JwtAuthenticationByUserDetails;
 import com.itech.service.user.UserService;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
  */
 
 @RestController
+@Log4j2
 @RequestMapping("/api/auth")
 public class AuthenticationController {
 
@@ -25,6 +29,9 @@ public class AuthenticationController {
     @Autowired
     private JwtAuthenticationByUserDetails jwtAuthenticationByUserDetails;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     /**
      * Sign-in endpoint.
      *
@@ -32,7 +39,9 @@ public class AuthenticationController {
      * @return ResponseEntity Response, which contains message and HTTP code.
      */
     @PostMapping("/sign-in")
-    public ResponseEntity<String> signIn(@RequestBody UserDto userDto) throws AuthenticationException {
+    public ResponseEntity<String> signIn(@RequestBody UserDto userDto) throws AuthenticationException, JsonProcessingException {
+        log.info("signIn method call. RequestBody: {}", objectMapper.writeValueAsString(userDto));
+
         return jwtAuthenticationByUserDetails.authenticate(userDto);
     }
 
@@ -43,7 +52,9 @@ public class AuthenticationController {
      * @return ResponseEntity Response, which contains message and HTTP code.
      */
     @PostMapping("/sign-up")
-    public ResponseEntity<Void> signUp(@RequestBody UserDto userDto) {
+    public ResponseEntity<Void> signUp(@RequestBody UserDto userDto) throws JsonProcessingException {
+        log.info("signUp method call. RequestBody: {}", objectMapper.writeValueAsString(userDto));
+
         userService.createUser(userDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

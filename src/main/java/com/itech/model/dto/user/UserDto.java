@@ -3,6 +3,8 @@ package com.itech.model.dto.user;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
+import javax.validation.constraints.Size;
+
 /**
  * User data-transfer object to manipulate with DB.
  *
@@ -17,6 +19,7 @@ public class UserDto {
     private String username;
 
     @JsonProperty("Password")
+    @Size(min = 5, max = 20, message = "Incorrect password length! It must be from 5 to 20.")
     private String password;
 
     @JsonProperty("Email")

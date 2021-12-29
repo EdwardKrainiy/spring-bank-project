@@ -38,7 +38,6 @@ public class User {
     private String username;
 
     @NotNull(message = "Password not found!")
-    @Size(min = 5, max = 20, message = "Incorrect password length! It must be from 5 to 20.")
     @Column(name = "password")
     private String password;
 

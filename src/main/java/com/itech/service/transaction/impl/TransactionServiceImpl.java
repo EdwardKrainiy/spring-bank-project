@@ -4,6 +4,7 @@ import com.itech.model.dto.operation.OperationCreateDto;
 import com.itech.model.dto.operation.OperationDto;
 import com.itech.model.dto.transaction.TransactionCreateDto;
 import com.itech.model.dto.transaction.TransactionDto;
+import com.itech.model.entity.Account;
 import com.itech.model.entity.Operation;
 import com.itech.model.entity.Transaction;
 import com.itech.model.entity.User;
@@ -20,8 +21,8 @@ import com.itech.utils.exception.EntityNotFoundException;
 import com.itech.utils.exception.ValidationException;
 import com.itech.utils.mapper.operation.OperationDtoMapper;
 import com.itech.utils.mapper.transaction.TransactionDtoMapper;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -36,6 +37,7 @@ import java.util.Set;
  * @author Edvard Krainiy on 12/23/2021
  */
 @Service
+@Log4j2
 public class TransactionServiceImpl implements TransactionService {
     @Autowired
     private TransactionRepository transactionRepository;
@@ -60,7 +62,6 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Autowired
     private TransactionServiceUtil transactionServiceUtil;
-
 
 
     /**
@@ -119,8 +120,7 @@ public class TransactionServiceImpl implements TransactionService {
             operation.setAccount(accountRepository.findAccountByAccountNumber(operationCreateDto.getAccountNumber()).orElseThrow(() -> new EntityNotFoundException("Account not found!")));
             operation.setTransaction(transaction);
 
-            if(operationCreateDto.getOperationType().equals("DEBIT") || operationCreateDto.getOperationType().equals("CREDIT"))
-            {
+            if (operationCreateDto.getOperationType().equals("DEBIT") || operationCreateDto.getOperationType().equals("CREDIT")) {
                 operation.setOperationType(OperationType.valueOf(operationCreateDto.getOperationType()));
 
             } else throw new ValidationException("Incorrect Operation Type!");
@@ -129,7 +129,8 @@ public class TransactionServiceImpl implements TransactionService {
             operations.add(operation);
         }
 
-        if(!transactionServiceUtil.checkRequestDtoValidity(operations, transaction)) throw new ValidationException("Incorrect structure of request. It must be at least 1 DEBIT and 1 CREDIT operations, and sum of CREDIT minus sum of DEBIT operation amounts must equals 0.");
+        if (!transactionServiceUtil.checkRequestDtoValidity(operations, transaction))
+            throw new ValidationException("Incorrect structure of request. It must be at least 1 DEBIT and 1 CREDIT operations, and sum of CREDIT minus sum of DEBIT operation amounts must equals 0.");
 
 
         operationRepository.saveAll(operations);
@@ -143,7 +144,7 @@ public class TransactionServiceImpl implements TransactionService {
      * completeTransaction method. Provides us
      *
      * @param transaction Transaction object, which we need to write to DB.
-     * @param operations Set of operations we need to check request dto validity and to change account amount.
+     * @param operations  Set of operations we need to check request dto validity and to change account amount.
      * @return TransactionDto Dto of created Transaction.
      */
 
@@ -151,7 +152,7 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setStatus(TransactionStatus.CREATED);
 
         try {
-            transactionServiceUtil.changeAccountAmount(operations, transaction);
+            transactionServiceUtil.changeAccountAmount(operations);
         } catch (ValidationException exception) {
             transaction.setStatus(TransactionStatus.REJECTED);
             transactionRepository.save(transaction);
@@ -160,12 +161,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         Transaction createdTransaction = transactionRepository.save(transaction);
 
-        TransactionDto dtoOfCreateTransaction = transactionDtoMapper.toDto(createdTransaction);
-
-        Set<OperationDto> operationDtos = operationDtoMapper.toDtos(operations);
-
-        dtoOfCreateTransaction.setOperations(operationDtos);
-        return dtoOfCreateTransaction;
+        return transactionDtoMapper.toDto(createdTransaction);
     }
 
 }
