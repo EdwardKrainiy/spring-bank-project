@@ -675,10 +675,10 @@
 2021-12-29 23:59:51,308 INFO  [main] org.apache.juli.logging.DirectJDKLog:   Stopping service [Tomcat]
 2021-12-29 23:59:51,312 INFO  [main] org.apache.juli.logging.DirectJDKLog:   Stopping ProtocolHandler ["http-nio-8080"]
 2021-12-29 23:59:51,313 INFO  [main] org.apache.juli.logging.DirectJDKLog:   Destroying ProtocolHandler ["http-nio-8080"]
-2021-12-29 23:59:51,323 INFO  [main] org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLoggingListener:   
+2021-12-29 23:59:51,323 INFO  [main] org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLoggingListener:
 
 Error starting ApplicationContext. To display the conditions report re-run your application with 'debug' enabled.
-2021-12-29 23:59:51,343 ERROR [main] org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter:   
+2021-12-29 23:59:51,343 ERROR [main] org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter:
 
 ***************************
 APPLICATION FAILED TO START
@@ -727,10 +727,10 @@ Identify and stop the process that's listening on port 8080 or configure this ap
 2021-12-30 00:01:49,136 INFO  [main] org.apache.juli.logging.DirectJDKLog:   Stopping service [Tomcat]
 2021-12-30 00:01:49,140 INFO  [main] org.apache.juli.logging.DirectJDKLog:   Stopping ProtocolHandler ["http-nio-8080"]
 2021-12-30 00:01:49,140 INFO  [main] org.apache.juli.logging.DirectJDKLog:   Destroying ProtocolHandler ["http-nio-8080"]
-2021-12-30 00:01:49,147 INFO  [main] org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLoggingListener:   
+2021-12-30 00:01:49,147 INFO  [main] org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLoggingListener:
 
 Error starting ApplicationContext. To display the conditions report re-run your application with 'debug' enabled.
-2021-12-30 00:01:49,163 ERROR [main] org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter:   
+2021-12-30 00:01:49,163 ERROR [main] org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter:
 
 ***************************
 APPLICATION FAILED TO START
@@ -779,10 +779,10 @@ Identify and stop the process that's listening on port 8080 or configure this ap
 2021-12-30 00:02:12,397 INFO  [main] org.apache.juli.logging.DirectJDKLog:   Stopping service [Tomcat]
 2021-12-30 00:02:12,400 INFO  [main] org.apache.juli.logging.DirectJDKLog:   Stopping ProtocolHandler ["http-nio-8080"]
 2021-12-30 00:02:12,400 INFO  [main] org.apache.juli.logging.DirectJDKLog:   Destroying ProtocolHandler ["http-nio-8080"]
-2021-12-30 00:02:12,407 INFO  [main] org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLoggingListener:   
+2021-12-30 00:02:12,407 INFO  [main] org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLoggingListener:
 
 Error starting ApplicationContext. To display the conditions report re-run your application with 'debug' enabled.
-2021-12-30 00:02:12,421 ERROR [main] org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter:   
+2021-12-30 00:02:12,421 ERROR [main] org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter:
 
 ***************************
 APPLICATION FAILED TO START
@@ -831,10 +831,10 @@ Identify and stop the process that's listening on port 8080 or configure this ap
 2021-12-30 00:03:04,192 INFO  [main] org.apache.juli.logging.DirectJDKLog:   Stopping service [Tomcat]
 2021-12-30 00:03:04,196 INFO  [main] org.apache.juli.logging.DirectJDKLog:   Stopping ProtocolHandler ["http-nio-8080"]
 2021-12-30 00:03:04,197 INFO  [main] org.apache.juli.logging.DirectJDKLog:   Destroying ProtocolHandler ["http-nio-8080"]
-2021-12-30 00:03:04,202 INFO  [main] org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLoggingListener:   
+2021-12-30 00:03:04,202 INFO  [main] org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLoggingListener:
 
 Error starting ApplicationContext. To display the conditions report re-run your application with 'debug' enabled.
-2021-12-30 00:03:04,218 ERROR [main] org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter:   
+2021-12-30 00:03:04,218 ERROR [main] org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter:
 
 ***************************
 APPLICATION FAILED TO START
@@ -924,10 +924,10 @@ Identify and stop the process that's listening on port 8080 or configure this ap
 2021-12-30 00:05:13,662 INFO  [main] org.apache.juli.logging.DirectJDKLog:   Stopping service [Tomcat]
 2021-12-30 00:05:13,665 INFO  [main] org.apache.juli.logging.DirectJDKLog:   Stopping ProtocolHandler ["http-nio-8080"]
 2021-12-30 00:05:13,666 INFO  [main] org.apache.juli.logging.DirectJDKLog:   Destroying ProtocolHandler ["http-nio-8080"]
-2021-12-30 00:05:13,672 INFO  [main] org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLoggingListener:   
+2021-12-30 00:05:13,672 INFO  [main] org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLoggingListener:
 
 Error starting ApplicationContext. To display the conditions report re-run your application with 'debug' enabled.
-2021-12-30 00:05:13,684 ERROR [main] org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter:   
+2021-12-30 00:05:13,684 ERROR [main] org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter:
 
 ***************************
 APPLICATION FAILED TO START
