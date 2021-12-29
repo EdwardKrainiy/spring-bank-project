@@ -30,14 +30,14 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendEmail(String toAddress, String subject, String message) {
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-        log.info("AddressTo set.");
         simpleMailMessage.setTo(toAddress);
-        log.info("Subject set.");
+        log.info("Set address to...");
         simpleMailMessage.setSubject(subject);
-        log.info("Text set.");
+        log.info("Set subject...");
         simpleMailMessage.setText(message);
-        log.info("Mail sending...");
+        log.info("Set text...");
         emailSender.send(simpleMailMessage);
+        log.info("Mail sending...");
         log.info("Mail was sent successfully!");
     }
 }
