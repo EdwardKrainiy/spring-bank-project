@@ -6,6 +6,7 @@ import com.itech.model.dto.account.AccountCreateDto;
 import com.itech.model.dto.account.AccountDto;
 import com.itech.model.dto.account.AccountUpdateDto;
 import com.itech.service.account.impl.AccountServiceImpl;
+import com.itech.utils.JsonSerializer;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,7 +31,7 @@ public class AccountController {
     private AccountServiceImpl accountService;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private JsonSerializer jsonSerializer;
 
     /**
      * getAllAccounts endpoint.
@@ -64,8 +65,8 @@ public class AccountController {
      */
     @Transactional
     @PostMapping
-    public ResponseEntity<Long> createAccount(@RequestBody AccountCreateDto accountCreateDto) throws JsonProcessingException {
-        log.info("createAccount method call. RequestBody: {}", objectMapper.writeValueAsString(accountCreateDto));
+    public ResponseEntity<Long> createAccount(@RequestBody AccountCreateDto accountCreateDto){
+        log.info("RequestBody: {}", jsonSerializer.serializeObjectToJson(accountCreateDto));
         return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createAccount(accountCreateDto));
     }
 
@@ -80,8 +81,8 @@ public class AccountController {
     @Transactional
     @PutMapping("{id}")
     public ResponseEntity<Void> updateAccount(@RequestBody AccountUpdateDto accountUpdateDto,
-                                              @PathVariable("id") Long accountId) throws JsonProcessingException {
-        log.info("updateAccount method call. RequestBody: {}", objectMapper.writeValueAsString(accountUpdateDto));
+                                              @PathVariable("id") Long accountId){
+        log.info("RequestBody: {}", jsonSerializer.serializeObjectToJson(accountUpdateDto));
 
         accountService.updateAccount(accountUpdateDto, accountId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

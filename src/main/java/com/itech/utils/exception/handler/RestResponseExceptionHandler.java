@@ -38,7 +38,7 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
             errors.add(errorMessage);
         });
 
-        ApiError error = new ApiError("400", errors);
+        ApiError error = new ApiError(HttpStatus.BAD_REQUEST.value(), errors);
 
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
@@ -47,7 +47,7 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     protected ResponseEntity<ApiError> handleException(RuntimeException ex) {
         log.error("IllegalArgumentException was caught!");
 
-        ApiError exceptionError = new ApiError("401", "An error occurred while fetching Username from Token");
+    ApiError exceptionError = new ApiError(HttpStatus.UNAUTHORIZED.value(), "An error occurred while fetching Username from Token");
 
         return new ResponseEntity<>(exceptionError, HttpStatus.UNAUTHORIZED);
     }
@@ -56,7 +56,7 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     protected ResponseEntity<ApiError> handleExpiredJwtException(RuntimeException ex) {
         log.error("ExpiredJwtException was caught!");
 
-        ApiError exceptionError = new ApiError("401", "The token has expired!");
+        ApiError exceptionError = new ApiError(HttpStatus.UNAUTHORIZED.value(), "The token has expired!");
 
         return new ResponseEntity<>(exceptionError, HttpStatus.UNAUTHORIZED);
     }
@@ -65,7 +65,7 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     protected ResponseEntity<ApiError> handleInvalidSignatureException(RuntimeException ex) {
         log.error("SignatureException was caught!");
 
-        ApiError exceptionError = new ApiError("401", "Authentication Failed. Username or Password is not valid.");
+        ApiError exceptionError = new ApiError(HttpStatus.UNAUTHORIZED.value(), "Authentication Failed. Username or Password is not valid.");
 
         return new ResponseEntity<>(exceptionError, HttpStatus.UNAUTHORIZED);
     }
@@ -74,7 +74,7 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     protected ResponseEntity<ApiError> handleUserExistsException(EntityExistsException ex) {
         log.error("EntityExistsException was caught!");
 
-        ApiError exceptionError = new ApiError("400", ex.getMessage());
+        ApiError exceptionError = new ApiError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
 
         return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
     }
@@ -83,7 +83,7 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     protected ResponseEntity<ApiError> handleIncorrectPasswordException(IncorrectPasswordException ex) {
         log.error("IncorrectPasswordException was caught!");
 
-        ApiError exceptionError = new ApiError("400", ex.getMessage());
+        ApiError exceptionError = new ApiError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
 
         return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
     }
@@ -92,7 +92,7 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     protected ResponseEntity<ApiError> handleNullPointerException(RuntimeException ex) {
         log.error("NullPointerException was caught!");
 
-        ApiError exceptionError = new ApiError("400", ex.getMessage());
+        ApiError exceptionError = new ApiError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
 
         return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
     }
@@ -101,7 +101,7 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     protected ResponseEntity<ApiError> handleEntityNotFoundException(RuntimeException ex) {
         log.error("EntityNotFoundException was caught!");
 
-        ApiError exceptionError = new ApiError("404", ex.getMessage());
+        ApiError exceptionError = new ApiError(HttpStatus.NOT_FOUND.value(), ex.getMessage());
 
         return new ResponseEntity<>(exceptionError, HttpStatus.NOT_FOUND);
     }
@@ -110,7 +110,7 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     protected ResponseEntity<ApiError> handleValidationException(RuntimeException ex) {
         log.error("ValidationException was caught!");
 
-        ApiError exceptionError = new ApiError("400", ex.getMessage());
+        ApiError exceptionError = new ApiError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
 
         return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
     }
@@ -119,7 +119,7 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     protected ResponseEntity<ApiError> handleIbanExceptions(RuntimeException ex) {
         log.error("IbanException was caught!");
 
-        ApiError exceptionError = new ApiError("400", ex.getMessage());
+        ApiError exceptionError = new ApiError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
 
         return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
     }
@@ -128,7 +128,7 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     protected ResponseEntity<ApiError> handleJsonProcessingException(RuntimeException ex) {
         log.error("JsonProcessingException was caught!");
 
-        ApiError exceptionError = new ApiError("400", ex.getMessage());
+        ApiError exceptionError = new ApiError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
 
         return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
     }

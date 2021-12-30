@@ -20,12 +20,12 @@ import java.util.List;
 @NoArgsConstructor
 public class ApiError {
     @JsonProperty("Code")
-    private String code;
+    private int code;
     @JsonProperty("Errors")
     private List<String> errors;
 
-    public ApiError(String code, String error){
+    public ApiError(int code, String error){
         this.code = code;
-        this.errors = Arrays.asList(error);
+        this.errors = Collections.singletonList(error);
     }
 }

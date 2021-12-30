@@ -6,6 +6,7 @@ import com.itech.model.dto.transaction.TransactionCreateDto;
 import com.itech.model.dto.transaction.TransactionDto;
 import com.itech.model.entity.Transaction;
 import com.itech.service.transaction.impl.TransactionServiceImpl;
+import com.itech.utils.JsonSerializer;
 import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -32,7 +33,7 @@ public class TransactionController {
     private TransactionServiceImpl transactionService;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private JsonSerializer jsonSerializer;
 
     /**
      * getTransactionById endpoint.
@@ -65,8 +66,8 @@ public class TransactionController {
      */
 
     @PostMapping
-    public ResponseEntity<TransactionDto> createTransaction(@Valid @RequestBody TransactionCreateDto transactionCreateDto) throws JsonProcessingException {
-        log.info("createTransaction method call. RequestBody: {}", objectMapper.writeValueAsString(transactionCreateDto));
+    public ResponseEntity<TransactionDto> createTransaction(@Valid @RequestBody TransactionCreateDto transactionCreateDto){
+        log.info("RequestBody: {}", jsonSerializer.serializeObjectToJson(transactionCreateDto));
         return ResponseEntity.status(HttpStatus.CREATED).body(transactionService.createTransaction(transactionCreateDto));
     }
 
