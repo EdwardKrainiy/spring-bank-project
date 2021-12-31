@@ -2296,6 +2296,44 @@ List of constraint violations:[
 2021-12-30 19:09:16,466 INFO  [SpringApplicationShutdownHook] org.springframework.orm.jpa.AbstractEntityManagerFactoryBean:   Closing JPA EntityManagerFactory for persistence unit 'default'
 2021-12-30 19:09:16,469 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource:   HikariPool-1 - Shutdown initiated...
 2021-12-30 19:09:16,477 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource:   HikariPool-1 - Shutdown completed.
-2021-12-31 19:09:43,282 INFO  [SpringApplicationShutdownHook] org.springframework.orm.jpa.AbstractEntityManagerFactoryBean:   Closing JPA EntityManagerFactory for persistence unit 'default'
-2021-12-31 19:09:43,335 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource:   HikariPool-1 - Shutdown initiated...
-2021-12-31 19:09:47,225 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource:   HikariPool-1 - Shutdown completed.
+2021-12-30 19:09:46,529 INFO  [main] org.springframework.boot.StartupInfoLogger:   Starting BankProjectApplication using Java 13.0.2 on Shlyapik with PID 13716 (D:\Proga\Git Repository\spring-bank-project\target\classes started by Lenovo in D:\Proga\Git Repository\spring-bank-project)
+2021-12-30 19:09:46,529 INFO  [background-preinit] org.hibernate.validator.internal.util.Version:   HV000001: Hibernate Validator 6.2.0.Final
+2021-12-30 19:09:46,532 INFO  [main] org.springframework.boot.SpringApplication:   No active profile set, falling back to default profiles: default
+2021-12-30 19:09:47,277 INFO  [main] org.springframework.data.repository.config.RepositoryConfigurationDelegate:   Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2021-12-30 19:09:47,329 INFO  [main] org.springframework.data.repository.config.RepositoryConfigurationDelegate:   Finished Spring Data repository scanning in 45 ms. Found 4 JPA repository interfaces.
+2021-12-30 19:09:47,724 INFO  [main] org.springframework.boot.web.embedded.tomcat.TomcatWebServer:   Tomcat initialized with port(s): 8181 (http)
+2021-12-30 19:09:47,729 INFO  [main] org.apache.juli.logging.DirectJDKLog:   Initializing ProtocolHandler ["http-nio-8181"]
+2021-12-30 19:09:47,730 INFO  [main] org.apache.juli.logging.DirectJDKLog:   Starting service [Tomcat]
+2021-12-30 19:09:47,730 INFO  [main] org.apache.juli.logging.DirectJDKLog:   Starting Servlet engine: [Apache Tomcat/9.0.55]
+2021-12-30 19:09:47,825 INFO  [main] org.apache.juli.logging.DirectJDKLog:   Initializing Spring embedded WebApplicationContext
+2021-12-30 19:09:47,826 INFO  [main] org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext:   Root WebApplicationContext: initialization completed in 1255 ms
+2021-12-30 19:09:47,876 WARN  [main] org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration$JpaWebConfiguration:   spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2021-12-30 19:09:48,140 INFO  [main] org.flywaydb.core.internal.logging.slf4j.Slf4jLog:   Flyway Community Edition 8.2.0 by Redgate
+2021-12-30 19:09:48,141 INFO  [main] org.flywaydb.core.internal.logging.slf4j.Slf4jLog:   Database: jdbc:postgresql://localhost:5432/postgres (PostgreSQL 14.1)
+2021-12-30 19:09:48,188 INFO  [main] org.flywaydb.core.internal.logging.slf4j.Slf4jLog:   Successfully validated 4 migrations (execution time 00:00.023s)
+2021-12-30 19:09:48,202 INFO  [main] org.flywaydb.core.internal.logging.slf4j.Slf4jLog:   Current version of schema "public": 2.1.3
+2021-12-30 19:09:48,204 INFO  [main] org.flywaydb.core.internal.logging.slf4j.Slf4jLog:   Schema "public" is up to date. No migration necessary.
+2021-12-30 19:09:48,246 INFO  [main] org.hibernate.jpa.internal.util.LogHelper:   HHH000204: Processing PersistenceUnitInfo [name: default]
+2021-12-30 19:09:48,296 INFO  [main] org.hibernate.Version:   HHH000412: Hibernate ORM core version 5.6.1.Final
+2021-12-30 19:09:48,383 INFO  [main] org.hibernate.annotations.common.reflection.java.JavaReflectionManager:   HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2021-12-30 19:09:48,446 INFO  [main] com.zaxxer.hikari.HikariDataSource:   HikariPool-1 - Starting...
+2021-12-30 19:09:48,485 INFO  [main] com.zaxxer.hikari.HikariDataSource:   HikariPool-1 - Start completed.
+2021-12-30 19:09:48,497 INFO  [main] org.hibernate.dialect.Dialect:   HHH000400: Using dialect: org.hibernate.dialect.PostgreSQL10Dialect
+2021-12-30 19:09:48,974 INFO  [main] org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator:   HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2021-12-30 19:09:48,980 INFO  [main] org.springframework.orm.jpa.AbstractEntityManagerFactoryBean:   Initialized JPA EntityManagerFactory for persistence unit 'default'
+2021-12-30 19:09:49,650 INFO  [main] org.springframework.security.web.DefaultSecurityFilterChain:   Will secure any request with [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@e2696e8, org.springframework.security.web.context.SecurityContextPersistenceFilter@141eb85b, org.springframework.security.web.header.HeaderWriterFilter@6eeeb9da, org.springframework.security.web.authentication.logout.LogoutFilter@57df93c1, com.itech.security.jwt.filter.JwtAuthenticationFilter@6e1d9b32, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@6b04689e, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@4daead88, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@345d641e, org.springframework.security.web.session.SessionManagementFilter@447a557b, org.springframework.security.web.access.ExceptionTranslationFilter@32d46229, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@914ab92]
+2021-12-30 19:09:49,812 INFO  [main] org.apache.juli.logging.DirectJDKLog:   Starting ProtocolHandler ["http-nio-8181"]
+2021-12-30 19:09:49,986 INFO  [main] org.springframework.boot.web.embedded.tomcat.TomcatWebServer:   Tomcat started on port(s): 8181 (http) with context path ''
+2021-12-30 19:09:49,986 INFO  [main] springfox.documentation.spring.web.plugins.DocumentationPluginsBootstrapper:   Context refreshed
+2021-12-30 19:09:49,996 INFO  [main] springfox.documentation.spring.web.plugins.DocumentationPluginsBootstrapper:   Found 1 custom documentation plugin(s)
+2021-12-30 19:09:50,003 INFO  [main] springfox.documentation.spring.web.scanners.ApiListingReferenceScanner:   Scanning for api listing references
+2021-12-30 19:09:50,155 INFO  [main] org.springframework.boot.StartupInfoLogger:   Started BankProjectApplication in 4.003 seconds (JVM running for 4.788)
+2021-12-30 19:09:53,748 INFO  [http-nio-8181-exec-2] org.apache.juli.logging.DirectJDKLog:   Initializing Spring DispatcherServlet 'dispatcherServlet'
+2021-12-30 19:09:53,748 INFO  [http-nio-8181-exec-2] org.springframework.web.servlet.FrameworkServlet:   Initializing Servlet 'dispatcherServlet'
+2021-12-30 19:09:53,749 INFO  [http-nio-8181-exec-2] org.springframework.web.servlet.FrameworkServlet:   Completed initialization in 1 ms
+2021-12-30 19:09:53,837 INFO  [http-nio-8181-exec-2] com.itech.contoller.AuthenticationController:   signIn method call. RequestBody: {"Username":"Edvard Krainiy","Password":"managerpassword","Email":null}
+2021-12-30 19:09:55,057 WARN  [http-nio-8181-exec-2] org.apache.juli.logging.DirectJDKLog:   Creation of SecureRandom instance for session ID generation using [SHA1PRNG] took [180] milliseconds.
+2021-12-30 19:10:09,662 ERROR [http-nio-8181-exec-3] com.itech.utils.exception.handler.RestResponseExceptionHandler:   MethodArgumentNotValidException was caught!
+2021-12-30 19:31:16,318 ERROR [http-nio-8181-exec-5] com.itech.utils.exception.handler.RestResponseExceptionHandler:   MethodArgumentNotValidException was caught!
+2021-12-30 19:31:19,931 INFO  [http-nio-8181-exec-7] com.itech.contoller.TransactionController:   createTransaction method call. RequestBody: {"Operations":[{"AccountNumber":"","Amount":1.0,"OperationType":"CREDIT"},{"AccountNumber":"DE56426077798129842964","Amount":2.0,"OperationType":"DEBIT"},{"AccountNumber":"DE03909177280463145613","Amount":1.0,"OperationType":"CREDIT"}]}
+2021-12-30 19:31:19,965 ERROR [http-nio-8181-exec-7] com.itech.utils.exception.handler.RestResponseExceptionHandler:   EntityNotFoundException was caught!
