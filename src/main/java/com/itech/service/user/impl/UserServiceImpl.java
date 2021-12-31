@@ -10,6 +10,7 @@ import com.itech.service.user.UserService;
 import com.itech.utils.JwtDecoder;
 import com.itech.utils.exception.*;
 import com.itech.utils.mapper.user.UserDtoMapper;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,7 @@ import javax.validation.Valid;
  */
 
 @Service
+@Log4j2
 public class UserServiceImpl implements UserService {
     @Value("${spring.mail.confirmation.message}")
     private String confirmMessage;
@@ -58,7 +60,7 @@ public class UserServiceImpl implements UserService {
      * @throws EntityExistsException     if user already exists.
      */
     @Override
-    public void createUser(UserDto userDto){
+    public void createUser(@Valid UserDto userDto){
 
         @Valid User mappedUser = userDtoMapper.toEntity(userDto);
 
@@ -78,6 +80,8 @@ public class UserServiceImpl implements UserService {
         emailService.sendEmail(userRepository.getUserByRole(Role.MANAGER).orElseThrow(() -> new EntityNotFoundException("User not found!")).getEmail(),
                 "Confirm email for user " + mappedUser.getUsername(),
                 confirmMessage + confirmationToken);
+
+        log.info("Mail with confirmation link was sent to manager's email.");
     }
 
     /**
@@ -131,5 +135,6 @@ public class UserServiceImpl implements UserService {
         userRepository.save(activatedUser);
 
         emailService.sendEmail(activatedUser.getEmail(), "Email confirmed", "Your email was confirmed successfully!");
+        log.info("Mail about confirmation was sent.");
     }
 }

@@ -28,12 +28,11 @@ public class TransactionServiceUtil {
      * changeAccountAmount method. Changes amount on all accounts.
      *
      * @param operations Set of operations, which are required to obtain Account objects.
-     * @param transaction Transaction object, which we need to write in our DB.
      * @throws ValidationException If isDtoValid is false.
      */
 
     @Transactional
-    public void changeAccountAmount(Set<Operation> operations, Transaction transaction) throws ValidationException {
+    public void changeAccountAmount(Set<Operation> operations) throws ValidationException {
         for (Operation operation : operations) {
             switch (operation.getOperationType()) {
                 case CREDIT:
