@@ -1,6 +1,6 @@
 package com.itech.model.entity;
 
-import com.itech.model.enumeration.TransactionStatus;
+import com.itech.model.enumeration.Status;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,7 +37,7 @@ public class Transaction {
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    private TransactionStatus status;
+    private Status status;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "transaction")
     private Set<Operation> operations;

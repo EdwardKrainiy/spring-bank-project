@@ -8,7 +8,7 @@ import com.itech.model.entity.Operation;
 import com.itech.model.entity.Transaction;
 import com.itech.model.entity.User;
 import com.itech.model.enumeration.OperationType;
-import com.itech.model.enumeration.TransactionStatus;
+import com.itech.model.enumeration.Status;
 import com.itech.repository.AccountRepository;
 import com.itech.repository.OperationRepository;
 import com.itech.repository.TransactionRepository;
@@ -21,7 +21,6 @@ import com.itech.utils.exception.ValidationException;
 import com.itech.utils.mapper.operation.OperationDtoMapper;
 import com.itech.utils.mapper.transaction.TransactionDtoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -108,7 +107,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         transaction.setUser(foundUser);
         transaction.setIssuedAt(java.sql.Timestamp.valueOf(currentDate));
-        transaction.setStatus(TransactionStatus.IN_PROGRESS);
+        transaction.setStatus(Status.IN_PROGRESS);
 
         Set<Operation> operations = new LinkedHashSet<>();
 
@@ -148,12 +147,12 @@ public class TransactionServiceImpl implements TransactionService {
      */
 
     private TransactionDto completeTransaction(Transaction transaction, Set<Operation> operations) {
-        transaction.setStatus(TransactionStatus.CREATED);
+        transaction.setStatus(Status.CREATED);
 
         try {
             transactionServiceUtil.changeAccountAmount(operations, transaction);
         } catch (ValidationException exception) {
-            transaction.setStatus(TransactionStatus.REJECTED);
+            transaction.setStatus(Status.REJECTED);
             transactionRepository.save(transaction);
             throw new ValidationException("CREDIT amount is more than stored in this account.");
         }

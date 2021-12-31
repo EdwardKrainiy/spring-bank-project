@@ -5,7 +5,7 @@ package com.itech.model.enumeration;
  *
  * @author Edvard Krainiy on 12/23/2021
  */
-public enum TransactionStatus {
+public enum Status {
     REJECTED,
     IN_PROGRESS,
     CREATED
