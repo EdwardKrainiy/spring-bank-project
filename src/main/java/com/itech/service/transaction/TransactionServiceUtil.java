@@ -2,7 +2,7 @@ package com.itech.service.transaction;
 
 import com.itech.model.entity.Operation;
 import com.itech.model.entity.Transaction;
-import com.itech.model.enumeration.TransactionStatus;
+import com.itech.model.enumeration.Status;
 import com.itech.repository.TransactionRepository;
 import com.itech.utils.exception.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +66,7 @@ public class TransactionServiceUtil {
         for (Operation operation : operations) {
             LocalDate date = Instant.ofEpochMilli(transaction.getIssuedAt().getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
             if (!date.isBefore(LocalDate.now().plusDays(1))) {
-                transaction.setStatus(TransactionStatus.REJECTED);
+                transaction.setStatus(Status.REJECTED);
                 transactionRepository.save(transaction);
                 throw new ValidationException("Time of transaction is over!");
             }
