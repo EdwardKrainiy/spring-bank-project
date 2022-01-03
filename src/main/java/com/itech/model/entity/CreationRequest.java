@@ -32,6 +32,7 @@ public class CreationRequest {
     private String payload;
 
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     @Column(name = "created_id")

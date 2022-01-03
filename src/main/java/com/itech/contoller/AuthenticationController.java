@@ -1,11 +1,9 @@
 package com.itech.contoller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itech.model.dto.user.UserDto;
 import com.itech.security.jwt.authentication.JwtAuthenticationByUserDetails;
 import com.itech.service.user.UserService;
-import com.itech.utils.JsonSerializer;
+import com.itech.utils.JsonEntitySerializer;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,7 +29,7 @@ public class AuthenticationController {
     private JwtAuthenticationByUserDetails jwtAuthenticationByUserDetails;
 
     @Autowired
-    private JsonSerializer jsonSerializer;
+    private JsonEntitySerializer jsonEntitySerializer;
 
     /**
      * Sign-in endpoint.
@@ -41,7 +39,7 @@ public class AuthenticationController {
      */
     @PostMapping("/sign-in")
     public ResponseEntity<String> signIn(@RequestBody UserDto userDto) throws AuthenticationException{
-        log.info("RequestBody: {}", jsonSerializer.serializeObjectToJson(userDto));
+        log.info("RequestBody: {}", jsonEntitySerializer.serializeObjectToJson(userDto));
 
         return jwtAuthenticationByUserDetails.authenticate(userDto);
     }
@@ -54,7 +52,7 @@ public class AuthenticationController {
      */
     @PostMapping("/sign-up")
     public ResponseEntity<Void> signUp(@RequestBody UserDto userDto){
-        log.info("RequestBody: {}", jsonSerializer.serializeObjectToJson(userDto));
+        log.info("RequestBody: {}", jsonEntitySerializer.serializeObjectToJson(userDto));
 
         userService.createUser(userDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();

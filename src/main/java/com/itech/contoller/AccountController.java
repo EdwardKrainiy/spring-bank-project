@@ -1,12 +1,10 @@
 package com.itech.contoller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itech.model.dto.account.AccountCreateDto;
 import com.itech.model.dto.account.AccountDto;
 import com.itech.model.dto.account.AccountUpdateDto;
 import com.itech.service.account.impl.AccountServiceImpl;
-import com.itech.utils.JsonSerializer;
+import com.itech.utils.JsonEntitySerializer;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,7 +29,7 @@ public class AccountController {
     private AccountServiceImpl accountService;
 
     @Autowired
-    private JsonSerializer jsonSerializer;
+    private JsonEntitySerializer jsonEntitySerializer;
 
     /**
      * getAllAccounts endpoint.
@@ -66,7 +64,6 @@ public class AccountController {
     @Transactional
     @PostMapping
     public ResponseEntity<Long> createAccount(@RequestBody AccountCreateDto accountCreateDto){
-        log.info("RequestBody: {}", jsonSerializer.serializeObjectToJson(accountCreateDto));
         return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createAccount(accountCreateDto));
     }
 
@@ -82,7 +79,7 @@ public class AccountController {
     @PutMapping("{id}")
     public ResponseEntity<Void> updateAccount(@RequestBody AccountUpdateDto accountUpdateDto,
                                               @PathVariable("id") Long accountId){
-        log.info("RequestBody: {}", jsonSerializer.serializeObjectToJson(accountUpdateDto));
+        log.info("RequestBody: {}", jsonEntitySerializer.serializeObjectToJson(accountUpdateDto));
 
         accountService.updateAccount(accountUpdateDto, accountId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

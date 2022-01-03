@@ -1,16 +1,10 @@
 package com.itech.contoller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itech.model.dto.transaction.TransactionCreateDto;
 import com.itech.model.dto.transaction.TransactionDto;
-import com.itech.model.entity.Transaction;
 import com.itech.service.transaction.impl.TransactionServiceImpl;
-import com.itech.utils.JsonSerializer;
+import com.itech.utils.JsonEntitySerializer;
 import lombok.extern.log4j.Log4j2;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +27,7 @@ public class TransactionController {
     private TransactionServiceImpl transactionService;
 
     @Autowired
-    private JsonSerializer jsonSerializer;
+    private JsonEntitySerializer serializer;
 
     /**
      * getTransactionById endpoint.
@@ -66,8 +60,7 @@ public class TransactionController {
      */
 
     @PostMapping
-    public ResponseEntity<TransactionDto> createTransaction(@Valid @RequestBody TransactionCreateDto transactionCreateDto){
-        log.info("RequestBody: {}", jsonSerializer.serializeObjectToJson(transactionCreateDto));
+    public ResponseEntity<TransactionDto> createTransaction(@Valid @RequestBody TransactionCreateDto transactionCreateDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(transactionService.createTransaction(transactionCreateDto));
     }
 
