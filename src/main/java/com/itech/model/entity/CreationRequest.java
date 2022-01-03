@@ -7,6 +7,8 @@ import lombok.*;
 import javax.persistence.*;
 
 /**
+ * Basic CreationRequest class.
+ *
  * @author Edvard Krainiy on 12/30/2021
  */
 
