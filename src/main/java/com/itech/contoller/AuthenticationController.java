@@ -39,7 +39,10 @@ public class AuthenticationController {
      */
     @PostMapping("/sign-in")
     public ResponseEntity<String> signIn(@RequestBody UserDto userDto) throws AuthenticationException{
-        log.info("RequestBody: {}", jsonEntitySerializer.serializeObjectToJson(userDto));
+
+        if(log.isDebugEnabled()){
+            log.debug("RequestBody: {}", jsonEntitySerializer.serializeObjectToJson(userDto));
+        }
 
         return jwtAuthenticationByUserDetails.authenticate(userDto);
     }
@@ -52,7 +55,10 @@ public class AuthenticationController {
      */
     @PostMapping("/sign-up")
     public ResponseEntity<Void> signUp(@RequestBody UserDto userDto){
-        log.info("RequestBody: {}", jsonEntitySerializer.serializeObjectToJson(userDto));
+
+        if(log.isDebugEnabled()){
+            log.debug("RequestBody: {}", jsonEntitySerializer.serializeObjectToJson(userDto));
+        }
 
         userService.createUser(userDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();

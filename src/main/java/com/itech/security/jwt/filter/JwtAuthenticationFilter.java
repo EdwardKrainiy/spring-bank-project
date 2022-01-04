@@ -27,13 +27,13 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Value("${jwt.header.string}")
-    public String HEADER_STRING;
+    private String HEADER_STRING;
 
     @Value("${jwt.token.prefix}")
-    public String TOKEN_PREFIX;
+    private String TOKEN_PREFIX;
 
     @Value("${jwt.signing.key}")
-    public String SIGN_KEY;
+    private String SIGN_KEY;
 
     @Autowired
     private UserDetailsService customUserDetailsService;
