@@ -81,7 +81,10 @@ public class AccountController {
     @PutMapping("{id}")
     public ResponseEntity<Void> updateAccount(@RequestBody AccountUpdateDto accountUpdateDto,
                                               @PathVariable("id") Long accountId){
-        log.debug("RequestBody: {}", jsonEntitySerializer.serializeObjectToJson(accountUpdateDto));
+
+        if(log.isDebugEnabled()){
+            log.debug("RequestBody: {}", jsonEntitySerializer.serializeObjectToJson(accountUpdateDto));
+        }
 
         accountService.updateAccount(accountUpdateDto, accountId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
