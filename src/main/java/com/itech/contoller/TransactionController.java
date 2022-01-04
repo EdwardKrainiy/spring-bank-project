@@ -5,6 +5,8 @@ import com.itech.model.dto.transaction.TransactionDto;
 import com.itech.service.transaction.impl.TransactionServiceImpl;
 import com.itech.utils.JsonEntitySerializer;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.amqp.core.AmqpAdmin;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,9 +27,6 @@ public class TransactionController {
 
     @Autowired
     private TransactionServiceImpl transactionService;
-
-    @Autowired
-    private JsonEntitySerializer serializer;
 
     /**
      * getTransactionById endpoint.

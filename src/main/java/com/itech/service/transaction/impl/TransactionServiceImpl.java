@@ -16,6 +16,7 @@ import com.itech.utils.exception.EntityNotFoundException;
 import com.itech.utils.exception.ValidationException;
 import com.itech.utils.mapper.transaction.TransactionDtoMapper;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -59,7 +60,6 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Autowired
     private CreationRequestRepository creationRequestRepository;
-
 
     /**
      * findTransactionById method. Finds transaction by transactionId.

@@ -7,6 +7,8 @@ import com.itech.service.account.impl.AccountServiceImpl;
 import com.itech.utils.JsonEntitySerializer;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.messaging.Source;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,7 +81,7 @@ public class AccountController {
     @PutMapping("{id}")
     public ResponseEntity<Void> updateAccount(@RequestBody AccountUpdateDto accountUpdateDto,
                                               @PathVariable("id") Long accountId){
-        log.info("RequestBody: {}", jsonEntitySerializer.serializeObjectToJson(accountUpdateDto));
+        log.debug("RequestBody: {}", jsonEntitySerializer.serializeObjectToJson(accountUpdateDto));
 
         accountService.updateAccount(accountUpdateDto, accountId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
