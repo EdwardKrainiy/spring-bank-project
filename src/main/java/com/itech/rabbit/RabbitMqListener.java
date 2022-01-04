@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
+ * RabbitMqListener class. Provides queue listener.
+ *
  * @author Edvard Krainiy on 01/03/2022
  */
 @Component
@@ -13,6 +15,12 @@ import org.springframework.stereotype.Component;
 public class RabbitMqListener {
     @Value("${spring.rabbit.mq.queuename}")
     private String queueName;
+
+    /**
+     * processRabbitQueue method. Creates RabbitMQ listener for queue, which will process messages from queue.
+     *
+     * @param message Message from queue.
+     */
 
     @RabbitListener(queues = "${spring.rabbit.mq.queuename}")
     public void processRabbitQueue(String message) {

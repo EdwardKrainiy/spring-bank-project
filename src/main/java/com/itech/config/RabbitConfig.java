@@ -12,6 +12,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
+ * Configuration for RabbitMQ.
+ *
  * @author Edvard Krainiy on 01/03/2022
  */
 @Configuration
@@ -23,20 +25,43 @@ public class RabbitConfig {
     @Value("${spring.rabbit.mq.hostname}")
     private String hostname;
 
+    /**
+     * connectionFactory method.
+     *
+     * @return ConnectionFactory bean.
+     */
     @Bean
     public ConnectionFactory connectionFactory() {
         return new CachingConnectionFactory(hostname);
     }
+
+    /**
+     * amqpAdmin method. Creates amqp admin.
+     *
+     * @return AmqpAdmin bean.
+     */
 
     @Bean
     public AmqpAdmin amqpAdmin() {
         return new RabbitAdmin(connectionFactory());
     }
 
+    /**
+     * rabbitTemplate method.
+     *
+     * @return RabbitTemplate bean.
+     */
+
     @Bean
     public RabbitTemplate rabbitTemplate() {
         return new RabbitTemplate(connectionFactory());
     }
+
+    /**
+     * bankAppQueue method. Creates queue.
+     *
+     * @return Queue bean.
+     */
 
     @Bean
     public Queue bankAppQueue() {
