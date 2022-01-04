@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Log4j2
-public class JsonSerializer {
+public class JsonEntitySerializer {
     @Autowired
     private ObjectMapper objectMapper;
 

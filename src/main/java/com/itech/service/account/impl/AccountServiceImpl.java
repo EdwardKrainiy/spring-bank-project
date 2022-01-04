@@ -1,21 +1,27 @@
 package com.itech.service.account.impl;
 
-import com.itech.model.enumeration.Currency;
 import com.itech.model.dto.account.AccountCreateDto;
 import com.itech.model.dto.account.AccountDto;
 import com.itech.model.dto.account.AccountUpdateDto;
 import com.itech.model.entity.Account;
+import com.itech.model.entity.CreationRequest;
+import com.itech.model.entity.User;
+import com.itech.model.enumeration.CreationType;
+import com.itech.model.enumeration.Currency;
+import com.itech.model.enumeration.Status;
 import com.itech.repository.AccountRepository;
+import com.itech.repository.CreationRequestRepository;
+import com.itech.repository.UserRepository;
 import com.itech.service.account.AccountService;
 import com.itech.utils.IbanGenerator;
+import com.itech.utils.JsonEntitySerializer;
+import com.itech.utils.JwtDecoder;
 import com.itech.utils.exception.EntityNotFoundException;
-import com.itech.utils.exception.ValidationException;
 import com.itech.utils.mapper.account.AccountCreateDtoMapper;
 import com.itech.utils.mapper.account.AccountDtoMapper;
 import com.itech.utils.mapper.account.AccountUpdateDtoMapper;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
@@ -29,6 +35,7 @@ import java.util.List;
  */
 
 @Service
+@Log4j2
 public class AccountServiceImpl implements AccountService {
 
     @Autowired
@@ -45,6 +52,18 @@ public class AccountServiceImpl implements AccountService {
 
     @Autowired
     private IbanGenerator ibanGenerator;
+
+    @Autowired
+    private JsonEntitySerializer serializer;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private JwtDecoder jwtDecoder;
+
+    @Autowired
+    private CreationRequestRepository creationRequestRepository;
 
     /**
      * findAllAccounts method. Finds all accounts from DB.
@@ -84,13 +103,24 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Long createAccount(AccountCreateDto accountCreateDto) {
+        User foundUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("User not found!"));
+
         @Valid Account accountEntity = accountCreateDtoMapper.toEntity(accountCreateDto);
 
-        Currency accountCurrency = accountEntity.getCurrency();
+        CreationRequest accountCreatingRequest = new CreationRequest();
+        accountCreatingRequest.setStatus(Status.IN_PROGRESS);
+        accountCreatingRequest.setCreationType(CreationType.ACCOUNT);
+        accountCreatingRequest.setPayload(serializer.serializeObjectToJson(accountCreateDto));
+        accountCreatingRequest.setUser(foundUser);
 
+        Currency accountCurrency = accountEntity.getCurrency();
         accountEntity.setAccountNumber(ibanGenerator.generateIban(accountCurrency.getCountryCode()));
 
-        return accountRepository.save(accountEntity).getId();
+        accountCreatingRequest.setStatus(Status.CREATED);
+        accountCreatingRequest.setCreatedId(accountRepository.save(accountEntity).getId());
+
+        log.info("Account was created successfully!");
+        return creationRequestRepository.save(accountCreatingRequest).getCreatedId();
     }
 
     /**

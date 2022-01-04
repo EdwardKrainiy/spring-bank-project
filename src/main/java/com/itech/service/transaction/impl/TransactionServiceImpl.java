@@ -1,27 +1,22 @@
 package com.itech.service.transaction.impl;
 
 import com.itech.model.dto.operation.OperationCreateDto;
-import com.itech.model.dto.operation.OperationDto;
 import com.itech.model.dto.transaction.TransactionCreateDto;
 import com.itech.model.dto.transaction.TransactionDto;
-import com.itech.model.entity.Account;
-import com.itech.model.entity.Operation;
-import com.itech.model.entity.Transaction;
-import com.itech.model.entity.User;
+import com.itech.model.entity.*;
+import com.itech.model.enumeration.CreationType;
 import com.itech.model.enumeration.OperationType;
 import com.itech.model.enumeration.Status;
-import com.itech.repository.AccountRepository;
-import com.itech.repository.OperationRepository;
-import com.itech.repository.TransactionRepository;
-import com.itech.repository.UserRepository;
+import com.itech.repository.*;
 import com.itech.service.transaction.TransactionService;
 import com.itech.service.transaction.TransactionServiceUtil;
+import com.itech.utils.JsonEntitySerializer;
 import com.itech.utils.JwtDecoder;
 import com.itech.utils.exception.EntityNotFoundException;
 import com.itech.utils.exception.ValidationException;
-import com.itech.utils.mapper.operation.OperationDtoMapper;
 import com.itech.utils.mapper.transaction.TransactionDtoMapper;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,9 +41,6 @@ public class TransactionServiceImpl implements TransactionService {
     private TransactionDtoMapper transactionDtoMapper;
 
     @Autowired
-    private OperationDtoMapper operationDtoMapper;
-
-    @Autowired
     private AccountRepository accountRepository;
 
     @Autowired
@@ -63,6 +55,11 @@ public class TransactionServiceImpl implements TransactionService {
     @Autowired
     private TransactionServiceUtil transactionServiceUtil;
 
+    @Autowired
+    private JsonEntitySerializer serializer;
+
+    @Autowired
+    private CreationRequestRepository creationRequestRepository;
 
     /**
      * findTransactionById method. Finds transaction by transactionId.
@@ -104,6 +101,13 @@ public class TransactionServiceImpl implements TransactionService {
     public TransactionDto createTransaction(TransactionCreateDto transactionCreateDto) {
         User foundUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("User not found!"));
 
+        CreationRequest creationRequest = new CreationRequest();
+        creationRequest.setUser(foundUser);
+        creationRequest.setCreationType(CreationType.TRANSACTION);
+        creationRequest.setStatus(Status.IN_PROGRESS);
+        creationRequest.setPayload(serializer.serializeObjectToJson(transactionCreateDto));
+        creationRequestRepository.save(creationRequest);
+
         LocalDateTime currentDate = LocalDateTime.now();
         Transaction transaction = new Transaction();
 
@@ -137,7 +141,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         transaction.setOperations(operations);
 
-        return completeTransaction(transaction, operations);
+        return completeTransaction(transaction, operations, creationRequest);
     }
 
     /**
@@ -148,19 +152,27 @@ public class TransactionServiceImpl implements TransactionService {
      * @return TransactionDto Dto of created Transaction.
      */
 
-    private TransactionDto completeTransaction(Transaction transaction, Set<Operation> operations) {
+    private TransactionDto completeTransaction(Transaction transaction, Set<Operation> operations, CreationRequest creationRequest) {
+        creationRequest.setStatus(Status.CREATED);
         transaction.setStatus(Status.CREATED);
+        creationRequest.setCreatedId(transaction.getId());
 
         try {
             transactionServiceUtil.changeAccountAmount(operations);
         } catch (ValidationException exception) {
+            creationRequest.setStatus(Status.REJECTED);
             transaction.setStatus(Status.REJECTED);
+
+            creationRequestRepository.save(creationRequest);
             transactionRepository.save(transaction);
+
             throw new ValidationException("CREDIT amount is more than stored in this account.");
         }
 
+        creationRequestRepository.save(creationRequest);
         Transaction createdTransaction = transactionRepository.save(transaction);
 
+        log.info("Transaction was created successfully!");
         return transactionDtoMapper.toDto(createdTransaction);
     }
 
