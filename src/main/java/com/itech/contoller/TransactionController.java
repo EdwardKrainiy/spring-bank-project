@@ -1,7 +1,9 @@
 package com.itech.contoller;
 
+import com.itech.model.dto.request.CreationRequestDto;
 import com.itech.model.dto.transaction.TransactionCreateDto;
 import com.itech.model.dto.transaction.TransactionDto;
+import com.itech.service.request.impl.RequestServiceImpl;
 import com.itech.service.transaction.impl.TransactionServiceImpl;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,9 @@ public class TransactionController {
 
     @Autowired
     private TransactionServiceImpl transactionService;
+
+    @Autowired
+    private RequestServiceImpl requestService;
 
     /**
      * getTransactionById endpoint.
@@ -52,11 +57,11 @@ public class TransactionController {
      * createTransaction endpoint.
      *
      * @param transactionCreateDto Request body object, which we want to create in JSON format.
-     * @return ResponseEntity Response, which contains id of created transaction and HTTP code.
+     * @return ResponseEntity Response, which contains id of CreationRequestDto and HTTP code.
      */
 
     @PostMapping
-    public ResponseEntity<TransactionDto> createTransaction(@Valid @RequestBody TransactionCreateDto transactionCreateDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(transactionService.createTransaction(transactionCreateDto));
+    public ResponseEntity<CreationRequestDto> createTransaction(@Valid @RequestBody TransactionCreateDto transactionCreateDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(requestService.processCreationRequestMessage(transactionCreateDto));
     }
 }

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class RabbitMqPublisher {
-    @Value("${spring.rabbit.mq.queuename}")
+    @Value("${emp.rabbitmq.requestqueue}")
     private String queueName;
 
     @Autowired
