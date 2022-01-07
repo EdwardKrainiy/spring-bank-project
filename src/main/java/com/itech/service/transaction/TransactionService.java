@@ -1,5 +1,6 @@
 package com.itech.service.transaction;
 
+import com.itech.model.dto.request.CreationRequestDto;
 import com.itech.model.dto.transaction.TransactionDto;
 
 import java.util.List;
@@ -15,4 +16,8 @@ public interface TransactionService {
     List<TransactionDto> findAllTransactions();
 
     TransactionDto createTransaction(String creationRequestJson);
+
+    CreationRequestDto findTransactionCreationRequestById(Long creationRequestId);
+
+    List<CreationRequestDto> findTransactionCreationRequests();
 }

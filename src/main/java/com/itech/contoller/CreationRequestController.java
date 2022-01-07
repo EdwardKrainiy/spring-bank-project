@@ -2,7 +2,10 @@ package com.itech.contoller;
 
 import com.itech.model.dto.request.CreationRequestDto;
 import com.itech.model.dto.transaction.TransactionCreateDto;
+import com.itech.repository.AccountRepository;
+import com.itech.service.account.AccountService;
 import com.itech.service.request.RequestService;
+import com.itech.service.transaction.TransactionService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,6 +30,12 @@ public class CreationRequestController {
     @Autowired
     private RequestService requestService;
 
+    @Autowired
+    private TransactionService transactionService;
+
+    @Autowired
+    private AccountService accountService;
+
     /**
      * getCreationRequestById endpoint. Returns CreationRequest by Id.
      *
@@ -36,7 +45,7 @@ public class CreationRequestController {
 
     @GetMapping("/transactions/creation-requests/{id}")
     public ResponseEntity<CreationRequestDto> getTransactionCreationRequestById(@PathVariable("id") Long transactionCreationRequestId) {
-        return ResponseEntity.ok(requestService.findTransactionCreationRequestById(transactionCreationRequestId));
+        return ResponseEntity.ok(transactionService.findTransactionCreationRequestById(transactionCreationRequestId));
     }
 
     /**
@@ -48,7 +57,7 @@ public class CreationRequestController {
 
     @GetMapping("/accounts/creation-requests/{id}")
     public ResponseEntity<CreationRequestDto> getAccountCreationRequestById(@PathVariable("id") Long accountCreationRequestId) {
-        return ResponseEntity.ok(requestService.findAccountCreationRequestById(accountCreationRequestId));
+        return ResponseEntity.ok(accountService.findAccountCreationRequestById(accountCreationRequestId));
     }
 
     /**
@@ -59,7 +68,7 @@ public class CreationRequestController {
 
     @GetMapping("/accounts/creation-requests")
     public ResponseEntity<List<CreationRequestDto>> getAccountCreationRequests() {
-        return ResponseEntity.ok(requestService.findAccountCreationRequests());
+        return ResponseEntity.ok(accountService.findAccountCreationRequests());
     }
 
     /**
@@ -70,7 +79,7 @@ public class CreationRequestController {
 
     @GetMapping("/transactions/creation-requests")
     public ResponseEntity<List<CreationRequestDto>> getTransactionCreationRequests() {
-        return ResponseEntity.ok(requestService.findTransactionCreationRequests());
+        return ResponseEntity.ok(transactionService.findTransactionCreationRequests());
     }
 
     /**
@@ -82,7 +91,7 @@ public class CreationRequestController {
 
     @GetMapping("/accounts/creation-requests/{id}/approve")
     public ResponseEntity<Void> approveAccountCreationRequest(@PathVariable("id") Long accountCreationRequest) {
-        requestService.approveAccountCreationRequest(accountCreationRequest);
+        accountService.approveAccountCreationRequest(accountCreationRequest);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -95,7 +104,7 @@ public class CreationRequestController {
 
     @GetMapping("/accounts/creation-requests/{id}/reject")
     public ResponseEntity<Void> rejectAccountCreationRequest(@PathVariable("id") Long accountCreationRequest) {
-        requestService.rejectAccountCreationRequest(accountCreationRequest);
+        accountService.rejectAccountCreationRequest(accountCreationRequest);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

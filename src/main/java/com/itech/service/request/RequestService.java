@@ -12,15 +12,4 @@ import java.util.List;
  */
 public interface RequestService {
     CreationRequestDto processCreationRequestMessage(TransactionCreateDto transactionCreateDto);
-
-    CreationRequestDto findTransactionCreationRequestById(Long creationRequestId);
-
-    CreationRequestDto findAccountCreationRequestById(Long creationRequestId);
-
-    List<CreationRequestDto> findAccountCreationRequests();
-
-    List<CreationRequestDto> findTransactionCreationRequests();
-
-    void approveAccountCreationRequest(Long accountCreationRequestId);
-    void rejectAccountCreationRequest(Long accountCreationRequestId);
 }

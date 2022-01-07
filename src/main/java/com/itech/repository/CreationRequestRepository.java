@@ -1,13 +1,13 @@
 package com.itech.repository;
 
 import com.itech.model.entity.CreationRequest;
+import com.itech.model.entity.User;
 import com.itech.model.enumeration.CreationType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.OptionalInt;
 
 /**
  * JPA CreationRequest repository class.
@@ -20,5 +20,10 @@ public interface CreationRequestRepository extends JpaRepository<CreationRequest
 
     Optional<CreationRequest> findCreationRequestsByCreationTypeAndId(CreationType creationType, Long id);
 
+    Optional<CreationRequest> findCreationRequestsByCreationTypeAndIdAndUser(CreationType creationType, Long id, User user);
+
     List<CreationRequest> findCreationRequestsByCreationType(CreationType creationType);
+
+    List<CreationRequest> findCreationRequestsByCreationTypeAndUser(CreationType creationType, User user);
+
 }

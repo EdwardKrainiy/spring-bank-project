@@ -3,7 +3,7 @@ package com.itech.service.account;
 import com.itech.model.dto.account.AccountCreateDto;
 import com.itech.model.dto.account.AccountDto;
 import com.itech.model.dto.account.AccountUpdateDto;
-import org.springframework.http.ResponseEntity;
+import com.itech.model.dto.request.CreationRequestDto;
 
 import java.util.List;
 
@@ -22,4 +22,12 @@ public interface AccountService {
     void deleteAccountByAccountId(Long accountId);
 
     void updateAccount(AccountUpdateDto accountUpdateDto, Long accountId);
+
+    CreationRequestDto findAccountCreationRequestById(Long creationRequestId);
+
+    List<CreationRequestDto> findAccountCreationRequests();
+
+    void approveAccountCreationRequest(Long accountCreationRequestId);
+
+    void rejectAccountCreationRequest(Long accountCreationRequestId);
 }

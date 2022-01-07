@@ -8,9 +8,7 @@ import com.itech.model.entity.*;
 import com.itech.model.enumeration.CreationType;
 import com.itech.model.enumeration.OperationType;
 import com.itech.model.enumeration.Status;
-import com.itech.rabbit.RabbitMqPublisher;
 import com.itech.repository.*;
-import com.itech.service.request.impl.RequestServiceImpl;
 import com.itech.service.transaction.TransactionService;
 import com.itech.service.transaction.TransactionServiceUtil;
 import com.itech.utils.JsonEntitySerializer;
@@ -61,6 +59,12 @@ public class TransactionServiceImpl implements TransactionService {
     @Autowired
     private CreationRequestRepository creationRequestRepository;
 
+    @Autowired
+    private RequestDtoMapper requestDtoMapper;
+
+    @Autowired
+    private JwtDecoder jwtDecoder;
+
     /**
      * findTransactionById method. Finds transaction by transactionId.
      *
@@ -70,7 +74,15 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public TransactionDto findTransactionById(Long transactionId) {
-        return transactionDtoMapper.toDto(transactionRepository.getTransactionById(transactionId).orElseThrow(() -> new EntityNotFoundException("Transaction not found!")));
+        User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!"));
+
+        switch (authenticatedUser.getRole()) {
+            case USER:
+                return transactionDtoMapper.toDto(transactionRepository.getTransactionByIdAndUser(transactionId, authenticatedUser).orElseThrow(() -> new EntityNotFoundException("Transaction not found!")));
+            case MANAGER:
+                return transactionDtoMapper.toDto(transactionRepository.getTransactionById(transactionId).orElseThrow(() -> new EntityNotFoundException("Transaction not found!")));
+        }
+        return null;
     }
 
     /**
@@ -81,10 +93,22 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public List<TransactionDto> findAllTransactions() {
-        List<Transaction> transactions = transactionRepository.findAll();
-        if (transactions.isEmpty()) throw new EntityNotFoundException("Transaction not found!");
+        User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!"));
+
+        List<Transaction> transactions = new ArrayList<>();
 
         List<TransactionDto> transactionDtos = new ArrayList<>();
+
+        switch (authenticatedUser.getRole()) {
+            case MANAGER:
+                transactions = transactionRepository.findAll();
+                break;
+            case USER:
+                transactions = transactionRepository.findTransactionsByUser(authenticatedUser);
+                break;
+        }
+        if (transactions.isEmpty()) throw new EntityNotFoundException("Transaction not found!");
+
         transactions.forEach(transaction -> transactionDtos.add(transactionDtoMapper.toDto(transaction)));
 
         return transactionDtos;
@@ -152,7 +176,7 @@ public class TransactionServiceImpl implements TransactionService {
      */
 
     private TransactionDto completeTransaction(Transaction transaction, Set<Operation> operations, CreationRequestDto creationRequestDto) {
-        CreationRequest creationRequest =  creationRequestRepository.findCreationRequestById(creationRequestDto.getId()).orElseThrow(() -> new EntityNotFoundException("CreationRequest not found!"));
+        CreationRequest creationRequest = creationRequestRepository.findCreationRequestById(creationRequestDto.getId()).orElseThrow(() -> new EntityNotFoundException("CreationRequest not found!"));
 
         creationRequest.setStatus(Status.CREATED);
         transaction.setStatus(Status.CREATED);
@@ -177,6 +201,55 @@ public class TransactionServiceImpl implements TransactionService {
 
         log.info("Transaction was created successfully!");
         return transactionDtoMapper.toDto(createdTransaction);
+    }
+
+    /**
+     * findAccountCreationRequestById method. Finds CreationRequest with TRANSACTION CreationType by id and maps to Dto;
+     *
+     * @param creationRequestId Id of CreationRequest.
+     * @return CreationRequestDto Dto of found CreationRequest object.
+     */
+
+    @Override
+    public CreationRequestDto findTransactionCreationRequestById(Long creationRequestId) {
+        User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!"));
+
+        switch (authenticatedUser.getRole()) {
+            case USER:
+                return requestDtoMapper.toDto(creationRequestRepository.findCreationRequestsByCreationTypeAndIdAndUser(CreationType.TRANSACTION, creationRequestId, authenticatedUser).orElseThrow(() -> new EntityNotFoundException("Transaction CreationRequest with this id not found!")));
+            case MANAGER:
+                return requestDtoMapper.toDto(creationRequestRepository.findCreationRequestsByCreationTypeAndId(CreationType.TRANSACTION, creationRequestId).orElseThrow(() -> new EntityNotFoundException("Transaction CreationRequest with this id not found!")));
+        }
+        return null;
+    }
+
+    /**
+     * findTransactionCreationRequests method. Finds all CreationRequests with TRANSACTION CreationType and maps to Dto;
+     *
+     * @return List<CreationRequestDto> List of all CreationRequest objects.
+     */
+
+    @Override
+    public List<CreationRequestDto> findTransactionCreationRequests() {
+        User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!"));
+
+        List<CreationRequest> creationRequests = new ArrayList<>();
+
+        switch (authenticatedUser.getRole()) {
+            case MANAGER:
+                creationRequests = creationRequestRepository.findCreationRequestsByCreationType(CreationType.TRANSACTION);
+                break;
+            case USER:
+                creationRequests = creationRequestRepository.findCreationRequestsByCreationTypeAndUser(CreationType.TRANSACTION, authenticatedUser);
+                break;
+        }
+
+        if (creationRequests.isEmpty()) throw new EntityNotFoundException("Transaction CreationRequests not found!");
+
+        List<CreationRequestDto> creationRequestDtos = new ArrayList<>();
+        creationRequests.forEach(creationRequest -> creationRequestDtos.add(requestDtoMapper.toDto(creationRequest)));
+
+        return creationRequestDtos;
     }
 
 }
