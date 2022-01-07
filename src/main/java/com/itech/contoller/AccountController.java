@@ -4,12 +4,9 @@ import com.itech.model.dto.account.AccountCreateDto;
 import com.itech.model.dto.account.AccountDto;
 import com.itech.model.dto.account.AccountUpdateDto;
 import com.itech.service.account.AccountService;
-import com.itech.service.account.impl.AccountServiceImpl;
 import com.itech.utils.JsonEntitySerializer;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.stream.annotation.EnableBinding;
-import org.springframework.cloud.stream.messaging.Source;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,7 +63,7 @@ public class AccountController {
      */
     @Transactional
     @PostMapping
-    public ResponseEntity<Long> createAccount(@RequestBody AccountCreateDto accountCreateDto){
+    public ResponseEntity<Long> createAccount(@RequestBody AccountCreateDto accountCreateDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createAccount(accountCreateDto));
     }
 
@@ -81,9 +78,9 @@ public class AccountController {
     @Transactional
     @PutMapping("{id}")
     public ResponseEntity<Void> updateAccount(@RequestBody AccountUpdateDto accountUpdateDto,
-                                              @PathVariable("id") Long accountId){
+                                              @PathVariable("id") Long accountId) {
 
-        if(log.isDebugEnabled()){
+        if (log.isDebugEnabled()) {
             log.debug("RequestBody: {}", jsonEntitySerializer.serializeObjectToJson(accountUpdateDto));
         }
 
