@@ -1,23 +1,23 @@
 package com.itech.service.transaction.impl;
 
 import com.itech.model.dto.operation.OperationCreateDto;
+import com.itech.model.dto.request.CreationRequestDto;
 import com.itech.model.dto.transaction.TransactionCreateDto;
 import com.itech.model.dto.transaction.TransactionDto;
-import com.itech.model.entity.CreationRequest;
-import com.itech.model.entity.Operation;
-import com.itech.model.entity.Transaction;
-import com.itech.model.entity.User;
+import com.itech.model.entity.*;
 import com.itech.model.enumeration.CreationType;
 import com.itech.model.enumeration.OperationType;
 import com.itech.model.enumeration.Status;
 import com.itech.rabbit.RabbitMqPublisher;
 import com.itech.repository.*;
+import com.itech.service.request.impl.RequestServiceImpl;
 import com.itech.service.transaction.TransactionService;
 import com.itech.service.transaction.TransactionServiceUtil;
 import com.itech.utils.JsonEntitySerializer;
 import com.itech.utils.JwtDecoder;
 import com.itech.utils.exception.EntityNotFoundException;
 import com.itech.utils.exception.ValidationException;
+import com.itech.utils.mapper.request.RequestDtoMapper;
 import com.itech.utils.mapper.transaction.TransactionDtoMapper;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,9 +51,6 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Autowired
     private OperationRepository operationRepository;
-
-    @Autowired
-    private JwtDecoder jwtDecoder;
 
     @Autowired
     private TransactionServiceUtil transactionServiceUtil;
@@ -96,20 +93,17 @@ public class TransactionServiceImpl implements TransactionService {
     /**
      * createTransaction method. Creates Transaction from transactionCreateDto.
      *
-     * @param transactionCreateDto Object, from which we want to create Transaction.
-     * @return Long id of created Transaction.
+     * @param creationRequestDtoJson JSON of CreationRequestDto.
+     * @return TransactionDto Obtained object of TransactionDto.
      */
 
     @Override
-    public TransactionDto createTransaction(TransactionCreateDto transactionCreateDto) {
-        User foundUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("User not found!"));
+    public TransactionDto createTransaction(String creationRequestDtoJson) {
+        CreationRequestDto creationRequestDto = serializer.serializeJsonToObject(creationRequestDtoJson, CreationRequestDto.class);
 
-        CreationRequest creationRequest = new CreationRequest();
-        creationRequest.setUser(foundUser);
-        creationRequest.setCreationType(CreationType.TRANSACTION);
-        creationRequest.setStatus(Status.IN_PROGRESS);
-        creationRequest.setPayload(serializer.serializeObjectToJson(transactionCreateDto));
-        creationRequestRepository.save(creationRequest);
+        TransactionCreateDto transactionCreateDto = serializer.serializeJsonToObject(creationRequestDto.getPayload(), TransactionCreateDto.class);
+
+        User foundUser = userRepository.getUserById(creationRequestDto.getUserId()).orElseThrow(() -> new EntityNotFoundException("User not found!"));
 
         LocalDateTime currentDate = LocalDateTime.now();
         Transaction transaction = new Transaction();
@@ -118,13 +112,16 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setIssuedAt(java.sql.Timestamp.valueOf(currentDate));
         transaction.setStatus(Status.IN_PROGRESS);
 
+        transactionRepository.save(transaction);
+
         Set<Operation> operations = new LinkedHashSet<>();
 
         Set<OperationCreateDto> dtoOperations = transactionCreateDto.getOperations();
 
         for (OperationCreateDto operationCreateDto : dtoOperations) {
             Operation operation = new Operation();
-            operation.setAccount(accountRepository.findAccountByAccountNumber(operationCreateDto.getAccountNumber()).orElseThrow(() -> new EntityNotFoundException("Account not found!")));
+            Account account = accountRepository.findAccountByAccountNumber(operationCreateDto.getAccountNumber()).orElseThrow(() -> new EntityNotFoundException("Account not found!"));
+            operation.setAccount(account);
             operation.setTransaction(transaction);
 
             if (operationCreateDto.getOperationType().equals("DEBIT") || operationCreateDto.getOperationType().equals("CREDIT")) {
@@ -133,18 +130,17 @@ public class TransactionServiceImpl implements TransactionService {
             } else throw new ValidationException("Incorrect Operation Type!");
 
             operation.setAmount(operationCreateDto.getAmount());
-            operations.add(operation);
+            operations.add(operationRepository.save(operation));
         }
 
         if (!transactionServiceUtil.checkRequestDtoValidity(operations, transaction))
             throw new ValidationException("Incorrect structure of request. It must be at least 1 DEBIT and 1 CREDIT operations, and sum of CREDIT minus sum of DEBIT operation amounts must equals 0.");
 
-
         operationRepository.saveAll(operations);
 
         transaction.setOperations(operations);
 
-        return completeTransaction(transaction, operations, creationRequest);
+        return completeTransaction(transaction, operations, creationRequestDto);
     }
 
     /**
@@ -155,7 +151,9 @@ public class TransactionServiceImpl implements TransactionService {
      * @return TransactionDto Dto of created Transaction.
      */
 
-    private TransactionDto completeTransaction(Transaction transaction, Set<Operation> operations, CreationRequest creationRequest) {
+    private TransactionDto completeTransaction(Transaction transaction, Set<Operation> operations, CreationRequestDto creationRequestDto) {
+        CreationRequest creationRequest =  creationRequestRepository.findCreationRequestById(creationRequestDto.getId()).orElseThrow(() -> new EntityNotFoundException("CreationRequest not found!"));
+
         creationRequest.setStatus(Status.CREATED);
         transaction.setStatus(Status.CREATED);
         creationRequest.setCreatedId(transaction.getId());
@@ -171,6 +169,8 @@ public class TransactionServiceImpl implements TransactionService {
 
             throw new ValidationException("CREDIT amount is more than stored in this account.");
         }
+
+        operationRepository.saveAll(transaction.getOperations());
 
         creationRequestRepository.save(creationRequest);
         Transaction createdTransaction = transactionRepository.save(transaction);

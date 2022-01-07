@@ -1,8 +1,6 @@
 package com.itech.model.dto.operation;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.itech.model.enumeration.OperationType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

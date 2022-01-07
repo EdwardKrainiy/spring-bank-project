@@ -15,12 +15,20 @@ public class JsonEntitySerializer {
     @Autowired
     private ObjectMapper objectMapper;
 
-    public <T> String serializeObjectToJson(T object){
+    public <T> String serializeObjectToJson(T object) {
         try {
             return objectMapper.writeValueAsString(object);
-        } catch (JsonProcessingException exception){
+        } catch (JsonProcessingException exception) {
             log.error("JsonProcessingException caught!");
             return "";
+        }
+    }
+    public <T> T serializeJsonToObject(String json, Class<T> tClass){
+        try {
+            return objectMapper.readValue(json, tClass);
+        } catch (JsonProcessingException exception){
+            log.error("JsonProcessingException caught!");
+            return null;
         }
     }
 }

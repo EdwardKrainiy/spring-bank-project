@@ -39,7 +39,6 @@ public class TransactionServiceUtil {
                     if (operation.getAccount().getAmount() - operation.getAmount() < 0) {
                         throw new ValidationException("CREDIT amount is more than stored in this account.");
                     }
-
                     operation.getAccount().setAmount(operation.getAccount().getAmount() - operation.getAmount());
                     break;
                 case DEBIT:
@@ -52,12 +51,12 @@ public class TransactionServiceUtil {
     /**
      * checkRequestDtoValidity method.
      *
-     * @param operations Set of operations, which are required to obtain Account objects.
+     * @param operations  Set of operations, which are required to obtain Account objects.
      * @param transaction Transaction object, which we need to write in DB.
      * @return Boolean Is dto valid flag.
      */
 
-    public boolean checkRequestDtoValidity(Set<Operation> operations, Transaction transaction){
+    public boolean checkRequestDtoValidity(Set<Operation> operations, Transaction transaction) {
         double sumOfAmounts = 0;
 
         boolean isDebitOperationsExists = false;
