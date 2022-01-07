@@ -26,7 +26,7 @@ import java.util.List;
 public class TransactionController {
 
     @Autowired
-    private TransactionServiceImpl transactionService;
+    private TransactionService transactionService;
 
     @Autowired
     private RequestService requestService;
