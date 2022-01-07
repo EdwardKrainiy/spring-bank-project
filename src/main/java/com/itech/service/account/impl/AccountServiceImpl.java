@@ -77,7 +77,7 @@ public class AccountServiceImpl implements AccountService {
         if (accounts.isEmpty()) throw new EntityNotFoundException("Account not found!");
 
         List<AccountDto> accountDtos = new ArrayList<>();
-        for (Account account : accounts) accountDtos.add(accountDtoMapper.toDto(account));
+        accounts.forEach(account -> accountDtos.add(accountDtoMapper.toDto(account)));
 
         return accountDtos;
     }
@@ -105,22 +105,14 @@ public class AccountServiceImpl implements AccountService {
     public Long createAccount(AccountCreateDto accountCreateDto) {
         User foundUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("User not found!"));
 
-        @Valid Account accountEntity = accountCreateDtoMapper.toEntity(accountCreateDto);
-
         CreationRequest accountCreatingRequest = new CreationRequest();
         accountCreatingRequest.setStatus(Status.IN_PROGRESS);
         accountCreatingRequest.setCreationType(CreationType.ACCOUNT);
         accountCreatingRequest.setPayload(serializer.serializeObjectToJson(accountCreateDto));
         accountCreatingRequest.setUser(foundUser);
 
-        Currency accountCurrency = accountEntity.getCurrency();
-        accountEntity.setAccountNumber(ibanGenerator.generateIban(accountCurrency.getCountryCode()));
-
-        accountCreatingRequest.setStatus(Status.CREATED);
-        accountCreatingRequest.setCreatedId(accountRepository.save(accountEntity).getId());
-
         log.info("Account was created successfully!");
-        return creationRequestRepository.save(accountCreatingRequest).getCreatedId();
+        return creationRequestRepository.save(accountCreatingRequest).getId();
     }
 
     /**
