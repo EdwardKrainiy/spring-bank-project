@@ -28,7 +28,7 @@ public class TransactionController {
     private TransactionServiceImpl transactionService;
 
     @Autowired
-    private RequestServiceImpl requestService;
+    private RequestService requestService;
 
     /**
      * getTransactionById endpoint.

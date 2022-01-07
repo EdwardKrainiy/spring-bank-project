@@ -1,6 +1,6 @@
 package com.itech.rabbit;
 
-import com.itech.service.transaction.impl.TransactionServiceImpl;
+import com.itech.service.transaction.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -12,10 +12,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class RabbitMqProcessor {
     @Autowired
-    private TransactionServiceImpl transactionService;
+    private TransactionService transactionService;
 
     /**
      * processTransactionMessage method. Processes message in queue. In our case this message is creationRequestDto object in JSON format.
+     *
      * @param creationRequestDtoJson JSON of creationRequestDto object.
      */
 

@@ -61,9 +61,6 @@ public class TransactionServiceImpl implements TransactionService {
     @Autowired
     private CreationRequestRepository creationRequestRepository;
 
-    @Autowired
-    private RequestDtoMapper requestDtoMapper;
-
     /**
      * findTransactionById method. Finds transaction by transactionId.
      *

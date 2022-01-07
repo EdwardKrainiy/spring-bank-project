@@ -28,7 +28,7 @@ import java.util.List;
 public class AccountController {
 
     @Autowired
-    private AccountServiceImpl accountService;
+    private AccountService accountService;
 
     @Autowired
     private JsonEntitySerializer jsonEntitySerializer;

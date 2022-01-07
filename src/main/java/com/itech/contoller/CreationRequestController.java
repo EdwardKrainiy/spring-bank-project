@@ -1,6 +1,7 @@
 package com.itech.contoller;
 
 import com.itech.model.dto.request.CreationRequestDto;
+import com.itech.service.request.RequestService;
 import com.itech.service.request.impl.RequestServiceImpl;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class CreationRequestController {
 
     @Autowired
-    private RequestServiceImpl requestService;
+    private RequestService requestService;
+
+    /**
+     * getCreationRequestById endpoint. Returns CreationRequest by Id.
+     *
+     * @param creationRequestId Id of creationRequest we want to obtain.
+     * @return CreationRequestDto Dto of obtained creationRequest.
+     */
 
     @GetMapping("{id}")
     public ResponseEntity<CreationRequestDto> getCreationRequestById(@PathVariable("id") Long creationRequestId) {
