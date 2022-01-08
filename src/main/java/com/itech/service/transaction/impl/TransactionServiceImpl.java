@@ -124,6 +124,8 @@ public class TransactionServiceImpl implements TransactionService {
 
         TransactionCreateDto transactionCreateDto = serializer.serializeJsonToObject(creationRequestDto.getPayload(), TransactionCreateDto.class);
 
+        CreationRequest requestToReject = creationRequestRepository.findCreationRequestById(creationRequestDto.getId()).orElseThrow(() -> new EntityNotFoundException("Creation Request not found!"));
+
         User foundUser = userRepository.getUserById(creationRequestDto.getUserId()).orElseThrow(() -> new EntityNotFoundException("User not found!"));
 
         LocalDateTime currentDate = LocalDateTime.now();
@@ -143,8 +145,8 @@ public class TransactionServiceImpl implements TransactionService {
             Operation operation = new Operation();
             Account account = accountRepository.findAccountByAccountNumber(operationCreateDto.getAccountNumber()).orElse(null);
             if(account == null){
-                CreationRequest requestToReject = creationRequestRepository.findCreationRequestById(creationRequestDto.getId()).orElseThrow(() -> new EntityNotFoundException("Creation Request not found!"));
                 requestToReject.setStatus(Status.REJECTED);
+                requestToReject.setCreatedId(transaction.getId());
                 creationRequestRepository.save(requestToReject);
 
                 transaction.setStatus(Status.REJECTED);
@@ -157,8 +159,8 @@ public class TransactionServiceImpl implements TransactionService {
             if (operationCreateDto.getOperationType().equals("DEBIT") || operationCreateDto.getOperationType().equals("CREDIT")) {
                 operation.setOperationType(OperationType.valueOf(operationCreateDto.getOperationType()));
             } else {
-                CreationRequest requestToReject = creationRequestRepository.findCreationRequestById(creationRequestDto.getId()).orElseThrow(() -> new EntityNotFoundException("Creation Request not found!"));
                 requestToReject.setStatus(Status.REJECTED);
+                requestToReject.setCreatedId(transaction.getId());
                 creationRequestRepository.save(requestToReject);
 
                 transaction.setStatus(Status.REJECTED);
@@ -171,8 +173,8 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         if (!transactionServiceUtil.checkRequestDtoValidity(operations, transaction)){
-            CreationRequest requestToReject = creationRequestRepository.findCreationRequestById(creationRequestDto.getId()).orElseThrow(() -> new EntityNotFoundException("Creation Request not found!"));
             requestToReject.setStatus(Status.REJECTED);
+            requestToReject.setCreatedId(transaction.getId());
             creationRequestRepository.save(requestToReject);
 
             transaction.setStatus(Status.REJECTED);
