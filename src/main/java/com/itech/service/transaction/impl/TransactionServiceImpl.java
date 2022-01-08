@@ -22,10 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Implementation of TransactionService interface. Provides us different methods of Service layer to work with Repository layer of Transaction objects.
@@ -144,21 +141,45 @@ public class TransactionServiceImpl implements TransactionService {
 
         for (OperationCreateDto operationCreateDto : dtoOperations) {
             Operation operation = new Operation();
-            Account account = accountRepository.findAccountByAccountNumber(operationCreateDto.getAccountNumber()).orElseThrow(() -> new EntityNotFoundException("Account not found!"));
+            Account account = accountRepository.findAccountByAccountNumber(operationCreateDto.getAccountNumber()).orElse(null);
+            if(account == null){
+                CreationRequest requestToReject = creationRequestRepository.findCreationRequestById(creationRequestDto.getId()).orElseThrow(() -> new EntityNotFoundException("Creation Request not found!"));
+                requestToReject.setStatus(Status.REJECTED);
+                creationRequestRepository.save(requestToReject);
+
+                transaction.setStatus(Status.REJECTED);
+                transactionRepository.save(transaction);
+                throw new EntityNotFoundException("Account not found!");
+            }
             operation.setAccount(account);
             operation.setTransaction(transaction);
 
             if (operationCreateDto.getOperationType().equals("DEBIT") || operationCreateDto.getOperationType().equals("CREDIT")) {
                 operation.setOperationType(OperationType.valueOf(operationCreateDto.getOperationType()));
+            } else {
+                CreationRequest requestToReject = creationRequestRepository.findCreationRequestById(creationRequestDto.getId()).orElseThrow(() -> new EntityNotFoundException("Creation Request not found!"));
+                requestToReject.setStatus(Status.REJECTED);
+                creationRequestRepository.save(requestToReject);
 
-            } else throw new ValidationException("Incorrect Operation Type!");
+                transaction.setStatus(Status.REJECTED);
+                transactionRepository.save(transaction);
+                throw new ValidationException("Incorrect Operation Type!");
+            }
 
             operation.setAmount(operationCreateDto.getAmount());
             operations.add(operationRepository.save(operation));
         }
 
-        if (!transactionServiceUtil.checkRequestDtoValidity(operations, transaction))
+        if (!transactionServiceUtil.checkRequestDtoValidity(operations, transaction)){
+            CreationRequest requestToReject = creationRequestRepository.findCreationRequestById(creationRequestDto.getId()).orElseThrow(() -> new EntityNotFoundException("Creation Request not found!"));
+            requestToReject.setStatus(Status.REJECTED);
+            creationRequestRepository.save(requestToReject);
+
+            transaction.setStatus(Status.REJECTED);
+            transactionRepository.save(transaction);
+
             throw new ValidationException("Incorrect structure of request. It must be at least 1 DEBIT and 1 CREDIT operations, and sum of CREDIT minus sum of DEBIT operation amounts must equals 0.");
+        }
 
         operationRepository.saveAll(operations);
 
