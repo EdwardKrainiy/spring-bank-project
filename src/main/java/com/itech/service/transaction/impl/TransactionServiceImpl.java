@@ -7,6 +7,7 @@ import com.itech.model.dto.transaction.TransactionDto;
 import com.itech.model.entity.*;
 import com.itech.model.enumeration.CreationType;
 import com.itech.model.enumeration.OperationType;
+import com.itech.model.enumeration.Role;
 import com.itech.model.enumeration.Status;
 import com.itech.repository.*;
 import com.itech.service.transaction.TransactionService;
@@ -22,7 +23,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Implementation of TransactionService interface. Provides us different methods of Service layer to work with Repository layer of Transaction objects.
@@ -73,13 +77,11 @@ public class TransactionServiceImpl implements TransactionService {
     public TransactionDto findTransactionById(Long transactionId) {
         User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!"));
 
-        switch (authenticatedUser.getRole()) {
-            case USER:
-                return transactionDtoMapper.toDto(transactionRepository.getTransactionByIdAndUser(transactionId, authenticatedUser).orElseThrow(() -> new EntityNotFoundException("Transaction not found!")));
-            case MANAGER:
-                return transactionDtoMapper.toDto(transactionRepository.getTransactionById(transactionId).orElseThrow(() -> new EntityNotFoundException("Transaction not found!")));
+        if (authenticatedUser.getRole().equals(Role.USER)) {
+            return transactionDtoMapper.toDto(transactionRepository.getTransactionByIdAndUser(transactionId, authenticatedUser).orElseThrow(() -> new EntityNotFoundException("Transaction not found!")));
+        } else {
+            return transactionDtoMapper.toDto(transactionRepository.getTransactionById(transactionId).orElseThrow(() -> new EntityNotFoundException("Transaction not found!")));
         }
-        return null;
     }
 
     /**
@@ -92,18 +94,16 @@ public class TransactionServiceImpl implements TransactionService {
     public List<TransactionDto> findAllTransactions() {
         User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!"));
 
-        List<Transaction> transactions = new ArrayList<>();
+        List<Transaction> transactions;
 
         List<TransactionDto> transactionDtos = new ArrayList<>();
 
-        switch (authenticatedUser.getRole()) {
-            case MANAGER:
-                transactions = transactionRepository.findAll();
-                break;
-            case USER:
-                transactions = transactionRepository.findTransactionsByUser(authenticatedUser);
-                break;
+        if (authenticatedUser.getRole().equals(Role.USER)) {
+            transactions = transactionRepository.findTransactionsByUser(authenticatedUser);
+        } else {
+            transactions = transactionRepository.findAll();
         }
+
         if (transactions.isEmpty()) throw new EntityNotFoundException("Transaction not found!");
 
         transactions.forEach(transaction -> transactionDtos.add(transactionDtoMapper.toDto(transaction)));
@@ -237,13 +237,11 @@ public class TransactionServiceImpl implements TransactionService {
     public CreationRequestDto findTransactionCreationRequestById(Long creationRequestId) {
         User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!"));
 
-        switch (authenticatedUser.getRole()) {
-            case USER:
-                return requestDtoMapper.toDto(creationRequestRepository.findCreationRequestsByCreationTypeAndIdAndUser(CreationType.TRANSACTION, creationRequestId, authenticatedUser).orElseThrow(() -> new EntityNotFoundException("Transaction CreationRequest with this id not found!")));
-            case MANAGER:
-                return requestDtoMapper.toDto(creationRequestRepository.findCreationRequestsByCreationTypeAndId(CreationType.TRANSACTION, creationRequestId).orElseThrow(() -> new EntityNotFoundException("Transaction CreationRequest with this id not found!")));
+        if (authenticatedUser.getRole().equals(Role.USER)) {
+            return requestDtoMapper.toDto(creationRequestRepository.findCreationRequestsByCreationTypeAndIdAndUser(CreationType.TRANSACTION, creationRequestId, authenticatedUser).orElseThrow(() -> new EntityNotFoundException("Transaction CreationRequest with this id not found!")));
+        } else {
+            return requestDtoMapper.toDto(creationRequestRepository.findCreationRequestsByCreationTypeAndId(CreationType.TRANSACTION, creationRequestId).orElseThrow(() -> new EntityNotFoundException("Transaction CreationRequest with this id not found!")));
         }
-        return null;
     }
 
     /**
@@ -256,15 +254,12 @@ public class TransactionServiceImpl implements TransactionService {
     public List<CreationRequestDto> findTransactionCreationRequests() {
         User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!"));
 
-        List<CreationRequest> creationRequests = new ArrayList<>();
+        List<CreationRequest> creationRequests;
 
-        switch (authenticatedUser.getRole()) {
-            case MANAGER:
-                creationRequests = creationRequestRepository.findCreationRequestsByCreationType(CreationType.TRANSACTION);
-                break;
-            case USER:
-                creationRequests = creationRequestRepository.findCreationRequestsByCreationTypeAndUser(CreationType.TRANSACTION, authenticatedUser);
-                break;
+        if (authenticatedUser.getRole().equals(Role.USER)) {
+            creationRequests = creationRequestRepository.findCreationRequestsByCreationTypeAndUser(CreationType.TRANSACTION, authenticatedUser);
+        } else {
+            creationRequests = creationRequestRepository.findCreationRequestsByCreationType(CreationType.TRANSACTION);
         }
 
         if (creationRequests.isEmpty()) throw new EntityNotFoundException("Transaction CreationRequests not found!");
@@ -274,5 +269,4 @@ public class TransactionServiceImpl implements TransactionService {
 
         return creationRequestDtos;
     }
-
 }

@@ -1,8 +1,6 @@
 package com.itech.contoller;
 
 import com.itech.model.dto.request.CreationRequestDto;
-import com.itech.model.dto.transaction.TransactionCreateDto;
-import com.itech.repository.AccountRepository;
 import com.itech.service.account.AccountService;
 import com.itech.service.request.RequestService;
 import com.itech.service.transaction.TransactionService;
@@ -24,11 +22,8 @@ import java.util.List;
  */
 @RestController
 @Log4j2
-@RequestMapping("api")
+@RequestMapping("/api")
 public class CreationRequestController {
-
-    @Autowired
-    private RequestService requestService;
 
     @Autowired
     private TransactionService transactionService;

@@ -49,7 +49,7 @@ public class AccountController {
      * @return ResponseEntity<AccountDto> Response with HTTP code and AccountDto of account that we found.
      */
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<AccountDto> getAccountById(@PathVariable("id") Long accountId) {
         return ResponseEntity.ok(accountService.findAccountByAccountId(accountId));
     }
@@ -76,7 +76,7 @@ public class AccountController {
      */
 
     @Transactional
-    @PutMapping("{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Void> updateAccount(@RequestBody AccountUpdateDto accountUpdateDto,
                                               @PathVariable("id") Long accountId) {
 
@@ -95,7 +95,7 @@ public class AccountController {
      * @return ResponseEntity 204 HTTP code.
      */
     @Transactional
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAccountById(@PathVariable("id") Long accountId) {
         accountService.deleteAccountByAccountId(accountId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

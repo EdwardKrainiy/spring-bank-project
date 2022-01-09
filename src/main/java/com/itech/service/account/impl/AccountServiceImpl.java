@@ -9,6 +9,7 @@ import com.itech.model.entity.CreationRequest;
 import com.itech.model.entity.User;
 import com.itech.model.enumeration.CreationType;
 import com.itech.model.enumeration.Currency;
+import com.itech.model.enumeration.Role;
 import com.itech.model.enumeration.Status;
 import com.itech.repository.AccountRepository;
 import com.itech.repository.CreationRequestRepository;
@@ -91,18 +92,17 @@ public class AccountServiceImpl implements AccountService {
     public List<AccountDto> findAllAccounts() {
 
         User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Logged user not found!"));
-        List<Account> accounts = new ArrayList<>();
+        List<Account> accounts;
 
-        switch (authenticatedUser.getRole()) {
-            case MANAGER:
-                accounts = accountRepository.findAll();
-                break;
-            case USER:
-                accounts = accountRepository.findAccountsByUser(authenticatedUser);
-                break;
+        if (authenticatedUser.getRole().equals(Role.USER)) {
+            accounts = accountRepository.findAccountsByUser(authenticatedUser);
+        } else {
+            accounts = accountRepository.findAll();
         }
 
-        if (accounts.isEmpty()) throw new EntityNotFoundException("Account not found!");
+        if (accounts.isEmpty()) {
+            throw new EntityNotFoundException("Account not found!");
+        }
 
         List<AccountDto> accountDtos = new ArrayList<>();
         accounts.forEach(account -> accountDtos.add(accountDtoMapper.toDto(account)));
@@ -121,15 +121,12 @@ public class AccountServiceImpl implements AccountService {
     public AccountDto findAccountByAccountId(Long accountId) {
         User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!"));
 
-        Optional<Account> foundAccount = Optional.empty();
+        Optional<Account> foundAccount;
 
-        switch (authenticatedUser.getRole()) {
-            case MANAGER:
-                foundAccount = accountRepository.findAccountById(accountId);
-                break;
-            case USER:
-                foundAccount = accountRepository.findAccountByIdAndUser(accountId, authenticatedUser);
-                break;
+        if (authenticatedUser.getRole().equals(Role.USER)) {
+            foundAccount = accountRepository.findAccountByIdAndUser(accountId, authenticatedUser);
+        } else {
+            foundAccount = accountRepository.findAccountById(accountId);
         }
 
         return accountDtoMapper.toDto(foundAccount.orElseThrow(() -> new EntityNotFoundException("Account not found!")));
@@ -161,7 +158,6 @@ public class AccountServiceImpl implements AccountService {
      *
      * @param accountUpdateDto Account transfer object, which we need to update. This one will be converted into Account object, passed some checks and will be updated on DB.
      * @param accountId        Id of account we need to update.
-     * @return ResponseEntity<Long> ResponseEntity with HTTP code and id of updated account.
      */
 
     @Override
@@ -170,29 +166,20 @@ public class AccountServiceImpl implements AccountService {
 
         Account updateAccount = accountUpdateDtoMapper.toEntity(accountUpdateDto);
 
-        switch (authenticatedUser.getRole()) {
-            case USER:
-                if (authenticatedUser.getId().equals(updateAccount.getUser().getId())) {
-                    updateAccount.setId(accountId);
-                    updateAccount.setAccountNumber(ibanGenerator.generateIban(accountUpdateDto.getCurrency().getCountryCode()));
-                } else {
-                    throw new ValidationException("Id of this account is not equals id of logged user.");
-                }
-                break;
-            case MANAGER:
-                updateAccount.setId(accountId);
-                updateAccount.setAccountNumber(ibanGenerator.generateIban(accountUpdateDto.getCurrency().getCountryCode()));
-                break;
-        }
-        accountRepository.save(updateAccount);
+        updateAccount.setId(accountId);
+        updateAccount.setAccountNumber(ibanGenerator.generateIban(accountUpdateDto.getCurrency().getCountryCode()));
 
+        if (authenticatedUser.getRole().equals(Role.USER) && !authenticatedUser.getId().equals(updateAccount.getUser().getId())) {
+            throw new ValidationException("Id of this account is not equals id of logged user.");
+        }
+
+        accountRepository.save(updateAccount);
     }
 
     /**
      * deleteAccountByAccountId method. Deletes account by id.
      *
      * @param accountId Id of account we need to delete.
-     * @return ResponseEntity<Void> 204 HTTP code.
      */
 
     @Override
@@ -201,17 +188,10 @@ public class AccountServiceImpl implements AccountService {
 
         Account foundAccountToDelete = accountRepository.findAccountById(accountId).orElseThrow(() -> new EntityNotFoundException("Account not found!"));
 
-        switch (authenticatedUser.getRole()) {
-            case MANAGER:
-                accountRepository.deleteAccountById(foundAccountToDelete.getId());
-                break;
-            case USER:
-                if (authenticatedUser.getId().equals(foundAccountToDelete.getId())) {
-                    accountRepository.deleteAccountById(foundAccountToDelete.getId());
-                } else {
-                    throw new ValidationException("Id of this account is not equals id of logged user.");
-                }
-                break;
+        if (authenticatedUser.getRole().equals(Role.USER) && !authenticatedUser.getId().equals(foundAccountToDelete.getId())) {
+            throw new ValidationException("Id of this account is not equals id of logged user.");
+        } else {
+            accountRepository.deleteAccountById(foundAccountToDelete.getId());
         }
     }
 
@@ -226,13 +206,11 @@ public class AccountServiceImpl implements AccountService {
     public CreationRequestDto findAccountCreationRequestById(Long creationRequestId) {
         User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!"));
 
-        switch (authenticatedUser.getRole()) {
-            case USER:
-                return requestDtoMapper.toDto(creationRequestRepository.findCreationRequestsByCreationTypeAndIdAndUser(CreationType.ACCOUNT, creationRequestId, authenticatedUser).orElseThrow(() -> new EntityNotFoundException("Account CreationRequest with this id not found!")));
-            case MANAGER:
-                return requestDtoMapper.toDto(creationRequestRepository.findCreationRequestsByCreationTypeAndId(CreationType.ACCOUNT, creationRequestId).orElseThrow(() -> new EntityNotFoundException("Account CreationRequest with this id not found!")));
+        if (authenticatedUser.getRole().equals(Role.USER)) {
+            return requestDtoMapper.toDto(creationRequestRepository.findCreationRequestsByCreationTypeAndIdAndUser(CreationType.ACCOUNT, creationRequestId, authenticatedUser).orElseThrow(() -> new EntityNotFoundException("Account CreationRequest with this id not found!")));
+        } else {
+            return requestDtoMapper.toDto(creationRequestRepository.findCreationRequestsByCreationTypeAndId(CreationType.ACCOUNT, creationRequestId).orElseThrow(() -> new EntityNotFoundException("Account CreationRequest with this id not found!")));
         }
-        return null;
     }
 
     /**
@@ -245,17 +223,14 @@ public class AccountServiceImpl implements AccountService {
     public List<CreationRequestDto> findAccountCreationRequests() {
         User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!"));
 
-        List<CreationRequest> creationRequests = new ArrayList<>();
+        List<CreationRequest> creationRequests;
 
         List<CreationRequestDto> creationRequestDtos = new ArrayList<>();
 
-        switch (authenticatedUser.getRole()) {
-            case MANAGER:
-                creationRequests = creationRequestRepository.findCreationRequestsByCreationType(CreationType.ACCOUNT);
-                break;
-            case USER:
-                creationRequests = creationRequestRepository.findCreationRequestsByCreationTypeAndUser(CreationType.ACCOUNT, authenticatedUser);
-                break;
+        if (authenticatedUser.getRole().equals(Role.USER)) {
+            creationRequests = creationRequestRepository.findCreationRequestsByCreationTypeAndUser(CreationType.ACCOUNT, authenticatedUser);
+        } else {
+            creationRequests = creationRequestRepository.findCreationRequestsByCreationType(CreationType.ACCOUNT);
         }
 
         if (creationRequests.isEmpty()) {
