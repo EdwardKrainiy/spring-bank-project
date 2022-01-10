@@ -37,7 +37,7 @@ public class TransactionController {
      * @return ResponseEntity Response, which contains TransactionDto and HTTP code.
      */
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<TransactionDto> getTransactionById(@PathVariable("id") Long transactionId) {
         return ResponseEntity.status(HttpStatus.OK).body(transactionService.findTransactionById(transactionId));
     }

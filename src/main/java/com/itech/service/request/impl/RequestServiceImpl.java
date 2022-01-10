@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class RequestServiceImpl implements RequestService {
+
     @Autowired
     private CreationRequestRepository creationRequestRepository;
 
@@ -68,15 +69,5 @@ public class RequestServiceImpl implements RequestService {
         return creationRequestDto;
     }
 
-    /**
-     * findCreationRequestById method. Finds CreationRequest by id and maps to Dto;
-     *
-     * @param creationRequestId Id of CreationRequest.
-     * @return CreationRequestDto Dto of found CreationRequest object.
-     */
 
-    @Override
-    public CreationRequestDto findCreationRequestById(Long creationRequestId) {
-        return requestDtoMapper.toDto(creationRequestRepository.findCreationRequestById(creationRequestId).orElseThrow(() -> new EntityNotFoundException("CreationRequest not found!")));
-    }
 }

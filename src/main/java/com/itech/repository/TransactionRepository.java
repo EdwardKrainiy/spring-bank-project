@@ -1,6 +1,7 @@
 package com.itech.repository;
 
 import com.itech.model.entity.Transaction;
+import com.itech.model.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,5 +16,11 @@ import java.util.Optional;
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
     Optional<Transaction> getTransactionById(Long id);
+
     List<Transaction> findAll();
+
+    Optional<Transaction> getTransactionByIdAndUser(Long id, User user);
+
+    List<Transaction> findTransactionsByUser(User user);
+
 }
