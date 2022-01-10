@@ -30,4 +30,6 @@ public interface AccountService {
     void approveAccountCreationRequest(Long accountCreationRequestId);
 
     void rejectAccountCreationRequest(Long accountCreationRequestId);
+
+    void checkExpiredAccountCreationRequests();
 }

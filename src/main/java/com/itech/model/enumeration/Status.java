@@ -8,5 +8,6 @@ package com.itech.model.enumeration;
 public enum Status {
     REJECTED,
     IN_PROGRESS,
-    CREATED
+    CREATED,
+    EXPIRED
 }

@@ -22,7 +22,8 @@ public interface TransactionDtoMapper {
      * @return TransactionDto Obtained TransactionDto entity.
      */
     @Mappings({
-            @Mapping(source = "transaction.user.id", target = "userId")
+            @Mapping(source = "transaction.user.id", target = "userId"),
+            @Mapping(source = "transaction.issuedAt", target = "issuedAt")
     })
     TransactionDto toDto(Transaction transaction);
 }

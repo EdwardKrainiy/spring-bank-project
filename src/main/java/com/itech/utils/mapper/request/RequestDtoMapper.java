@@ -20,7 +20,8 @@ public interface RequestDtoMapper {
      * @return CreationRequestDto Obtained CreationRequestDto entity.
      */
     @Mappings({
-            @Mapping(source = "creationRequest.user.id", target = "userId")
+            @Mapping(source = "creationRequest.user.id", target = "userId"),
+            @Mapping(source = "creationRequest.issuedAt", target = "issuedAt")
     })
     CreationRequestDto toDto(CreationRequest creationRequest);
 }
