@@ -321,7 +321,7 @@ public class AccountServiceImpl implements AccountService {
 
         for (CreationRequest accountCreationRequest : accountCreationRequests) {
             LocalDateTime time = accountCreationRequest.getIssuedAt().plusSeconds(timeToBeExpired);
-            if (!time.isBefore(LocalDateTime.now())) {
+            if (time.isBefore(LocalDateTime.now())) {
                 accountCreationRequest.setStatus(Status.EXPIRED);
                 creationRequestRepository.save(accountCreationRequest);
                 log.info(String.format("Expired account creation request id: %d", accountCreationRequest.getId()));
