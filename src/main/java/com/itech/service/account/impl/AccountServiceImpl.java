@@ -153,7 +153,7 @@ public class AccountServiceImpl implements AccountService {
         accountCreatingRequest.setStatus(Status.IN_PROGRESS);
         accountCreatingRequest.setCreationType(CreationType.ACCOUNT);
         accountCreatingRequest.setPayload(serializer.serializeObjectToJson(accountCreateDto));
-        accountCreatingRequest.setIssuedAt(java.sql.Timestamp.valueOf(LocalDateTime.now()));
+        accountCreatingRequest.setIssuedAt(LocalDateTime.now());
         accountCreatingRequest.setUser(authenticatedUser);
 
         log.info("Account was created successfully!");
@@ -320,8 +320,8 @@ public class AccountServiceImpl implements AccountService {
         List<CreationRequest> accountCreationRequests = creationRequestRepository.findCreationRequestsByCreationTypeAndStatus(CreationType.ACCOUNT, Status.IN_PROGRESS);
 
         for (CreationRequest accountCreationRequest : accountCreationRequests) {
-            LocalDateTime time = Instant.ofEpochSecond(accountCreationRequest.getIssuedAt().getTime()).atZone(ZoneId.systemDefault()).toLocalDateTime();
-            if (!time.isBefore(LocalDateTime.now().plusSeconds(timeToBeExpired))) {
+            LocalDateTime time = accountCreationRequest.getIssuedAt().plusSeconds(timeToBeExpired);
+            if (!time.isBefore(LocalDateTime.now())) {
                 accountCreationRequest.setStatus(Status.EXPIRED);
                 creationRequestRepository.save(accountCreationRequest);
                 log.info(String.format("Expired account creation request id: %d", accountCreationRequest.getId()));

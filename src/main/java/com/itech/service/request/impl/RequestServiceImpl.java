@@ -52,7 +52,7 @@ public class RequestServiceImpl implements RequestService {
         creationRequest.setUser(foundUser);
         creationRequest.setCreationType(CreationType.TRANSACTION);
         creationRequest.setStatus(Status.IN_PROGRESS);
-        creationRequest.setIssuedAt(java.sql.Timestamp.valueOf(LocalDateTime.now()));
+        creationRequest.setIssuedAt(LocalDateTime.now());
         creationRequest.setPayload(serializer.serializeObjectToJson(transactionCreateDto));
 
         return creationRequestRepository.save(creationRequest);

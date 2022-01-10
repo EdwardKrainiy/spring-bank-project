@@ -6,6 +6,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
+/**
+ * SchedulerConfig class. Provides us Scheduler, which checks EXPIRED Account CreationRequests and marks them.
+ */
+
 @Configuration
 @EnableScheduling
 public class SchedulerConfig {
