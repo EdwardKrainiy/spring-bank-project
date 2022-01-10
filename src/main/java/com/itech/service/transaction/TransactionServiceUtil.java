@@ -65,7 +65,7 @@ public class TransactionServiceUtil {
         for (Operation operation : operations) {
             LocalDate date = Instant.ofEpochMilli(transaction.getIssuedAt().getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
             if (!date.isBefore(LocalDate.now().plusDays(1))) {
-                transaction.setStatus(Status.REJECTED);
+                transaction.setStatus(Status.EXPIRED);
                 transactionRepository.save(transaction);
                 throw new ValidationException("Time of transaction is over!");
             }

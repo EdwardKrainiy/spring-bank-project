@@ -29,6 +29,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -48,6 +51,9 @@ public class AccountServiceImpl implements AccountService {
 
     @Value("${spring.mail.rejectmessage}")
     private String rejectMessage;
+
+    @Value("${spring.time.expired.request.time}")
+    private long timeToBeExpired;
 
     @Autowired
     private AccountRepository accountRepository;
@@ -147,6 +153,7 @@ public class AccountServiceImpl implements AccountService {
         accountCreatingRequest.setStatus(Status.IN_PROGRESS);
         accountCreatingRequest.setCreationType(CreationType.ACCOUNT);
         accountCreatingRequest.setPayload(serializer.serializeObjectToJson(accountCreateDto));
+        accountCreatingRequest.setIssuedAt(LocalDateTime.now());
         accountCreatingRequest.setUser(authenticatedUser);
 
         log.info("Account was created successfully!");
@@ -250,7 +257,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void approveAccountCreationRequest(Long accountCreationRequestId) {
-        CreationRequest accountCreationRequest = creationRequestRepository.findCreationRequestById(accountCreationRequestId).orElseThrow(() -> new EntityNotFoundException("Account CreationRequest with this id not found!"));
+        CreationRequest accountCreationRequest = creationRequestRepository.findCreationRequestsByIdAndAndStatus(accountCreationRequestId, Status.IN_PROGRESS).orElseThrow(() -> new EntityNotFoundException("Account CreationRequest with this id not found!"));
 
         User accountCreationRequestUser = accountCreationRequest.getUser();
 
@@ -286,7 +293,7 @@ public class AccountServiceImpl implements AccountService {
      */
 
     public void rejectAccountCreationRequest(Long accountCreationRequestId) {
-        CreationRequest accountCreationRequest = creationRequestRepository.findCreationRequestById(accountCreationRequestId).orElseThrow(() -> new EntityNotFoundException("Account CreationRequest with this id not found!"));
+        CreationRequest accountCreationRequest = creationRequestRepository.findCreationRequestsByIdAndAndStatus(accountCreationRequestId, Status.IN_PROGRESS).orElseThrow(() -> new EntityNotFoundException("Account CreationRequest with this id not found!"));
 
         User accountCreationRequestUser = accountCreationRequest.getUser();
 
@@ -301,6 +308,24 @@ public class AccountServiceImpl implements AccountService {
                     rejectMessage);
         } else {
             throw new EntityNotFoundException("User email is not found!");
+        }
+    }
+
+    /**
+     * checkExpiredAccountCreationRequests method. Marks Request, created more than 4 hours ago, as EXPIRED.
+     */
+
+    @Override
+    public void checkExpiredAccountCreationRequests() {
+        List<CreationRequest> accountCreationRequests = creationRequestRepository.findCreationRequestsByCreationTypeAndStatus(CreationType.ACCOUNT, Status.IN_PROGRESS);
+
+        for (CreationRequest accountCreationRequest : accountCreationRequests) {
+            LocalDateTime time = accountCreationRequest.getIssuedAt().plusSeconds(timeToBeExpired);
+            if (time.isBefore(LocalDateTime.now())) {
+                accountCreationRequest.setStatus(Status.EXPIRED);
+                creationRequestRepository.save(accountCreationRequest);
+                log.info(String.format("Expired account creation request id: %d", accountCreationRequest.getId()));
+            }
         }
     }
 }

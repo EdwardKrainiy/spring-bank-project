@@ -17,6 +17,8 @@ import com.itech.utils.mapper.request.RequestDtoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 /**
  * Implementation of RequestService interface. Provides us different methods of Service layer to work with Repository layer of CreationRequest objects.
  *
@@ -50,6 +52,7 @@ public class RequestServiceImpl implements RequestService {
         creationRequest.setUser(foundUser);
         creationRequest.setCreationType(CreationType.TRANSACTION);
         creationRequest.setStatus(Status.IN_PROGRESS);
+        creationRequest.setIssuedAt(LocalDateTime.now());
         creationRequest.setPayload(serializer.serializeObjectToJson(transactionCreateDto));
 
         return creationRequestRepository.save(creationRequest);

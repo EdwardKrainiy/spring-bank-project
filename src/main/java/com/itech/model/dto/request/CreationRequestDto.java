@@ -29,6 +29,9 @@ public class CreationRequestDto {
     @JsonProperty("CreatedId")
     private Long createdId;
 
+    @JsonProperty("IssuedAt")
+    private String issuedAt;
+
     @JsonProperty("CreationType")
     private String creationType;
 }

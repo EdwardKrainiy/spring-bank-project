@@ -5,6 +5,8 @@ import com.itech.model.enumeration.Status;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * Basic CreationRequest class.
@@ -37,6 +39,9 @@ public class CreationRequest {
 
     @Column(name = "created_id")
     private Long createdId;
+
+    @Column(name = "issued_at")
+    private LocalDateTime issuedAt;
 
     @Column(name = "creation_type")
     @Enumerated(EnumType.STRING)
