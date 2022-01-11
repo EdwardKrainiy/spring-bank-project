@@ -27,12 +27,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private UserDetailsService customUserDetailsService;
+    private UserDetailsService customUserDetailsService; // TODO: use constructor injection instead of autowired
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()
+                .csrf().disable()//TODO: a lot of duplications here, antMatchers(method, ... patterns) you able to pass more than 1 pattern for specific http  type request
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/api/auth/sign-in").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/auth/sign-up").permitAll()
@@ -65,7 +65,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     protected PasswordEncoder encoder() {
         return new BCryptPasswordEncoder(12);
-    }
+    } //TODO: move bcrypt configuration to config file
 
     /**
      * Returns authenticationManagerBean() and adds this one to Application context.

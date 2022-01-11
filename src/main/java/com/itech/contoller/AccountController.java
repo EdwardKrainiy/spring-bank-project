@@ -26,7 +26,7 @@ import java.util.List;
 public class AccountController {
 
     @Autowired
-    private AccountService accountService;
+    private AccountService accountService; // TODO: use constructor injection
 
     @Autowired
     private JsonEntitySerializer jsonEntitySerializer;
@@ -61,9 +61,9 @@ public class AccountController {
      * @param accountCreateDto Data-transfer object of account that will be transformed to Account and put into DB.
      * @return ResponseEntity<Long> 201 HTTP code and id of created account.
      */
-    @Transactional
+    @Transactional //TODO: why did you used transactional here?
     @PostMapping
-    public ResponseEntity<Long> createAccount(@RequestBody AccountCreateDto accountCreateDto) {
+    public ResponseEntity<Long> createAccount(@RequestBody AccountCreateDto accountCreateDto) { //TODO: return account dto instead of id
         return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createAccount(accountCreateDto));
     }
 
@@ -75,7 +75,7 @@ public class AccountController {
      * @return ResponseEntity<Void> 204 HTTP code.
      */
 
-    @Transactional
+    @Transactional //TODO: why did you used transactional here?
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateAccount(@RequestBody AccountUpdateDto accountUpdateDto,
                                               @PathVariable("id") Long accountId) {
@@ -85,7 +85,7 @@ public class AccountController {
         }
 
         accountService.updateAccount(accountUpdateDto, accountId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // TODO: return updated accountdto instead of no_content
     }
 
     /**
@@ -94,7 +94,7 @@ public class AccountController {
      * @param accountId id of account we want to delete.
      * @return ResponseEntity 204 HTTP code.
      */
-    @Transactional
+    @Transactional //TODO: why did you used transactional here?
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAccountById(@PathVariable("id") Long accountId) {
         accountService.deleteAccountByAccountId(accountId);

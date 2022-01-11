@@ -19,7 +19,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "users")
-@Getter
+@Getter //TODO: use @Data annotation
 @Setter
 @NoArgsConstructor
 public class User {

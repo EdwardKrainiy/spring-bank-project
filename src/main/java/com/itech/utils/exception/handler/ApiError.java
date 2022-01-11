@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatus; // TODO: remove unused imports
 
 import java.util.Arrays;
 import java.util.Collections;

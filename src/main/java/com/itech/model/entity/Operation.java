@@ -15,7 +15,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "operation")
-@Getter
+@Getter //TODO: use @Data annotation
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor

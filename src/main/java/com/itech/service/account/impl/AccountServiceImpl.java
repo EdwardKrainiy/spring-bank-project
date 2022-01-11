@@ -24,6 +24,7 @@ import com.itech.utils.exception.ValidationException;
 import com.itech.utils.mapper.account.AccountDtoMapper;
 import com.itech.utils.mapper.account.AccountUpdateDtoMapper;
 import com.itech.utils.mapper.request.RequestDtoMapper;
+import java.util.stream.Collectors;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,7 +57,7 @@ public class AccountServiceImpl implements AccountService {
     private long timeToBeExpired;
 
     @Autowired
-    private AccountRepository accountRepository;
+    private AccountRepository accountRepository; // TODO: use constructor injection
 
     @Autowired
     private AccountDtoMapper accountDtoMapper;
@@ -97,7 +98,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public List<AccountDto> findAllAccounts() {
 
-        User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Logged user not found!"));
+        User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Logged user not found!")); //TODO: move literal to constants
         List<Account> accounts;
 
         if (authenticatedUser.getRole().equals(Role.USER)) {
@@ -107,11 +108,11 @@ public class AccountServiceImpl implements AccountService {
         }
 
         if (accounts.isEmpty()) {
-            throw new EntityNotFoundException("Account not found!");
+            throw new EntityNotFoundException("Account not found!"); // TODO: Account not found literal duplication 3 times. Move it to constant.
         }
 
         List<AccountDto> accountDtos = new ArrayList<>();
-        accounts.forEach(account -> accountDtos.add(accountDtoMapper.toDto(account)));
+        accounts.forEach(account -> accountDtos.add(accountDtoMapper.toDto(account))); //TODO: better to use the following  List<AccountDto> collect = accounts.stream().map(accountDtoMapper::toDto).collect(Collectors.toList());
 
         return accountDtos;
     }
@@ -125,7 +126,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public AccountDto findAccountByAccountId(Long accountId) {
-        User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!"));
+        User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!")); // TODO: henticated user not found! literal duplication 6 times. Move it to constant.
 
         Optional<Account> foundAccount;
 
@@ -135,7 +136,7 @@ public class AccountServiceImpl implements AccountService {
             foundAccount = accountRepository.findAccountById(accountId);
         }
 
-        return accountDtoMapper.toDto(foundAccount.orElseThrow(() -> new EntityNotFoundException("Account not found!")));
+        return accountDtoMapper.toDto(foundAccount.orElseThrow(() -> new EntityNotFoundException("Account not found!"))); //TODO: move literal to constant
     }
 
     /**
@@ -148,7 +149,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Long createAccount(AccountCreateDto accountCreateDto) {
         User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!"));
-
+        //TODO: add debug log here with full accounCreateDto content
         CreationRequest accountCreatingRequest = new CreationRequest();
         accountCreatingRequest.setStatus(Status.IN_PROGRESS);
         accountCreatingRequest.setCreationType(CreationType.ACCOUNT);
@@ -168,16 +169,16 @@ public class AccountServiceImpl implements AccountService {
      */
 
     @Override
-    public void updateAccount(AccountUpdateDto accountUpdateDto, Long accountId) {
-        User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!"));
+    public void updateAccount(AccountUpdateDto accountUpdateDto, Long accountId) { //TODO: should return updated account dto
+        User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!")); //TODO: please move all literals to constants
 
         Account updateAccount = accountUpdateDtoMapper.toEntity(accountUpdateDto);
 
         updateAccount.setId(accountId);
-        updateAccount.setAccountNumber(ibanGenerator.generateIban(accountUpdateDto.getCurrency().getCountryCode()));
+        updateAccount.setAccountNumber(ibanGenerator.generateIban(accountUpdateDto.getCurrency().getCountryCode())); //TODO" why did you generate new account number per each update?
 
         if (authenticatedUser.getRole().equals(Role.USER) && !authenticatedUser.getId().equals(updateAccount.getUser().getId())) {
-            throw new ValidationException("Id of this account is not equals id of logged user.");
+            throw new ValidationException("Id of this account is not equals id of logged user."); //TODO: please move all literals to constants
         }
 
         accountRepository.save(updateAccount);
@@ -191,12 +192,12 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void deleteAccountByAccountId(Long accountId) {
-        User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!"));
+        User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!")); //TODO: please move all literals to constants
 
-        Account foundAccountToDelete = accountRepository.findAccountById(accountId).orElseThrow(() -> new EntityNotFoundException("Account not found!"));
+        Account foundAccountToDelete = accountRepository.findAccountById(accountId).orElseThrow(() -> new EntityNotFoundException("Account not found!")); //TODO: please move all literals to constants
 
         if (authenticatedUser.getRole().equals(Role.USER) && !authenticatedUser.getId().equals(foundAccountToDelete.getId())) {
-            throw new ValidationException("Id of this account is not equals id of logged user.");
+            throw new ValidationException("Id of this account is not equals id of logged user."); //TODO: please move all literals to constants
         } else {
             accountRepository.deleteAccountById(foundAccountToDelete.getId());
         }
@@ -211,10 +212,10 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public CreationRequestDto findAccountCreationRequestById(Long creationRequestId) {
-        User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!"));
+        User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!")); //TODO: move all literals to constant
 
         if (authenticatedUser.getRole().equals(Role.USER)) {
-            return requestDtoMapper.toDto(creationRequestRepository.findCreationRequestsByCreationTypeAndIdAndUser(CreationType.ACCOUNT, creationRequestId, authenticatedUser).orElseThrow(() -> new EntityNotFoundException("Account CreationRequest with this id not found!")));
+            return requestDtoMapper.toDto(creationRequestRepository.findCreationRequestsByCreationTypeAndIdAndUser(CreationType.ACCOUNT, creationRequestId, authenticatedUser).orElseThrow(() -> new EntityNotFoundException("Account CreationRequest with this id not found!"))); // TODO: remove literals duplication. Move to constant.
         } else {
             return requestDtoMapper.toDto(creationRequestRepository.findCreationRequestsByCreationTypeAndId(CreationType.ACCOUNT, creationRequestId).orElseThrow(() -> new EntityNotFoundException("Account CreationRequest with this id not found!")));
         }
@@ -228,7 +229,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public List<CreationRequestDto> findAccountCreationRequests() {
-        User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!"));
+        User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!")); //TODO: to constant
 
         List<CreationRequest> creationRequests;
 
@@ -241,10 +242,10 @@ public class AccountServiceImpl implements AccountService {
         }
 
         if (creationRequests.isEmpty()) {
-            throw new EntityNotFoundException("Account CreationRequests not found!");
+            throw new EntityNotFoundException("Account CreationRequests not found!");  ////TODO: to constant
         }
 
-        creationRequests.forEach(creationRequest -> creationRequestDtos.add(requestDtoMapper.toDto(creationRequest)));
+        creationRequests.forEach(creationRequest -> creationRequestDtos.add(requestDtoMapper.toDto(creationRequest))); // TODO: use streamApi functionality for convertion. creationRequests.stream.map ....
 
         return creationRequestDtos;
     }
@@ -268,7 +269,7 @@ public class AccountServiceImpl implements AccountService {
         accountToCreate.setAmount(accountCreateDtoFromCreationRequest.getAmount());
         accountToCreate.setCurrency(Currency.valueOf(accountCreateDtoFromCreationRequest.getCurrency()));
         accountToCreate.setAccountNumber(ibanGenerator.generateIban(accountToCreate.getCurrency().getCountryCode()));
-        accountRepository.save(accountToCreate);
+        accountRepository.save(accountToCreate); // TODO: save returned created entity. line 276 redundant
 
         accountCreationRequest.setStatus(Status.CREATED);
 
@@ -277,12 +278,12 @@ public class AccountServiceImpl implements AccountService {
         creationRequestRepository.save(accountCreationRequest);
 
         String userEmail = accountCreationRequestUser.getEmail();
-        if (!(userEmail == null)) {
+        if (!(userEmail == null)) { // TODO: use != instead of !()
             emailService.sendEmail(userEmail,
                     String.format("Request approved. Id of created account: %d", createdAccountId),
                     approveMessage);
         } else {
-            throw new EntityNotFoundException("User email is not found!");
+            throw new EntityNotFoundException("User email is not found!"); //TODO: to constant
         }
     }
 
@@ -302,12 +303,12 @@ public class AccountServiceImpl implements AccountService {
 
         String userEmail = accountCreationRequestUser.getEmail();
 
-        if (!(userEmail == null)) {
+        if (!(userEmail == null)) {  // TODO: use != instead of !()
             emailService.sendEmail(userEmail,
-                    "Request rejected.",
+                    "Request rejected.", //TODO: to constants
                     rejectMessage);
         } else {
-            throw new EntityNotFoundException("User email is not found!");
+            throw new EntityNotFoundException("User email is not found!"); //TODO: to constants
         }
     }
 

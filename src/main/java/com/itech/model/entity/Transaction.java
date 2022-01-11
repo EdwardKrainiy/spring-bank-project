@@ -17,7 +17,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "transactions")
-@Getter
+@Getter //TODO: use @Data annotation
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -33,7 +33,7 @@ public class Transaction {
 
     @Column(name = "issued_at")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date issuedAt;
+    private Date issuedAt; //TODO change to localDateTime
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)

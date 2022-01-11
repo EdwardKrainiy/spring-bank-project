@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AccountUpdateDto {
     @JsonProperty("Currency")
-    private Currency currency;
+    private Currency currency; //TODO: AccountUpdateDTO and AccountCreateDTO are the same. You can move common fields to abstract class and extend them
 
     @JsonProperty("Amount")
     private double amount;

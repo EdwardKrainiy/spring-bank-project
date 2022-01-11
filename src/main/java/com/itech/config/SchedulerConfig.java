@@ -15,7 +15,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 public class SchedulerConfig {
 
     @Autowired
-    private AccountService accountService;
+    private AccountService accountService; // TODO: use constructor injection instead of autowired
 
     /**
      * checkExpiredCreationRequests method. Scheduler, which marks all AccountCreationRequests, which was created more than 4 hours ago as EXPIRED, and checks that every 5 minutes.

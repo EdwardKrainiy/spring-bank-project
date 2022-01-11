@@ -21,7 +21,7 @@ import java.util.Optional;
 @Component
 public class JwtDecoder {
     @Value("${jwt.confirmation.key}")
-    private String CONFIRMATION_KEY;
+    private String CONFIRMATION_KEY; // TODO: rename this variable. Read about java naming convention
 
     /**
      * getIdFromConfirmToken method. Gets id from transferred token.
@@ -36,7 +36,7 @@ public class JwtDecoder {
 
         Optional<Long> userId = Optional.of(Long.parseLong(confirmationClaims.getSubject()));
 
-        return userId.orElseThrow(() -> new EntityNotFoundException(String.format("User with id = %d not found!", userId)));
+        return userId.orElseThrow(() -> new EntityNotFoundException(String.format("User with id = %d not found!", userId))); // TODO: %d expected int, not optional. userId is optional.
     }
 
     public String getUsernameOfLoggedUser(){

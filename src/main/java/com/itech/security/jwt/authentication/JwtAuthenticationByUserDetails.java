@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 public class JwtAuthenticationByUserDetails {
 
     @Autowired
-    private AuthenticationManager authenticationManager;
+    private AuthenticationManager authenticationManager; //TODO: constructor injection
 
     @Autowired
     private TokenProvider jwtTokenUtil;
@@ -31,7 +31,7 @@ public class JwtAuthenticationByUserDetails {
      * @param userDto User object which we need to check and authenticate.
      * @return ResponseEntity Response, which contains message and HTTP code.
      */
-    public ResponseEntity<String> authenticate(UserDto userDto) {
+    public ResponseEntity<String> authenticate(UserDto userDto) { // TODO: let's return only token here. Controller will wrap it with ResponseEntity
         final Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         userDto.getUsername(),

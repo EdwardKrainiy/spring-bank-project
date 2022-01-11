@@ -17,7 +17,7 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "accounts")
-@Getter
+@Getter //TODO: use @Data annotation
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor

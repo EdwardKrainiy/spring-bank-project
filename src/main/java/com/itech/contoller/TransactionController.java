@@ -21,11 +21,11 @@ import java.util.List;
  */
 @RestController
 @Log4j2
-@RequestMapping("api/transactions")
+@RequestMapping("api/transactions") // TODO: should be /api/transactions
 public class TransactionController {
 
     @Autowired
-    private TransactionService transactionService;
+    private TransactionService transactionService; //TODO: constructor injection
 
     @Autowired
     private RequestService requestService;

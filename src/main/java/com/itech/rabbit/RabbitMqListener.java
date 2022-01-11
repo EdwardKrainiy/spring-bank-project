@@ -18,7 +18,7 @@ public class RabbitMqListener {
     private String queueName;
 
     @Autowired
-    private RabbitMqProcessor processor;
+    private RabbitMqProcessor processor; //TODO: constructor injection
 
     /**
      * processRabbitQueue method. Creates RabbitMQ listener for queue, which will process messages from queue.

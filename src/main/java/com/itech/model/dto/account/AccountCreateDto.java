@@ -9,14 +9,14 @@ import lombok.*;
  * @author Edvard Krainiy on 12/18/2021
  */
 
-@Data
+@Data //TODO: data already includes getter and setter
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class AccountCreateDto {
     @JsonProperty("Currency")
-    private String currency;
+    private String currency; //TODO: use enum here like in AccountUpdateDTO.
 
     @JsonProperty("Amount")
     private double amount;

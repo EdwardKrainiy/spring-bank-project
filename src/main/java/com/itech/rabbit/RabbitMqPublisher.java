@@ -16,7 +16,7 @@ public class RabbitMqPublisher {
     private String queueName;
 
     @Autowired
-    private AmqpTemplate template;
+    private AmqpTemplate template; //TODO: constructor injection
 
     /**
      * sendMessageToQueue method. Sends message to queue.

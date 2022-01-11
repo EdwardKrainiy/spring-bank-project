@@ -65,7 +65,7 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     protected ResponseEntity<ApiError> handleInvalidSignatureException(RuntimeException ex) {
         log.error("SignatureException was caught!");
 
-        ApiError exceptionError = new ApiError(HttpStatus.UNAUTHORIZED.value(), "Authentication Failed. Username or Password is not valid.");
+        ApiError exceptionError = new ApiError(HttpStatus.UNAUTHORIZED.value(), "Authentication Failed. Username or Password is not valid."); //TODO: literal to constant
 
         return new ResponseEntity<>(exceptionError, HttpStatus.UNAUTHORIZED);
     }

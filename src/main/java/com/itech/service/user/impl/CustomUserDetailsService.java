@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserRepository userRepository; //TODO: constructor injection
 
     /**
      * loadUserByUsername method. Returns us userDetails of the user, found by username.
@@ -31,8 +31,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) {
 
-        com.itech.model.entity.User user = userRepository.getUserByUsername(username).orElseThrow(() -> new EntityNotFoundException("User not found!"));
-        UserDetails userDetails = User.withUsername(user.getUsername()).password(user.getPassword()).authorities(user.getRole().name()).build();
+        com.itech.model.entity.User user = userRepository.getUserByUsername(username).orElseThrow(() -> new EntityNotFoundException("User not found!")); //TODO: literal to constant
+        UserDetails userDetails = User.withUsername(user.getUsername()).password(user.getPassword()).authorities(user.getRole().name()).build(); // TODO: return expression immediately, without temporary variable userDetails
 
         return userDetails;
     }

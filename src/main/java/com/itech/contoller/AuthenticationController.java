@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthenticationController {
 
     @Autowired
-    private UserService userService;
+    private UserService userService; //TODO: use constuctor injection intead of authowired. Please read about difference between injection types.
 
     @Autowired
     private JwtAuthenticationByUserDetails jwtAuthenticationByUserDetails;
@@ -72,6 +72,7 @@ public class AuthenticationController {
      */
     @GetMapping("/email-confirmation")
     public ResponseEntity<Void> emailConfirmation(@RequestParam("token") String token) {
+        //TODO: add logs here
         userService.activateUser(token);
         return ResponseEntity.ok().build();
     }

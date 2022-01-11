@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
  */
 
 public interface UserService {
+    //TODO: all java docs should be places in Interface declaration.
     void createUser(UserDto userDto);
 
     User findUserByUsername(String username);

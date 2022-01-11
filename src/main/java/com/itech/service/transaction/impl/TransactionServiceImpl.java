@@ -37,7 +37,7 @@ import java.util.Set;
 @Log4j2
 public class TransactionServiceImpl implements TransactionService {
     @Autowired
-    private TransactionRepository transactionRepository;
+    private TransactionRepository transactionRepository; //TODO: constructor injection
 
     @Autowired
     private TransactionDtoMapper transactionDtoMapper;
@@ -75,10 +75,10 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public TransactionDto findTransactionById(Long transactionId) {
-        User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!"));
+        User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!")); //TODO: duplicated literal. Move to constants.
 
         if (authenticatedUser.getRole().equals(Role.USER)) {
-            return transactionDtoMapper.toDto(transactionRepository.getTransactionByIdAndUser(transactionId, authenticatedUser).orElseThrow(() -> new EntityNotFoundException("Transaction not found!")));
+            return transactionDtoMapper.toDto(transactionRepository.getTransactionByIdAndUser(transactionId, authenticatedUser).orElseThrow(() -> new EntityNotFoundException("Transaction not found!"))); //TODO: duplicated literal. Move to contants
         } else {
             return transactionDtoMapper.toDto(transactionRepository.getTransactionById(transactionId).orElseThrow(() -> new EntityNotFoundException("Transaction not found!")));
         }
@@ -104,9 +104,9 @@ public class TransactionServiceImpl implements TransactionService {
             transactions = transactionRepository.findAll();
         }
 
-        if (transactions.isEmpty()) throw new EntityNotFoundException("Transaction not found!");
+        if (transactions.isEmpty()) throw new EntityNotFoundException("Transaction not found!"); //TODO: to constant
 
-        transactions.forEach(transaction -> transactionDtos.add(transactionDtoMapper.toDto(transaction)));
+        transactions.forEach(transaction -> transactionDtos.add(transactionDtoMapper.toDto(transaction))); //TODO: use streamAPi .map()
 
         return transactionDtos;
     }
@@ -119,14 +119,14 @@ public class TransactionServiceImpl implements TransactionService {
      */
 
     @Override
-    public TransactionDto createTransaction(String creationRequestDtoJson) {
+    public TransactionDto createTransaction(String creationRequestDtoJson) { //TODO: method is to huge please refactor it
         CreationRequestDto creationRequestDto = serializer.serializeJsonToObject(creationRequestDtoJson, CreationRequestDto.class);
 
         TransactionCreateDto transactionCreateDto = serializer.serializeJsonToObject(creationRequestDto.getPayload(), TransactionCreateDto.class);
 
-        CreationRequest requestToReject = creationRequestRepository.findCreationRequestById(creationRequestDto.getId()).orElseThrow(() -> new EntityNotFoundException("Creation Request not found!"));
+        CreationRequest requestToReject = creationRequestRepository.findCreationRequestById(creationRequestDto.getId()).orElseThrow(() -> new EntityNotFoundException("Creation Request not found!"));//TODO: to constant
 
-        User foundUser = userRepository.getUserById(creationRequestDto.getUserId()).orElseThrow(() -> new EntityNotFoundException("User not found!"));
+        User foundUser = userRepository.getUserById(creationRequestDto.getUserId()).orElseThrow(() -> new EntityNotFoundException("User not found!")); //TODO: to constant
 
         LocalDateTime currentDate = LocalDateTime.now();
         Transaction transaction = new Transaction();
@@ -143,7 +143,8 @@ public class TransactionServiceImpl implements TransactionService {
 
         for (OperationCreateDto operationCreateDto : dtoOperations) {
             Operation operation = new Operation();
-            Account account = accountRepository.findAccountByAccountNumber(operationCreateDto.getAccountNumber()).orElse(null);
+            Account account = accountRepository.findAccountByAccountNumber(operationCreateDto.getAccountNumber()).orElse(null); //TODO: try to refactor  orElse(null) used if presentOrElse
+
             if(account == null){
                 requestToReject.setStatus(Status.REJECTED);
                 requestToReject.setCreatedId(transaction.getId());
@@ -151,12 +152,12 @@ public class TransactionServiceImpl implements TransactionService {
 
                 transaction.setStatus(Status.REJECTED);
                 transactionRepository.save(transaction);
-                throw new EntityNotFoundException("Account not found!");
+                throw new EntityNotFoundException("Account not found!"); //TODO to constant
             }
             operation.setAccount(account);
             operation.setTransaction(transaction);
 
-            if (operationCreateDto.getOperationType().equals("DEBIT") || operationCreateDto.getOperationType().equals("CREDIT")) {
+            if (operationCreateDto.getOperationType().equals("DEBIT") || operationCreateDto.getOperationType().equals("CREDIT")) { //TODO: use enum values here
                 operation.setOperationType(OperationType.valueOf(operationCreateDto.getOperationType()));
             } else {
                 requestToReject.setStatus(Status.REJECTED);
@@ -165,7 +166,7 @@ public class TransactionServiceImpl implements TransactionService {
 
                 transaction.setStatus(Status.REJECTED);
                 transactionRepository.save(transaction);
-                throw new ValidationException("Incorrect Operation Type!");
+                throw new ValidationException("Incorrect Operation Type!"); //TODO to constant
             }
 
             operation.setAmount(operationCreateDto.getAmount());
@@ -180,7 +181,7 @@ public class TransactionServiceImpl implements TransactionService {
             transaction.setStatus(Status.REJECTED);
             transactionRepository.save(transaction);
 
-            throw new ValidationException("Incorrect structure of request. It must be at least 1 DEBIT and 1 CREDIT operations, and sum of CREDIT minus sum of DEBIT operation amounts must equals 0.");
+            throw new ValidationException("Incorrect structure of request. It must be at least 1 DEBIT and 1 CREDIT operations, and sum of CREDIT minus sum of DEBIT operation amounts must equals 0."); //TODO: to constant
         }
 
         operationRepository.saveAll(operations);
@@ -207,14 +208,14 @@ public class TransactionServiceImpl implements TransactionService {
 
         try {
             transactionServiceUtil.changeAccountAmount(operations);
-        } catch (ValidationException exception) {
+        } catch (ValidationException exception) { //TODO: here you catching unchecked exception. Please create checked exception for that purpose.
             creationRequest.setStatus(Status.REJECTED);
             transaction.setStatus(Status.REJECTED);
 
             creationRequestRepository.save(creationRequest);
             transactionRepository.save(transaction);
 
-            throw new ValidationException("CREDIT amount is more than stored in this account.");
+            throw new ValidationException("CREDIT amount is more than stored in this account."); //TODO: to constant
         }
 
         operationRepository.saveAll(transaction.getOperations());
@@ -235,12 +236,12 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public CreationRequestDto findTransactionCreationRequestById(Long creationRequestId) {
-        User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!"));
+        User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!")); //TODO: literals to constants
 
         if (authenticatedUser.getRole().equals(Role.USER)) {
-            return requestDtoMapper.toDto(creationRequestRepository.findCreationRequestsByCreationTypeAndIdAndUser(CreationType.TRANSACTION, creationRequestId, authenticatedUser).orElseThrow(() -> new EntityNotFoundException("Transaction CreationRequest with this id not found!")));
+            return requestDtoMapper.toDto(creationRequestRepository.findCreationRequestsByCreationTypeAndIdAndUser(CreationType.TRANSACTION, creationRequestId, authenticatedUser).orElseThrow(() -> new EntityNotFoundException("Transaction CreationRequest with this id not found!"))); //TODO: literals to constants
         } else {
-            return requestDtoMapper.toDto(creationRequestRepository.findCreationRequestsByCreationTypeAndId(CreationType.TRANSACTION, creationRequestId).orElseThrow(() -> new EntityNotFoundException("Transaction CreationRequest with this id not found!")));
+            return requestDtoMapper.toDto(creationRequestRepository.findCreationRequestsByCreationTypeAndId(CreationType.TRANSACTION, creationRequestId).orElseThrow(() -> new EntityNotFoundException("Transaction CreationRequest with this id not found!"))); //TODO: literals to constants
         }
     }
 
@@ -265,7 +266,7 @@ public class TransactionServiceImpl implements TransactionService {
         if (creationRequests.isEmpty()) throw new EntityNotFoundException("Transaction CreationRequests not found!");
 
         List<CreationRequestDto> creationRequestDtos = new ArrayList<>();
-        creationRequests.forEach(creationRequest -> creationRequestDtos.add(requestDtoMapper.toDto(creationRequest)));
+        creationRequests.forEach(creationRequest -> creationRequestDtos.add(requestDtoMapper.toDto(creationRequest))); //TODO: use stream api map() for convertion
 
         return creationRequestDtos;
     }

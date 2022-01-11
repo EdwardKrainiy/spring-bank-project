@@ -23,5 +23,5 @@ public class UserDto {
     private String password;
 
     @JsonProperty("Email")
-    private String email;
+    private String email; //TODO: add email validation
 }

@@ -16,7 +16,7 @@ import java.util.Optional;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long> {
-    List<Account> findAll();
+    List<Account> findAll();//TODO: findAll already exists in JPARepository
 
     List<Account> findAccountsByUser(User user);
 
@@ -24,7 +24,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
     Optional<Account> findAccountById(Long id);
 
-    void deleteAccountById(Long id);
+    void deleteAccountById(Long id); //TODO: delete already exists in JPARepository
 
     Optional<Account> findAccountByAccountNumber(String accountNumber);
 }

@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 public class EmailServiceImpl implements EmailService {
 
     @Autowired
-    private JavaMailSender emailSender;
+    private JavaMailSender emailSender; //TODO constructor injection
 
     /**
      * sendEmail method.

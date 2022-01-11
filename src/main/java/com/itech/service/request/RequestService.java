@@ -11,5 +11,6 @@ import java.util.List;
  * @author Edvard Krainiy on 01/05/2022
  */
 public interface RequestService {
+    //TODO: java doc
     CreationRequestDto processCreationRequestMessage(TransactionCreateDto transactionCreateDto);
 }

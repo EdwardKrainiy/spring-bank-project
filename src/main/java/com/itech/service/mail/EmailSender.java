@@ -40,8 +40,8 @@ public class EmailSender {
         mailSender.setPassword(password);
 
         Properties props = mailSender.getJavaMailProperties();
-        props.put("mail.transport.protocol", "smtp");
-        props.put("mail.debug", "true");
+        props.put("mail.transport.protocol", "smtp"); //TODO: move to properties
+        props.put("mail.debug", "true"); //TODO: move to properties
 
         return mailSender;
     }

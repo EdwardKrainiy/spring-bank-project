@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Log4j2
 public class JsonEntitySerializer {
     @Autowired
-    private ObjectMapper objectMapper;
+    private ObjectMapper objectMapper; //TODO: constructor injection.
 
     public <T> String serializeObjectToJson(T object) {
         try {

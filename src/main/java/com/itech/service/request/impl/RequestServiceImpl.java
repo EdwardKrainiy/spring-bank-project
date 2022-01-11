@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 public class RequestServiceImpl implements RequestService {
 
     @Autowired
-    private CreationRequestRepository creationRequestRepository;
+    private CreationRequestRepository creationRequestRepository; //TODO: constructor injection
 
     @Autowired
     private RabbitMqPublisher publisher;

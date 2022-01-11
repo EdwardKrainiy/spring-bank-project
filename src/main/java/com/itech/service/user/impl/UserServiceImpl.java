@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService {
     private String confirmMessage;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserRepository userRepository; //TODO: constructor injection
 
     @Autowired
     private PasswordEncoder encoder;
@@ -51,6 +51,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserDtoMapper userDtoMapper;
 
+    //TODO: move java docs to Interface declaration. Please do it for all interfaces.
+
     /**
      * createUser method. Saves our user on DB.
      *
@@ -65,7 +67,7 @@ public class UserServiceImpl implements UserService {
         @Valid User mappedUser = userDtoMapper.toEntity(userDto);
 
         if (userRepository.getUserByUsername(mappedUser.getUsername()).isPresent() || userRepository.getUserByEmail(mappedUser.getEmail()).isPresent())
-            throw new ValidationException("This user already exists!");
+            throw new ValidationException("This user already exists!"); //TODO: literal to constant
 
         User createdUser = new User(mappedUser.getUsername(), encoder.encode(mappedUser.getPassword()), mappedUser.getEmail(), Role.USER);
 
@@ -77,8 +79,8 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(createdUser);
 
-        emailService.sendEmail(userRepository.getUserByRole(Role.MANAGER).orElseThrow(() -> new EntityNotFoundException("User not found!")).getEmail(),
-                "Confirm email for user " + mappedUser.getUsername(),
+        emailService.sendEmail(userRepository.getUserByRole(Role.MANAGER).orElseThrow(() -> new EntityNotFoundException("User not found!")).getEmail(), //TODO: define constant instead of duplication literal
+                "Confirm email for user " + mappedUser.getUsername(), //TODO: move email text to constant or property. USe placeholders
                 confirmMessage + confirmationToken);
 
         log.info("Mail with confirmation link was sent to manager's email.");
@@ -92,7 +94,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public User findUserByUsername(String username) {
-        return userRepository.getUserByUsername(username).orElseThrow(() -> new EntityNotFoundException("User not found!"));
+        return userRepository.getUserByUsername(username).orElseThrow(() -> new EntityNotFoundException("User not found!")); //TODO: literal to constant
     }
 
     /**
@@ -105,7 +107,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findUserByUsernameAndPassword(String username, String password) {
 
-        User foundUser = userRepository.getUserByUsername(username).orElseThrow(() -> new EntityNotFoundException("User not found!"));
+        User foundUser = userRepository.getUserByUsername(username).orElseThrow(() -> new EntityNotFoundException("User not found!")); //TODO: literal to constant
 
         if (foundUser.getPassword().equals(password)) {
             return foundUser;
@@ -126,7 +128,7 @@ public class UserServiceImpl implements UserService {
         User activatedUser = userRepository.getById(userId);
 
         if (activatedUser.getConfirmationToken() == null) {
-            throw new ValidationException("This user is already activated!");
+            throw new ValidationException("This user is already activated!"); //TODO: literal to constant
         }
 
         activatedUser.setConfirmationToken(null);
@@ -134,7 +136,7 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(activatedUser);
 
-        emailService.sendEmail(activatedUser.getEmail(), "Email confirmed", "Your email was confirmed successfully!");
+        emailService.sendEmail(activatedUser.getEmail(), "Email confirmed", "Your email was confirmed successfully!"); //TODO: literal to constant
         log.info("Mail about confirmation was sent.");
     }
 }

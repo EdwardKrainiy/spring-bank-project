@@ -22,7 +22,7 @@ import java.util.Set;
 @Component
 public class TransactionServiceUtil {
     @Autowired
-    private TransactionRepository transactionRepository;
+    private TransactionRepository transactionRepository; //TODO: constructor injection
 
     /**
      * changeAccountAmount method. Changes amount on all accounts.
@@ -34,10 +34,10 @@ public class TransactionServiceUtil {
     @Transactional
     public void changeAccountAmount(Set<Operation> operations) throws ValidationException {
         for (Operation operation : operations) {
-            switch (operation.getOperationType()) {
+            switch (operation.getOperationType()) { //TODO: change switch to if.
                 case CREDIT:
                     if (operation.getAccount().getAmount() - operation.getAmount() < 0) {
-                        throw new ValidationException("CREDIT amount is more than stored in this account.");
+                        throw new ValidationException("CREDIT amount is more than stored in this account."); //TODO: to constant
                     }
                     operation.getAccount().setAmount(operation.getAccount().getAmount() - operation.getAmount());
                     break;
@@ -56,7 +56,7 @@ public class TransactionServiceUtil {
      * @return Boolean Is dto valid flag.
      */
 
-    public boolean checkRequestDtoValidity(Set<Operation> operations, Transaction transaction) {
+    public boolean checkRequestDtoValidity(Set<Operation> operations, Transaction transaction) { //TODO: refactor this method. Split it. This method should call OperationTypes check method and operation amounth check.
         double sumOfAmounts = 0;
 
         boolean isDebitOperationsExists = false;
@@ -67,7 +67,7 @@ public class TransactionServiceUtil {
             if (!date.isBefore(LocalDate.now().plusDays(1))) {
                 transaction.setStatus(Status.EXPIRED);
                 transactionRepository.save(transaction);
-                throw new ValidationException("Time of transaction is over!");
+                throw new ValidationException("Time of transaction is over!"); //TODO: to constant
             }
 
             switch (operation.getOperationType()) {
@@ -80,7 +80,7 @@ public class TransactionServiceUtil {
                     sumOfAmounts = sumOfAmounts - operation.getAmount();
                     break;
                 default:
-                    throw new ValidationException("Operation Type is incorrect!");
+                    throw new ValidationException("Operation Type is incorrect!"); //TODO: to constant
             }
         }
         return isCreditOperationsExists && isDebitOperationsExists && sumOfAmounts == 0;

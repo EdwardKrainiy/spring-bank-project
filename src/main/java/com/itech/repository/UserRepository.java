@@ -15,11 +15,11 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> getUserByUsername(String username);
+    Optional<User> getUserByUsername(String username); // TODO: rename get to find
 
-    Optional<User> getUserByEmail(String email);
+    Optional<User> getUserByEmail(String email); // TODO: rename get to find
 
-    Optional<User> getUserByRole(Role role);
+    Optional<User> getUserByRole(Role role); // TODO: rename get to find
 
-    Optional<User> getUserById(Long id);
+    Optional<User> getUserById(Long id); // TODO: already exists
 }

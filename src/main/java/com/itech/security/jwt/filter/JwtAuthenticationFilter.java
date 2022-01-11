@@ -5,6 +5,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.NonNullApi;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,7 +28,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Value("${jwt.header.string}")
-    private String HEADER_STRING;
+    private String HEADER_STRING; //TODO: rename this variables. CAPS used only with final static variables
 
     @Value("${jwt.token.prefix}")
     private String TOKEN_PREFIX;

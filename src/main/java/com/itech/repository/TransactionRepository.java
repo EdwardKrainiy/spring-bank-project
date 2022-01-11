@@ -15,11 +15,11 @@ import java.util.Optional;
  */
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
-    Optional<Transaction> getTransactionById(Long id);
+    Optional<Transaction> getTransactionById(Long id); //TODO: already exists
 
-    List<Transaction> findAll();
+    List<Transaction> findAll(); //TODO: already exists
 
-    Optional<Transaction> getTransactionByIdAndUser(Long id, User user);
+    Optional<Transaction> getTransactionByIdAndUser(Long id, User user); // TODO: rename get to find
 
     List<Transaction> findTransactionsByUser(User user);
 

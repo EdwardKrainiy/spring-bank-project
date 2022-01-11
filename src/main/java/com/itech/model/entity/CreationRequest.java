@@ -16,7 +16,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "creation_request")
-@Getter
+@Getter //TODO: use @Data annotation
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor

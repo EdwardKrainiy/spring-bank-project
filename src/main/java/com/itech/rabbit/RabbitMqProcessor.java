@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class RabbitMqProcessor {
     @Autowired
-    private TransactionService transactionService;
+    private TransactionService transactionService; //TODO: constructor injection
 
     /**
      * processTransactionMessage method. Processes message in queue. In our case this message is creationRequestDto object in JSON format.

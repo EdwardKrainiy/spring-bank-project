@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 public class TokenProvider implements Serializable {
 
     @Value("${jwt.authorities.key}")
-    public String AUTHORITIES_KEY;
+    public String AUTHORITIES_KEY; //TODO: rename variables used java naming convention
     @Value("${jwt.token.validity}")
     private long TOKEN_VALIDITY;
     @Value("${jwt.signing.key}")
@@ -65,7 +65,7 @@ public class TokenProvider implements Serializable {
      */
     public String getSubjectFromToken(String token, String key) {
         return getClaimFromToken(token, Claims::getSubject, key);
-    }
+    } // TODO: method not used
 
     /**
      * getClaimFromToken method.
@@ -115,13 +115,13 @@ public class TokenProvider implements Serializable {
     public String generateAuthToken(Authentication authentication) {
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
+                .collect(Collectors.joining(",")); //TODO: move to constants
 
         return Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim(AUTHORITIES_KEY, authorities)
-                .setIssuedAt(new Date(System.currentTimeMillis())) // Дата создания токена
-                .setExpiration(new Date(System.currentTimeMillis() + TOKEN_VALIDITY * 1000)) //Дата истечения токена
+                .setIssuedAt(new Date(System.currentTimeMillis())) // Дата создания токена TODO: remove comments
+                .setExpiration(new Date(System.currentTimeMillis() + TOKEN_VALIDITY * 1000)) //Дата истечения токена TODO: move 1000 to properties or constants
                 .signWith(SignatureAlgorithm.HS256, SIGNING_KEY) //Ключ расшифровки
                 .compact();
     }
@@ -170,7 +170,7 @@ public class TokenProvider implements Serializable {
         final Claims claims = claimsJws.getBody();
 
         final Collection<? extends GrantedAuthority> authorities =
-                Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
+                Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(",")) //TODO: move to constants
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
