@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -63,7 +64,7 @@ public class AccountController {
      */
     @Transactional
     @PostMapping
-    public ResponseEntity<Long> createAccount(@RequestBody AccountCreateDto accountCreateDto) {
+    public ResponseEntity<Long> createAccount(@RequestBody @Valid AccountCreateDto accountCreateDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createAccount(accountCreateDto));
     }
 
@@ -77,7 +78,7 @@ public class AccountController {
 
     @Transactional
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateAccount(@RequestBody AccountUpdateDto accountUpdateDto,
+    public ResponseEntity<Void> updateAccount(@RequestBody @Valid AccountUpdateDto accountUpdateDto,
                                               @PathVariable("id") Long accountId) {
 
         if (log.isDebugEnabled()) {

@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.validation.Valid;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -267,7 +268,16 @@ public class AccountServiceImpl implements AccountService {
         accountToCreate.setUser(accountCreationRequestUser);
         accountToCreate.setAmount(accountCreateDtoFromCreationRequest.getAmount());
         accountToCreate.setCurrency(Currency.valueOf(accountCreateDtoFromCreationRequest.getCurrency()));
-        accountToCreate.setAccountNumber(ibanGenerator.generateIban(accountToCreate.getCurrency().getCountryCode()));
+
+        String accountNumber = ibanGenerator.generateIban(accountToCreate.getCurrency().getCountryCode());
+
+        if(!accountRepository.findAccountByAccountNumber(accountNumber).isPresent()){
+            accountToCreate.setAccountNumber(accountNumber);
+        } else {
+            accountNumber = ibanGenerator.generateIban(accountToCreate.getCurrency().getCountryCode());
+            accountToCreate.setAccountNumber(accountNumber);
+        }
+
         accountRepository.save(accountToCreate);
 
         accountCreationRequest.setStatus(Status.CREATED);

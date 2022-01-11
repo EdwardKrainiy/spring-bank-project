@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 /**
  * Authentication controller with sign-in, sign-up and email-confirmation endpoints.
  *
@@ -38,7 +40,7 @@ public class AuthenticationController {
      * @return ResponseEntity Response, which contains message and HTTP code.
      */
     @PostMapping("/sign-in")
-    public ResponseEntity<String> signIn(@RequestBody UserDto userDto) throws AuthenticationException{
+    public ResponseEntity<String> signIn(@RequestBody @Valid UserDto userDto) throws AuthenticationException{
 
         if(log.isDebugEnabled()){
             log.debug("RequestBody: {}", jsonEntitySerializer.serializeObjectToJson(userDto));
@@ -54,7 +56,7 @@ public class AuthenticationController {
      * @return ResponseEntity Response, which contains message and HTTP code.
      */
     @PostMapping("/sign-up")
-    public ResponseEntity<Void> signUp(@RequestBody UserDto userDto){
+    public ResponseEntity<Void> signUp(@RequestBody @Valid UserDto userDto){
 
         if(log.isDebugEnabled()){
             log.debug("RequestBody: {}", jsonEntitySerializer.serializeObjectToJson(userDto));
