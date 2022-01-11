@@ -48,7 +48,7 @@ public class TransactionServiceUtil {
             } else if(operation.getOperationType().equals(OperationType.DEBIT)){
                 operation.getAccount().setAmount(operation.getAccount().getAmount() + operation.getAmount());
             } else {
-                throw new ValidationException(creditIsMoreThanStoredOnAccountExceptionText);
+                throw new ChangeAccountAmountException(creditIsMoreThanStoredOnAccountExceptionText);
             }
         }
     }

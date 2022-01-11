@@ -143,30 +143,34 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction transaction = createAndSaveTransaction(foundUser);
 
         if (accountRepository.findAll().isEmpty()) {
-            requestToReject.setStatus(Status.REJECTED);
-            requestToReject.setCreatedId(transaction.getId());
-            creationRequestRepository.save(requestToReject);
-
-            transaction.setStatus(Status.REJECTED);
-            transactionRepository.save(transaction);
-            throw new EntityNotFoundException(accountsAreEmptyExceptionText);
+            rejectCreationRequest(requestToReject, transaction, accountsAreEmptyExceptionText);
         }
 
         Set<Operation> operations = new LinkedHashSet<>();
         Set<OperationCreateDto> dtoOperations = transactionCreateDto.getOperations();
-        Currency currencyToCheck = accountRepository.findAccountByAccountNumber(dtoOperations.stream().findFirst().orElseThrow(() -> new EntityNotFoundException(operationsAreEmptyExceptionText)).getAccountNumber()).orElseThrow(() -> new EntityNotFoundException(accountNotFoundExceptionText)).getCurrency();
+
+        Optional<OperationCreateDto> firstOperation = dtoOperations.stream().findFirst();
+
+        Currency currencyToCheck = null;
+        
+        if (firstOperation.isPresent()) {
+            Optional<Account> expectedAccount = accountRepository.findAccountByAccountNumber(firstOperation.get().getAccountNumber());
+
+            if(expectedAccount.isPresent()){
+                currencyToCheck = expectedAccount.get().getCurrency();
+            }
+            else {
+                rejectCreationRequest(requestToReject, transaction, accountNotFoundExceptionText);
+            }
+        }
+        else {
+            rejectCreationRequest(requestToReject, transaction, operationsAreEmptyExceptionText);
+        }
 
         validateAndAddOperationsToSet(dtoOperations, requestToReject, transaction, currencyToCheck, operations);
 
         if (!transactionServiceUtil.checkRequestDtoValidity(operations, transaction)) {
-            requestToReject.setStatus(Status.REJECTED);
-            requestToReject.setCreatedId(transaction.getId());
-            creationRequestRepository.save(requestToReject);
-
-            transaction.setStatus(Status.REJECTED);
-            transactionRepository.save(transaction);
-
-            throw new ValidationException(incorrectRequestStructureExceptionText);
+            rejectCreationRequest(requestToReject, transaction, incorrectRequestStructureExceptionText);
         }
 
         operationRepository.saveAll(operations);
@@ -189,31 +193,25 @@ public class TransactionServiceImpl implements TransactionService {
 
     private void validateAndAddOperationsToSet(Set<OperationCreateDto> dtoOperations, CreationRequest requestToReject, Transaction transaction, Currency currencyToCheck, Set<Operation> operations) {
         for (OperationCreateDto operationCreateDto : dtoOperations) {
-            accountRepository.findAccountByAccountNumber(operationCreateDto.getAccountNumber()).ifPresentOrElse(foundAccount -> completeOperationAdding(foundAccount, currencyToCheck, requestToReject, transaction, operationCreateDto, operations), () -> rejectCreationRequestIfAccountNotFound(requestToReject, transaction));
+            accountRepository.findAccountByAccountNumber(operationCreateDto.getAccountNumber()).ifPresentOrElse(foundAccount -> completeOperationAdding(foundAccount, currencyToCheck, requestToReject, transaction, operationCreateDto, operations), () -> rejectCreationRequest(requestToReject, transaction, accountNotFoundExceptionText));
         }
     }
 
-    private void rejectCreationRequestIfAccountNotFound(CreationRequest requestToReject, Transaction transaction) {
+    private void rejectCreationRequest(CreationRequest requestToReject, Transaction transaction, String exceptionMessage) {
         requestToReject.setStatus(Status.REJECTED);
         requestToReject.setCreatedId(transaction.getId());
         creationRequestRepository.save(requestToReject);
 
         transaction.setStatus(Status.REJECTED);
         transactionRepository.save(transaction);
-        throw new EntityNotFoundException(accountNotFoundExceptionText);
+        throw new EntityNotFoundException(exceptionMessage);
     }
 
     private void completeOperationAdding(Account account, Currency currencyToCheck, CreationRequest requestToReject, Transaction transaction, OperationCreateDto operationCreateDto, Set<Operation> operations) {
         Operation operation = new Operation();
 
         if (!currencyToCheck.equals(account.getCurrency())) {
-            requestToReject.setStatus(Status.REJECTED);
-            requestToReject.setCreatedId(transaction.getId());
-            creationRequestRepository.save(requestToReject);
-
-            transaction.setStatus(Status.REJECTED);
-            transactionRepository.save(transaction);
-            throw new EntityNotFoundException(currenciesAreNotSameExceptionText);
+            rejectCreationRequest(requestToReject, transaction, currenciesAreNotSameExceptionText);
         }
 
         operation.setAccount(account);
@@ -235,13 +233,7 @@ public class TransactionServiceImpl implements TransactionService {
         try {
             transactionServiceUtil.changeAccountAmount(operations);
         } catch (ChangeAccountAmountException exception) {
-            creationRequest.setStatus(Status.REJECTED);
-            transaction.setStatus(Status.REJECTED);
-
-            creationRequestRepository.save(creationRequest);
-            transactionRepository.save(transaction);
-
-            throw new ValidationException(creditIsMoreThanStoredExceptionText);
+            rejectCreationRequest(creationRequest, transaction, creditIsMoreThanStoredExceptionText);
         }
 
         operationRepository.saveAll(transaction.getOperations());

@@ -1,9 +1,7 @@
 package com.itech.model.entity;
 
 import com.itech.model.enumeration.Status;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -15,7 +13,8 @@ import java.util.Set;
  * @author Edvard Krainiy on 12/23/2021
  */
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "transactions")
 @NoArgsConstructor
 @AllArgsConstructor

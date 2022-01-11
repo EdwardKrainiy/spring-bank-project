@@ -1,9 +1,7 @@
 package com.itech.model.entity;
 
 import com.itech.model.enumeration.OperationType;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -13,7 +11,8 @@ import javax.persistence.*;
  * @author Edvard Krainiy on 12/23/2021
  */
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "operation")
 @NoArgsConstructor
 @AllArgsConstructor
