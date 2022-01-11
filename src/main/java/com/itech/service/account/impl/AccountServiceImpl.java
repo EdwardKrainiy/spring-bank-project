@@ -8,7 +8,6 @@ import com.itech.model.entity.Account;
 import com.itech.model.entity.CreationRequest;
 import com.itech.model.entity.User;
 import com.itech.model.enumeration.CreationType;
-import com.itech.model.enumeration.Currency;
 import com.itech.model.enumeration.Role;
 import com.itech.model.enumeration.Status;
 import com.itech.repository.AccountRepository;
@@ -22,20 +21,17 @@ import com.itech.utils.JwtDecoder;
 import com.itech.utils.exception.EntityNotFoundException;
 import com.itech.utils.exception.ValidationException;
 import com.itech.utils.mapper.account.AccountDtoMapper;
-import com.itech.utils.mapper.account.AccountUpdateDtoMapper;
 import com.itech.utils.mapper.request.RequestDtoMapper;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 import org.springframework.stereotype.Service;
 
-import javax.validation.Valid;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of AccountService interface. Provides us different methods of Service layer to work with Repository layer of Account objects.
@@ -45,7 +41,25 @@ import java.util.Optional;
 
 @Service
 @Log4j2
+@PropertySources({
+        @PropertySource("classpath:properties/exception.properties"),
+        @PropertySource("classpath:properties/mail.properties")
+})
 public class AccountServiceImpl implements AccountService {
+
+    private final AccountRepository accountRepository;
+    private final AccountDtoMapper accountDtoMapper;
+    private final IbanGenerator ibanGenerator;
+    private final JsonEntitySerializer serializer;
+    private final UserRepository userRepository;
+    private final JwtDecoder jwtDecoder;
+    private final CreationRequestRepository creationRequestRepository;
+    private final JsonEntitySerializer jsonEntitySerializer;
+    private final RequestDtoMapper requestDtoMapper;
+    private final EmailService emailService;
+
+    @Value("${exception.account.not.found}")
+    private String accountNotFoundExceptionText;
 
     @Value("${spring.mail.approvemessage}")
     private String approveMessage;
@@ -56,49 +70,44 @@ public class AccountServiceImpl implements AccountService {
     @Value("${spring.time.expired.request.time}")
     private long timeToBeExpired;
 
-    @Autowired
-    private AccountRepository accountRepository;
+    @Value("${exception.authenticated.user.not.found}")
+    private String authenticatedUserNotFoundExceptionText;
 
-    @Autowired
-    private AccountDtoMapper accountDtoMapper;
+    @Value("${exception.account.creation.request.with.id.not.found}")
+    private String creationRequestWithIdNotFoundExceptionText;
 
-    @Autowired
-    private AccountUpdateDtoMapper accountUpdateDtoMapper;
+    @Value("${exception.id.of.logged.user.not.equals.id.of.account}")
+    private String idOfLoggedUserNotEqualsIdOfAccountExceptionText;
 
-    @Autowired
-    private IbanGenerator ibanGenerator;
+    @Value("${exception.account.creation.requests.not.found}")
+    private String accountCreationRequestsNotFoundExceptionText;
 
-    @Autowired
-    private JsonEntitySerializer serializer;
+    @Value("${exception.logged.user.not.found}")
+    private String loggedUserNotFoundExceptionText;
 
-    @Autowired
-    private UserRepository userRepository;
+    @Value("${exception.user.email.not.found}")
+    private String userEmailNotFoundExceptionText;
 
-    @Autowired
-    private JwtDecoder jwtDecoder;
+    @Value("${mail.rejected.message.title}")
+    private String rejectedMessageTitleText;
 
-    @Autowired
-    private CreationRequestRepository creationRequestRepository;
-
-    @Autowired
-    private JsonEntitySerializer jsonEntitySerializer;
-
-    @Autowired
-    private RequestDtoMapper requestDtoMapper;
-
-    @Autowired
-    private EmailService emailService;
-
-    /**
-     * findAllAccounts method. Finds all accounts from DB.
-     *
-     * @return ResponseEntity<List < AccountDto>> ResponseEntity with HTTP code and list of all found accounts.
-     */
+    public AccountServiceImpl(AccountRepository accountRepository, AccountDtoMapper accountDtoMapper, IbanGenerator ibanGenerator, JsonEntitySerializer serializer, UserRepository userRepository, JwtDecoder jwtDecoder, CreationRequestRepository creationRequestRepository, JsonEntitySerializer jsonEntitySerializer, RequestDtoMapper requestDtoMapper, EmailService emailService) {
+        this.accountRepository = accountRepository;
+        this.accountDtoMapper = accountDtoMapper;
+        this.ibanGenerator = ibanGenerator;
+        this.serializer = serializer;
+        this.userRepository = userRepository;
+        this.jwtDecoder = jwtDecoder;
+        this.creationRequestRepository = creationRequestRepository;
+        this.jsonEntitySerializer = jsonEntitySerializer;
+        this.requestDtoMapper = requestDtoMapper;
+        this.emailService = emailService;
+    }
 
     @Override
     public List<AccountDto> findAllAccounts() {
 
-        User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Logged user not found!"));
+        User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(loggedUserNotFoundExceptionText));
         List<Account> accounts;
 
         if (authenticatedUser.getRole().equals(Role.USER)) {
@@ -108,25 +117,15 @@ public class AccountServiceImpl implements AccountService {
         }
 
         if (accounts.isEmpty()) {
-            throw new EntityNotFoundException("Account not found!");
+            throw new EntityNotFoundException(accountNotFoundExceptionText);
         }
 
-        List<AccountDto> accountDtos = new ArrayList<>();
-        accounts.forEach(account -> accountDtos.add(accountDtoMapper.toDto(account)));
-
-        return accountDtos;
+        return accounts.stream().map(accountDtoMapper::toDto).collect(Collectors.toList());
     }
-
-    /**
-     * findAccountByAccountId. Finds account by id.
-     *
-     * @param accountId Id of account we need to find.
-     * @return ResponseEntity<AccountDto> ResponseEntity with HTTP code and found account entity.
-     */
 
     @Override
     public AccountDto findAccountByAccountId(Long accountId) {
-        User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!"));
+        User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(authenticatedUserNotFoundExceptionText));
 
         Optional<Account> foundAccount;
 
@@ -136,104 +135,79 @@ public class AccountServiceImpl implements AccountService {
             foundAccount = accountRepository.findAccountById(accountId);
         }
 
-        return accountDtoMapper.toDto(foundAccount.orElseThrow(() -> new EntityNotFoundException("Account not found!")));
+        return accountDtoMapper.toDto(foundAccount.orElseThrow(() -> new EntityNotFoundException(accountNotFoundExceptionText)));
     }
 
-    /**
-     * createAccount method. Creates account from JSON object in RequestBody and saves into DB.
-     *
-     * @param accountCreateDto Account transfer object, which we need to save. This one will be converted into Account object, passed some checks and will be saved on DB.
-     * @return ResponseEntity<Long> ResponseEntity with HTTP code and id of created account.
-     */
-
     @Override
-    public Long createAccount(AccountCreateDto accountCreateDto) {
-        User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!"));
+    public Long createAccount(AccountCreateDto accountChangeDto) {
+        User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(authenticatedUserNotFoundExceptionText));
 
         CreationRequest accountCreatingRequest = new CreationRequest();
+        log.debug("CreationRequest empty object created.");
+
         accountCreatingRequest.setStatus(Status.IN_PROGRESS);
+        log.debug("CreationRequest status set.");
+
         accountCreatingRequest.setCreationType(CreationType.ACCOUNT);
-        accountCreatingRequest.setPayload(serializer.serializeObjectToJson(accountCreateDto));
+        log.debug("CreationRequest type set.");
+
+        accountCreatingRequest.setPayload(serializer.serializeObjectToJson(accountChangeDto));
+        log.debug("CreationRequest payload set.");
+
         accountCreatingRequest.setIssuedAt(LocalDateTime.now());
+        log.debug("CreationRequest issuedAt time set.");
+
         accountCreatingRequest.setUser(authenticatedUser);
+        log.debug("CreationRequest user set.");
 
         log.info("Account was created successfully!");
         return creationRequestRepository.save(accountCreatingRequest).getId();
     }
 
-    /**
-     * updateAccount method. Updates account by id and accountUpdateDto entity.
-     *
-     * @param accountUpdateDto Account transfer object, which we need to update. This one will be converted into Account object, passed some checks and will be updated on DB.
-     * @param accountId        Id of account we need to update.
-     */
-
     @Override
-    public void updateAccount(AccountUpdateDto accountUpdateDto, Long accountId) {
-        User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!"));
+    public AccountDto updateAccount(AccountUpdateDto accountUpdateDto, Long accountId) {
+        User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(authenticatedUserNotFoundExceptionText));
 
-        Account updateAccount = accountUpdateDtoMapper.toEntity(accountUpdateDto);
+        Account accountToUpdate = accountRepository.findAccountById(accountId).orElseThrow(() -> new EntityNotFoundException(accountNotFoundExceptionText));
 
-        updateAccount.setId(accountId);
-        updateAccount.setAccountNumber(ibanGenerator.generateIban(accountUpdateDto.getCurrency().getCountryCode()));
+        accountToUpdate.setAmount(accountUpdateDto.getAmount());
 
-        if (authenticatedUser.getRole().equals(Role.USER) && !authenticatedUser.getId().equals(updateAccount.getUser().getId())) {
-            throw new ValidationException("Id of this account is not equals id of logged user.");
+        if (authenticatedUser.getRole().equals(Role.USER) && !authenticatedUser.getId().equals(accountToUpdate.getUser().getId())) {
+            throw new ValidationException(idOfLoggedUserNotEqualsIdOfAccountExceptionText);
         }
 
-        accountRepository.save(updateAccount);
+        return accountDtoMapper.toDto(accountRepository.save(accountToUpdate));
     }
-
-    /**
-     * deleteAccountByAccountId method. Deletes account by id.
-     *
-     * @param accountId Id of account we need to delete.
-     */
 
     @Override
     public void deleteAccountByAccountId(Long accountId) {
-        User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!"));
+        User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(authenticatedUserNotFoundExceptionText));
 
-        Account foundAccountToDelete = accountRepository.findAccountById(accountId).orElseThrow(() -> new EntityNotFoundException("Account not found!"));
+        Account foundAccountToDelete = accountRepository.findAccountById(accountId).orElseThrow(() -> new EntityNotFoundException(accountNotFoundExceptionText));
 
         if (authenticatedUser.getRole().equals(Role.USER) && !authenticatedUser.getId().equals(foundAccountToDelete.getId())) {
-            throw new ValidationException("Id of this account is not equals id of logged user.");
+            throw new ValidationException(idOfLoggedUserNotEqualsIdOfAccountExceptionText);
         } else {
-            accountRepository.deleteAccountById(foundAccountToDelete.getId());
+            accountRepository.deleteById(foundAccountToDelete.getId());
         }
     }
-
-    /**
-     * findAccountCreationRequestById method. Finds CreationRequest with ACCOUNT CreationType by id and maps to Dto;
-     *
-     * @param creationRequestId Id of CreationRequest.
-     * @return CreationRequestDto Dto of found CreationRequest object.
-     */
 
     @Override
     public CreationRequestDto findAccountCreationRequestById(Long creationRequestId) {
-        User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!"));
+        User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(authenticatedUserNotFoundExceptionText));
 
         if (authenticatedUser.getRole().equals(Role.USER)) {
-            return requestDtoMapper.toDto(creationRequestRepository.findCreationRequestsByCreationTypeAndIdAndUser(CreationType.ACCOUNT, creationRequestId, authenticatedUser).orElseThrow(() -> new EntityNotFoundException("Account CreationRequest with this id not found!")));
+            return requestDtoMapper.toDto(creationRequestRepository.findCreationRequestsByCreationTypeAndIdAndUser(CreationType.ACCOUNT, creationRequestId, authenticatedUser).orElseThrow(() -> new EntityNotFoundException(creationRequestWithIdNotFoundExceptionText)));
         } else {
-            return requestDtoMapper.toDto(creationRequestRepository.findCreationRequestsByCreationTypeAndId(CreationType.ACCOUNT, creationRequestId).orElseThrow(() -> new EntityNotFoundException("Account CreationRequest with this id not found!")));
+            return requestDtoMapper.toDto(creationRequestRepository.findCreationRequestsByCreationTypeAndId(CreationType.ACCOUNT, creationRequestId).orElseThrow(() -> new EntityNotFoundException(creationRequestWithIdNotFoundExceptionText)));
         }
     }
 
-    /**
-     * findAccountCreationRequests method. Finds all CreationRequests with ACCOUNT CreationType and maps to Dto;
-     *
-     * @return List<CreationRequestDto> List of all CreationRequest objects.
-     */
-
     @Override
     public List<CreationRequestDto> findAccountCreationRequests() {
-        User authenticatedUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("Authenticated user not found!"));
+        User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(authenticatedUserNotFoundExceptionText));
 
         List<CreationRequest> creationRequests;
-
-        List<CreationRequestDto> creationRequestDtos = new ArrayList<>();
 
         if (authenticatedUser.getRole().equals(Role.USER)) {
             creationRequests = creationRequestRepository.findCreationRequestsByCreationTypeAndUser(CreationType.ACCOUNT, authenticatedUser);
@@ -242,36 +216,28 @@ public class AccountServiceImpl implements AccountService {
         }
 
         if (creationRequests.isEmpty()) {
-            throw new EntityNotFoundException("Account CreationRequests not found!");
+            throw new EntityNotFoundException(accountCreationRequestsNotFoundExceptionText);
         }
 
-        creationRequests.forEach(creationRequest -> creationRequestDtos.add(requestDtoMapper.toDto(creationRequest)));
-
-        return creationRequestDtos;
+        return creationRequests.stream().map(requestDtoMapper::toDto).collect(Collectors.toList());
     }
-
-    /**
-     * approveAccountCreationRequest method. Approves CreationRequest and creates account based on payload of CreationRequest, sets CreationRequest status to CREATED, then send email message.
-     *
-     * @param accountCreationRequestId Id of CreationRequest we need to approve.
-     */
 
     @Override
     public void approveAccountCreationRequest(Long accountCreationRequestId) {
-        CreationRequest accountCreationRequest = creationRequestRepository.findCreationRequestsByIdAndAndStatus(accountCreationRequestId, Status.IN_PROGRESS).orElseThrow(() -> new EntityNotFoundException("Account CreationRequest with this id not found!"));
+        CreationRequest accountCreationRequest = creationRequestRepository.findCreationRequestsByIdAndStatus(accountCreationRequestId, Status.IN_PROGRESS).orElseThrow(() -> new EntityNotFoundException(creationRequestWithIdNotFoundExceptionText));
 
         User accountCreationRequestUser = accountCreationRequest.getUser();
 
-        AccountCreateDto accountCreateDtoFromCreationRequest = jsonEntitySerializer.serializeJsonToObject(accountCreationRequest.getPayload(), AccountCreateDto.class);
+        AccountCreateDto accountChangeDtoFromCreationRequest = jsonEntitySerializer.serializeJsonToObject(accountCreationRequest.getPayload(), AccountCreateDto.class);
 
         Account accountToCreate = new Account();
         accountToCreate.setUser(accountCreationRequestUser);
-        accountToCreate.setAmount(accountCreateDtoFromCreationRequest.getAmount());
-        accountToCreate.setCurrency(Currency.valueOf(accountCreateDtoFromCreationRequest.getCurrency()));
+        accountToCreate.setAmount(accountChangeDtoFromCreationRequest.getAmount());
+        accountToCreate.setCurrency(accountChangeDtoFromCreationRequest.getCurrency());
 
         String accountNumber = ibanGenerator.generateIban(accountToCreate.getCurrency().getCountryCode());
 
-        if(!accountRepository.findAccountByAccountNumber(accountNumber).isPresent()){
+        if (!accountRepository.findAccountByAccountNumber(accountNumber).isPresent()) {
             accountToCreate.setAccountNumber(accountNumber);
         } else {
             accountNumber = ibanGenerator.generateIban(accountToCreate.getCurrency().getCountryCode());
@@ -282,28 +248,22 @@ public class AccountServiceImpl implements AccountService {
 
         accountCreationRequest.setStatus(Status.CREATED);
 
-        Long createdAccountId = accountRepository.findAccountByAccountNumber(accountToCreate.getAccountNumber()).orElseThrow(() -> new EntityNotFoundException("Account with this account number not found!")).getId();
+        Long createdAccountId = accountRepository.findAccountByAccountNumber(accountToCreate.getAccountNumber()).orElseThrow(() -> new EntityNotFoundException(accountNotFoundExceptionText)).getId();
         accountCreationRequest.setCreatedId(createdAccountId);
         creationRequestRepository.save(accountCreationRequest);
 
         String userEmail = accountCreationRequestUser.getEmail();
-        if (!(userEmail == null)) {
+        if (userEmail != null) {
             emailService.sendEmail(userEmail,
                     String.format("Request approved. Id of created account: %d", createdAccountId),
                     approveMessage);
         } else {
-            throw new EntityNotFoundException("User email is not found!");
+            throw new EntityNotFoundException(userEmailNotFoundExceptionText);
         }
     }
 
-    /**
-     * rejectAccountCreationRequest method. Rejects CreationRequest, sets CreationRequest status to REJECTED, then send email message.
-     *
-     * @param accountCreationRequestId Id of CreationRequest we need to reject.
-     */
-
     public void rejectAccountCreationRequest(Long accountCreationRequestId) {
-        CreationRequest accountCreationRequest = creationRequestRepository.findCreationRequestsByIdAndAndStatus(accountCreationRequestId, Status.IN_PROGRESS).orElseThrow(() -> new EntityNotFoundException("Account CreationRequest with this id not found!"));
+        CreationRequest accountCreationRequest = creationRequestRepository.findCreationRequestsByIdAndStatus(accountCreationRequestId, Status.IN_PROGRESS).orElseThrow(() -> new EntityNotFoundException(creationRequestWithIdNotFoundExceptionText));
 
         User accountCreationRequestUser = accountCreationRequest.getUser();
 
@@ -312,18 +272,13 @@ public class AccountServiceImpl implements AccountService {
 
         String userEmail = accountCreationRequestUser.getEmail();
 
-        if (!(userEmail == null)) {
-            emailService.sendEmail(userEmail,
-                    "Request rejected.",
+        if (userEmail != null) {
+            emailService.sendEmail(userEmail, rejectedMessageTitleText,
                     rejectMessage);
         } else {
-            throw new EntityNotFoundException("User email is not found!");
+            throw new EntityNotFoundException(userEmailNotFoundExceptionText);
         }
     }
-
-    /**
-     * checkExpiredAccountCreationRequests method. Marks Request, created more than 4 hours ago, as EXPIRED.
-     */
 
     @Override
     public void checkExpiredAccountCreationRequests() {

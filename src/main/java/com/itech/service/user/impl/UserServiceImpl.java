@@ -1,20 +1,21 @@
 package com.itech.service.user.impl;
 
-import com.itech.model.enumeration.Role;
-import com.itech.model.dto.user.UserDto;
+import com.itech.model.dto.user.UserSignUpDto;
 import com.itech.model.entity.User;
+import com.itech.model.enumeration.Role;
 import com.itech.repository.UserRepository;
 import com.itech.security.jwt.provider.TokenProvider;
 import com.itech.service.mail.EmailService;
 import com.itech.service.user.UserService;
 import com.itech.utils.JwtDecoder;
-import com.itech.utils.exception.*;
-import com.itech.utils.mapper.user.UserDtoMapper;
+import com.itech.utils.exception.EntityNotFoundException;
+import com.itech.utils.exception.IncorrectPasswordException;
+import com.itech.utils.exception.ValidationException;
+import com.itech.utils.mapper.user.UserSignUpDtoMapper;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,43 +30,60 @@ import javax.validation.Valid;
 
 @Service
 @Log4j2
+@PropertySources({
+        @PropertySource("classpath:properties/exception.properties"),
+        @PropertySource("classpath:properties/mail.properties")
+})
 public class UserServiceImpl implements UserService {
     @Value("${spring.mail.confirmation.message}")
     private String confirmMessage;
 
-    @Autowired
-    private UserRepository userRepository;
+    @Value("${exception.user.already.exists}")
+    private String userIsAlreadyExistsExceptionText;
 
-    @Autowired
-    private PasswordEncoder encoder;
+    @Value("${exception.user.not.found}")
+    private String userNotFoundExceptionText;
 
-    @Autowired
-    private EmailService emailService;
+    @Value("${exception.user.is.already.activated}")
+    private String userIsAlreadyActivatedExceptionText;
 
-    @Autowired
-    private TokenProvider tokenProvider;
+    @Value("${mail.user.confirmation.title}")
+    private String userConfirmationMessageTitleText;
 
-    @Autowired
-    private JwtDecoder jwtDecoder;
+    @Value("${mail.user.successful.confirmation.title}")
+    private String successfulConfirmationTitle;
 
-    @Autowired
-    private UserDtoMapper userDtoMapper;
+    @Value("${mail.user.successful.confirmation.message}")
+    private String successfulConfirmationMessage;
 
-    /**
-     * createUser method. Saves our user on DB.
-     *
-     * @param userDto User transfer object, which we need to save. This one will be converted into User object, passed some checks and will be saved on DB.
-     * @return ResponseEntity Response, which contains message and HTTP code. If something will be wrong, it will throw different Exceptions, which will tell about mistakes and errors.
-     * @throws EntityNotFoundException   If user wasn't found.
-     * @throws EntityExistsException     if user already exists.
-     */
+    private final UserRepository userRepository;
+
+    private final PasswordEncoder encoder;
+
+    private final EmailService emailService;
+
+    private final TokenProvider tokenProvider;
+
+    private final JwtDecoder jwtDecoder;
+
+    private final UserSignUpDtoMapper userSignUpDtoMapper;
+
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder encoder, EmailService emailService, TokenProvider tokenProvider, JwtDecoder jwtDecoder, UserSignUpDtoMapper userSignUpDtoMapper) {
+        this.userRepository = userRepository;
+        this.encoder = encoder;
+        this.emailService = emailService;
+        this.tokenProvider = tokenProvider;
+        this.jwtDecoder = jwtDecoder;
+        this.userSignUpDtoMapper = userSignUpDtoMapper;
+    }
+
     @Override
-    public void createUser(UserDto userDto){
+    public void createUser(UserSignUpDto userDto) {
 
-        @Valid User mappedUser = userDtoMapper.toEntity(userDto);
+        @Valid User mappedUser = userSignUpDtoMapper.toEntity(userDto);
 
-        if (userRepository.getUserByUsername(mappedUser.getUsername()).isPresent() || userRepository.getUserByEmail(mappedUser.getEmail()).isPresent())
-            throw new ValidationException("This user already exists!");
+        if (userRepository.findUserByUsername(mappedUser.getUsername()).isPresent() || userRepository.findUserByEmail(mappedUser.getEmail()).isPresent())
+            throw new ValidationException(userIsAlreadyExistsExceptionText);
 
         User createdUser = new User(mappedUser.getUsername(), encoder.encode(mappedUser.getPassword()), mappedUser.getEmail(), Role.USER);
 
@@ -77,47 +95,28 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(createdUser);
 
-        emailService.sendEmail(userRepository.getUserByRole(Role.MANAGER).orElseThrow(() -> new EntityNotFoundException("User not found!")).getEmail(),
-                "Confirm email for user " + mappedUser.getUsername(),
-                confirmMessage + confirmationToken);
+        emailService.sendEmail(userRepository.findUserByRole(Role.MANAGER).orElseThrow(() -> new EntityNotFoundException(userNotFoundExceptionText)).getEmail(),
+                String.format(userConfirmationMessageTitleText, mappedUser.getUsername()),
+                String.format(("%s%s"), confirmMessage, confirmationToken));
 
         log.info("Mail with confirmation link was sent to manager's email.");
     }
 
-    /**
-     * findUserByUsername method. Finds user by username.
-     *
-     * @param username Username of the user we need to get from DB.
-     * @return User Found by username User object. If user wasn't found, it will throw UserNotFoundException.
-     */
     @Override
     public User findUserByUsername(String username) {
-        return userRepository.getUserByUsername(username).orElseThrow(() -> new EntityNotFoundException("User not found!"));
+        return userRepository.findUserByUsername(username).orElseThrow(() -> new EntityNotFoundException(userNotFoundExceptionText));
     }
 
-    /**
-     * findUserByUsernameAndPassword method. Finds user by username and password.
-     *
-     * @param username Username of the user we need to get from DB.
-     * @param password Password of the user we need to get from DB.
-     * @return User Found by username and password User object. If user wasn't found, it will throw UserNotFoundException.
-     */
     @Override
     public User findUserByUsernameAndPassword(String username, String password) {
 
-        User foundUser = userRepository.getUserByUsername(username).orElseThrow(() -> new EntityNotFoundException("User not found!"));
+        User foundUser = userRepository.findUserByUsername(username).orElseThrow(() -> new EntityNotFoundException(userNotFoundExceptionText));
 
         if (foundUser.getPassword().equals(password)) {
             return foundUser;
         } else throw new IncorrectPasswordException(username);
     }
 
-    /**
-     * activateUser method. Activates user, found by token.
-     *
-     * @param token Transferred token of the user we need to activate.
-     * @return ResponseEntity Response, which contains message and HTTP code.
-     */
     @Transactional
     @Override
     public void activateUser(String token) {
@@ -126,7 +125,7 @@ public class UserServiceImpl implements UserService {
         User activatedUser = userRepository.getById(userId);
 
         if (activatedUser.getConfirmationToken() == null) {
-            throw new ValidationException("This user is already activated!");
+            throw new ValidationException(userIsAlreadyActivatedExceptionText);
         }
 
         activatedUser.setConfirmationToken(null);
@@ -134,7 +133,7 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(activatedUser);
 
-        emailService.sendEmail(activatedUser.getEmail(), "Email confirmed", "Your email was confirmed successfully!");
+        emailService.sendEmail(activatedUser.getEmail(), successfulConfirmationTitle, successfulConfirmationMessage);
         log.info("Mail about confirmation was sent.");
     }
 }

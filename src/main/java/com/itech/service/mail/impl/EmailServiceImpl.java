@@ -17,16 +17,12 @@ import org.springframework.stereotype.Service;
 @Log4j2
 public class EmailServiceImpl implements EmailService {
 
-    @Autowired
-    private JavaMailSender emailSender;
+    private final JavaMailSender emailSender;
 
-    /**
-     * sendEmail method.
-     *
-     * @param toAddress Address we want to send the message.
-     * @param subject   Message subject.
-     * @param message   Text of the message.
-     */
+    public EmailServiceImpl(JavaMailSender emailSender) {
+        this.emailSender = emailSender;
+    }
+
     @Override
     public void sendEmail(String toAddress, String subject, String message) {
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();

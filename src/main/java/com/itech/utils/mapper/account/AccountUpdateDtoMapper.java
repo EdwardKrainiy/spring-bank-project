@@ -1,5 +1,6 @@
 package com.itech.utils.mapper.account;
 
+import com.itech.model.dto.account.AccountCreateDto;
 import com.itech.model.dto.account.AccountUpdateDto;
 import com.itech.model.entity.Account;
 import org.mapstruct.Mapper;
@@ -19,8 +20,5 @@ public interface AccountUpdateDtoMapper {
      * @param accountUpdateDto AccountUpdateDto object we need to convert.
      * @return Account Obtained Account entity.
      */
-    @Mappings({
-            @Mapping(source = "accountUpdateDto.currency", target = "currency")
-    })
     Account toEntity(AccountUpdateDto accountUpdateDto);
 }

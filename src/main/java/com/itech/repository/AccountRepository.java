@@ -16,15 +16,11 @@ import java.util.Optional;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long> {
-    List<Account> findAll();
-
     List<Account> findAccountsByUser(User user);
 
     Optional<Account> findAccountByIdAndUser(Long id, User user);
 
     Optional<Account> findAccountById(Long id);
-
-    void deleteAccountById(Long id);
 
     Optional<Account> findAccountByAccountNumber(String accountNumber);
 }

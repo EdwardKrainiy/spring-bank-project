@@ -6,7 +6,6 @@ import com.itech.model.dto.transaction.TransactionDto;
 import com.itech.service.request.RequestService;
 import com.itech.service.transaction.TransactionService;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,11 +23,14 @@ import java.util.List;
 @RequestMapping("api/transactions")
 public class TransactionController {
 
-    @Autowired
-    private TransactionService transactionService;
+    private final TransactionService transactionService;
 
-    @Autowired
-    private RequestService requestService;
+    private final RequestService requestService;
+
+    public TransactionController(TransactionService transactionService, RequestService requestService) {
+        this.transactionService = transactionService;
+        this.requestService = requestService;
+    }
 
     /**
      * getTransactionById endpoint.
@@ -61,7 +63,7 @@ public class TransactionController {
      */
 
     @PostMapping
-    public ResponseEntity<CreationRequestDto> createTransaction(@Valid @RequestBody TransactionCreateDto transactionCreateDto) {
+    public ResponseEntity<CreationRequestDto> createTransaction(@RequestBody @Valid TransactionCreateDto transactionCreateDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(requestService.processCreationRequestMessage(transactionCreateDto));
     }
 }

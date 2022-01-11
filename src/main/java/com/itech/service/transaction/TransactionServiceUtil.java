@@ -2,14 +2,16 @@ package com.itech.service.transaction;
 
 import com.itech.model.entity.Operation;
 import com.itech.model.entity.Transaction;
+import com.itech.model.enumeration.OperationType;
 import com.itech.model.enumeration.Status;
 import com.itech.repository.TransactionRepository;
+import com.itech.utils.exception.ChangeAccountAmountException;
 import com.itech.utils.exception.ValidationException;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Set;
@@ -20,9 +22,16 @@ import java.util.Set;
  * @author Edvard Krainiy on 12/27/2021
  */
 @Component
+@PropertySource("classpath:properties/exception.properties")
 public class TransactionServiceUtil {
-    @Autowired
-    private TransactionRepository transactionRepository;
+    private final TransactionRepository transactionRepository;
+
+    public TransactionServiceUtil(TransactionRepository transactionRepository) {
+        this.transactionRepository = transactionRepository;
+    }
+
+    @Value("${exception.credit.is.more.than.stored}")
+    private String creditIsMoreThanStoredOnAccountExceptionText;
 
     /**
      * changeAccountAmount method. Changes amount on all accounts.
@@ -32,18 +41,14 @@ public class TransactionServiceUtil {
      */
 
     @Transactional
-    public void changeAccountAmount(Set<Operation> operations) throws ValidationException {
+    public void changeAccountAmount(Set<Operation> operations) throws ChangeAccountAmountException {
         for (Operation operation : operations) {
-            switch (operation.getOperationType()) {
-                case CREDIT:
-                    if (operation.getAccount().getAmount() - operation.getAmount() < 0) {
-                        throw new ValidationException("CREDIT amount is more than stored in this account.");
-                    }
-                    operation.getAccount().setAmount(operation.getAccount().getAmount() - operation.getAmount());
-                    break;
-                case DEBIT:
-                    operation.getAccount().setAmount(operation.getAccount().getAmount() + operation.getAmount());
-                    break;
+            if(operation.getOperationType().equals(OperationType.CREDIT) && operation.getAccount().getAmount() - operation.getAmount() >= 0){
+                operation.getAccount().setAmount(operation.getAccount().getAmount() - operation.getAmount());
+            } else if(operation.getOperationType().equals(OperationType.DEBIT)){
+                operation.getAccount().setAmount(operation.getAccount().getAmount() + operation.getAmount());
+            } else {
+                throw new ValidationException(creditIsMoreThanStoredOnAccountExceptionText);
             }
         }
     }
@@ -57,32 +62,43 @@ public class TransactionServiceUtil {
      */
 
     public boolean checkRequestDtoValidity(Set<Operation> operations, Transaction transaction) {
-        double sumOfAmounts = 0;
+        LocalDate date = transaction.getIssuedAt().atZone(ZoneId.systemDefault()).toLocalDate();
+        if (!date.isBefore(LocalDate.now().plusDays(1))) {
+            transaction.setStatus(Status.EXPIRED);
+            transactionRepository.save(transaction);
+            throw new ValidationException("Time of transaction is over!");
+        }
 
+        boolean areOperationTypesCorrect = checkOperationTypes(operations);
+        boolean isSumOfAmountsEqualsZero = checkSumOfOperationAmounts(operations);
+
+        return areOperationTypesCorrect && isSumOfAmountsEqualsZero;
+    }
+
+    private boolean checkOperationTypes(Set<Operation> operations){
         boolean isDebitOperationsExists = false;
         boolean isCreditOperationsExists = false;
 
         for (Operation operation : operations) {
-            LocalDate date = Instant.ofEpochMilli(transaction.getIssuedAt().getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
-            if (!date.isBefore(LocalDate.now().plusDays(1))) {
-                transaction.setStatus(Status.EXPIRED);
-                transactionRepository.save(transaction);
-                throw new ValidationException("Time of transaction is over!");
-            }
-
-            switch (operation.getOperationType()) {
-                case DEBIT:
-                    isDebitOperationsExists = true;
-                    sumOfAmounts = sumOfAmounts + operation.getAmount();
-                    break;
-                case CREDIT:
-                    isCreditOperationsExists = true;
-                    sumOfAmounts = sumOfAmounts - operation.getAmount();
-                    break;
-                default:
-                    throw new ValidationException("Operation Type is incorrect!");
+            if(operation.getOperationType().equals(OperationType.CREDIT)){
+                isCreditOperationsExists = true;
+            } else {
+                isDebitOperationsExists = true;
             }
         }
-        return isCreditOperationsExists && isDebitOperationsExists && sumOfAmounts == 0;
+        return (isCreditOperationsExists && isDebitOperationsExists);
+    }
+
+    private boolean checkSumOfOperationAmounts(Set<Operation> operations){
+        double sumOfAmounts = 0;
+
+        for (Operation operation : operations) {
+            if(operation.getOperationType().equals(OperationType.CREDIT)){
+                sumOfAmounts -= operation.getAmount();
+            } else {
+                sumOfAmounts += operation.getAmount();
+            }
+        }
+        return sumOfAmounts == 0;
     }
 }

@@ -1,4 +1,6 @@
-package com.itech.validator;
+package com.itech.validator.annotation;
+
+import com.itech.validator.EnumValueValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -13,9 +15,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({FIELD, PARAMETER})
 @Retention(RUNTIME)
 @Documented
-@Constraint(validatedBy = OperationCorrectionValidator.class)
-public @interface IsOperationCorrect {
-    String message() default "Operations CREDIT and DEBIT cannot be applied on the same account.";
+@Constraint(validatedBy = EnumValueValidator.class)
+public @interface EnumValue {
+    String message() default "Incorrect value of Enumeration!";
+
+    Class<? extends Enum<?>> enumClass();
 
     Class<?>[] groups() default {};
 

@@ -2,12 +2,11 @@ package com.itech.model.entity;
 
 import com.itech.model.enumeration.Status;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 /**
@@ -16,9 +15,8 @@ import java.util.Set;
  * @author Edvard Krainiy on 12/23/2021
  */
 @Entity
+@Data
 @Table(name = "transactions")
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Transaction {
@@ -32,8 +30,7 @@ public class Transaction {
     private User user;
 
     @Column(name = "issued_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date issuedAt;
+    private LocalDateTime issuedAt;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)

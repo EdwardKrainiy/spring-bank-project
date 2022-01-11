@@ -2,7 +2,7 @@ package com.itech.model.dto.transaction;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.itech.model.dto.operation.OperationCreateDto;
-import com.itech.validator.IsOperationCorrect;
+import com.itech.validator.annotation.IsOperationCorrect;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

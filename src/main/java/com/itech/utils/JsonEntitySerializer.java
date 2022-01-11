@@ -12,8 +12,11 @@ import org.springframework.stereotype.Component;
 @Component
 @Log4j2
 public class JsonEntitySerializer {
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
+
+    public JsonEntitySerializer(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     public <T> String serializeObjectToJson(T object) {
         try {

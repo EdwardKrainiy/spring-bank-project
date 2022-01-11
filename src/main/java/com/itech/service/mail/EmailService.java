@@ -7,5 +7,14 @@ package com.itech.service.mail;
  */
 
 public interface EmailService {
+
+    /**
+     * sendEmail method.
+     *
+     * @param toAddress Address we want to send the message.
+     * @param subject   Message subject.
+     * @param message   Text of the message.
+     */
+
     void sendEmail(String toAddress, String subject, String message);
 }

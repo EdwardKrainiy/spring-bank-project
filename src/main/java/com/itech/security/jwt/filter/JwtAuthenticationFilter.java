@@ -5,6 +5,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,16 +25,17 @@ import java.io.IOException;
  * @author Edvard Krainiy on 12/10/2021
  */
 
+@PropertySource("classpath:properties/jwt.properties")
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Value("${jwt.header.string}")
-    private String HEADER_STRING;
+    private String headerString;
 
     @Value("${jwt.token.prefix}")
-    private String TOKEN_PREFIX;
+    private String tokenPrefix;
 
     @Value("${jwt.signing.key}")
-    private String SIGN_KEY;
+    private String signKey;
 
     @Autowired
     private UserDetailsService customUserDetailsService;
@@ -54,22 +56,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
 
-        String header = req.getHeader(HEADER_STRING);
+        String header = req.getHeader(headerString);
         String username = null;
         String authToken = null;
 
-        if (header != null && header.startsWith(TOKEN_PREFIX)) {
+        if (header != null && header.startsWith(tokenPrefix)) {
 
-            authToken = header.replace(TOKEN_PREFIX, "");
+            authToken = header.replace(tokenPrefix, "");
 
-            username = jwtTokenUtil.getUsernameFromToken(authToken, SIGN_KEY);
+            username = jwtTokenUtil.getUsernameFromToken(authToken, signKey);
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
             UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
 
-            if (jwtTokenUtil.validateToken(authToken, userDetails, SIGN_KEY)) {
+            if (jwtTokenUtil.validateToken(authToken, userDetails, signKey)) {
                 UsernamePasswordAuthenticationToken authentication = jwtTokenUtil.getAuthenticationToken(authToken, userDetails);
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
                 SecurityContextHolder.getContext().setAuthentication(authentication);

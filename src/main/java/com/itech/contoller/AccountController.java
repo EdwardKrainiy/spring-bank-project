@@ -6,7 +6,6 @@ import com.itech.model.dto.account.AccountUpdateDto;
 import com.itech.service.account.AccountService;
 import com.itech.utils.JsonEntitySerializer;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,11 +25,14 @@ import java.util.List;
 @RequestMapping("/api/accounts")
 public class AccountController {
 
-    @Autowired
-    private AccountService accountService;
+    private final AccountService accountService;
 
-    @Autowired
-    private JsonEntitySerializer jsonEntitySerializer;
+    private final JsonEntitySerializer jsonEntitySerializer;
+
+    public AccountController(AccountService accountService, JsonEntitySerializer jsonEntitySerializer) {
+        this.accountService = accountService;
+        this.jsonEntitySerializer = jsonEntitySerializer;
+    }
 
     /**
      * getAllAccounts endpoint.
@@ -59,13 +61,13 @@ public class AccountController {
     /**
      * createAccount endpoint.
      *
-     * @param accountCreateDto Data-transfer object of account that will be transformed to Account and put into DB.
+     * @param accountChangeDto Data-transfer object of account that will be transformed to Account and put into DB.
      * @return ResponseEntity<Long> 201 HTTP code and id of created account.
      */
     @Transactional
     @PostMapping
-    public ResponseEntity<Long> createAccount(@RequestBody @Valid AccountCreateDto accountCreateDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createAccount(accountCreateDto));
+    public ResponseEntity<Long> createAccount(@RequestBody @Valid AccountCreateDto accountChangeDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createAccount(accountChangeDto));
     }
 
     /**
@@ -78,15 +80,14 @@ public class AccountController {
 
     @Transactional
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateAccount(@RequestBody @Valid AccountUpdateDto accountUpdateDto,
+    public ResponseEntity<AccountDto> updateAccount(@RequestBody @Valid AccountUpdateDto accountUpdateDto,
                                               @PathVariable("id") Long accountId) {
 
         if (log.isDebugEnabled()) {
             log.debug("RequestBody: {}", jsonEntitySerializer.serializeObjectToJson(accountUpdateDto));
         }
 
-        accountService.updateAccount(accountUpdateDto, accountId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.status(HttpStatus.OK).body(accountService.updateAccount(accountUpdateDto, accountId));
     }
 
     /**

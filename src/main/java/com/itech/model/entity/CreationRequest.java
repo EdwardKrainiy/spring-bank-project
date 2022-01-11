@@ -15,9 +15,8 @@ import java.util.Date;
  */
 
 @Entity
+@Data
 @Table(name = "creation_request")
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreationRequest {

@@ -2,10 +2,10 @@ package com.itech.service.mail;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-
-import java.util.Properties;
+import org.springframework.stereotype.Component;
 
 /**
  * EmailSender class. Configures JavaMailSender for sending messages.
@@ -13,6 +13,8 @@ import java.util.Properties;
  * @author Edvard Krainiy on 12/9/2021
  */
 
+@PropertySource("classpath:properties/mail.properties")
+@Component
 public class EmailSender {
     @Value("${spring.mail.host}")
     private String hostAddress;
@@ -38,10 +40,6 @@ public class EmailSender {
         mailSender.setPort(port);
         mailSender.setUsername(username);
         mailSender.setPassword(password);
-
-        Properties props = mailSender.getJavaMailProperties();
-        props.put("mail.transport.protocol", "smtp");
-        props.put("mail.debug", "true");
 
         return mailSender;
     }
