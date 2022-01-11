@@ -67,7 +67,7 @@ public class AccountServiceImpl implements AccountService {
     @Value("${mail.reject.message}")
     private String rejectMessage;
 
-    @Value("${spring.time.expired.request.time}")
+    @Value("${expired.request.time}")
     private long timeToBeExpired;
 
     @Value("${exception.authenticated.user.not.found}")
