@@ -5,10 +5,7 @@ import com.itech.model.dto.request.CreationRequestDto;
 import com.itech.model.dto.transaction.TransactionCreateDto;
 import com.itech.model.dto.transaction.TransactionDto;
 import com.itech.model.entity.*;
-import com.itech.model.enumeration.CreationType;
-import com.itech.model.enumeration.OperationType;
-import com.itech.model.enumeration.Role;
-import com.itech.model.enumeration.Status;
+import com.itech.model.enumeration.*;
 import com.itech.repository.*;
 import com.itech.service.transaction.TransactionService;
 import com.itech.service.transaction.TransactionServiceUtil;
@@ -141,9 +138,41 @@ public class TransactionServiceImpl implements TransactionService {
 
         Set<OperationCreateDto> dtoOperations = transactionCreateDto.getOperations();
 
+        Boolean isNumbersEquals = false;
+        Boolean isCreditExists = false;
+        Boolean isDebitExists = false;
+        String accountNumberToCheck = dtoOperations.stream().findFirst().orElseThrow(() -> new EntityNotFoundException("Operations not found!")).getAccountNumber();
+
+        if(dtoOperations.size() == 2){
+            if(dtoOperations.stream().filter(operationCreateDto -> operationCreateDto.getAccountNumber().equals(accountNumberToCheck)).count() == 2){
+                isNumbersEquals = true;
+            }
+            for(OperationCreateDto operationCreateDto: dtoOperations){
+                if(operationCreateDto.getOperationType().equals(OperationType.CREDIT.name())){
+                    isCreditExists = true;
+                }
+                if(operationCreateDto.getOperationType().equals(OperationType.DEBIT.name())){
+                    isDebitExists = true;
+                }
+            }
+            if(isCreditExists && isDebitExists && isNumbersEquals){
+                requestToReject.setStatus(Status.REJECTED);
+                requestToReject.setCreatedId(transaction.getId());
+                creationRequestRepository.save(requestToReject);
+
+                transaction.setStatus(Status.REJECTED);
+                transactionRepository.save(transaction);
+                throw new EntityNotFoundException("Operations CREDIT and DEBIT cannot be applied on the same account.");
+            }
+        }
+
+        Currency currencyToCheck = accountRepository.findAccountByAccountNumber(dtoOperations.stream().findFirst().orElseThrow(() -> new EntityNotFoundException("Operations is empty!")).getAccountNumber()).orElseThrow(() -> new EntityNotFoundException("Account not found!")).getCurrency();
+
         for (OperationCreateDto operationCreateDto : dtoOperations) {
+
             Operation operation = new Operation();
             Account account = accountRepository.findAccountByAccountNumber(operationCreateDto.getAccountNumber()).orElse(null);
+
             if(account == null){
                 requestToReject.setStatus(Status.REJECTED);
                 requestToReject.setCreatedId(transaction.getId());
@@ -153,20 +182,21 @@ public class TransactionServiceImpl implements TransactionService {
                 transactionRepository.save(transaction);
                 throw new EntityNotFoundException("Account not found!");
             }
-            operation.setAccount(account);
-            operation.setTransaction(transaction);
 
-            if (operationCreateDto.getOperationType().equals("DEBIT") || operationCreateDto.getOperationType().equals("CREDIT")) {
-                operation.setOperationType(OperationType.valueOf(operationCreateDto.getOperationType()));
-            } else {
+            if(!currencyToCheck.equals(account.getCurrency())){
                 requestToReject.setStatus(Status.REJECTED);
                 requestToReject.setCreatedId(transaction.getId());
                 creationRequestRepository.save(requestToReject);
 
                 transaction.setStatus(Status.REJECTED);
                 transactionRepository.save(transaction);
-                throw new ValidationException("Incorrect Operation Type!");
+                throw new EntityNotFoundException("Currencies isn't same!");
             }
+
+            operation.setAccount(account);
+            operation.setTransaction(transaction);
+
+            operation.setOperationType(OperationType.valueOf(operationCreateDto.getOperationType()));
 
             operation.setAmount(operationCreateDto.getAmount());
             operations.add(operationRepository.save(operation));

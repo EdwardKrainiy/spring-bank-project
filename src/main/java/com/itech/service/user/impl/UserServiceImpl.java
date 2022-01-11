@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
      * @throws EntityExistsException     if user already exists.
      */
     @Override
-    public void createUser(@Valid UserDto userDto){
+    public void createUser(UserDto userDto){
 
         @Valid User mappedUser = userDtoMapper.toEntity(userDto);
 

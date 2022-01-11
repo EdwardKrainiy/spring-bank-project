@@ -3,6 +3,7 @@ package com.itech.model.dto.user;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 /**
@@ -16,9 +17,11 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 public class UserDto {
     @JsonProperty("Username")
+    @NotBlank(message = "Username is empty!")
     private String username;
 
     @JsonProperty("Password")
+    @NotBlank(message = "Password is empty!")
     @Size(min = 5, max = 20, message = "Incorrect password length! It must be from 5 to 20.")
     private String password;
 
