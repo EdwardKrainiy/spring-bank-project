@@ -35,7 +35,7 @@ import javax.validation.Valid;
         @PropertySource("classpath:properties/mail.properties")
 })
 public class UserServiceImpl implements UserService {
-    @Value("${spring.mail.confirmation.message}")
+    @Value("${mail.confirmation.message}")
     private String confirmMessage;
 
     @Value("${exception.user.already.exists}")

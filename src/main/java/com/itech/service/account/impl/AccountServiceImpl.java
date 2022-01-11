@@ -61,10 +61,10 @@ public class AccountServiceImpl implements AccountService {
     @Value("${exception.account.not.found}")
     private String accountNotFoundExceptionText;
 
-    @Value("${spring.mail.approvemessage}")
+    @Value("${mail.approve.message}")
     private String approveMessage;
 
-    @Value("${spring.mail.rejectmessage}")
+    @Value("${mail.reject.message}")
     private String rejectMessage;
 
     @Value("${spring.time.expired.request.time}")
