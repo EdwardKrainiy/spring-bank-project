@@ -2,6 +2,7 @@ package com.itech.model.dto.transaction;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.itech.model.dto.operation.OperationCreateDto;
+import com.itech.validator.IsOperationCorrect;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,5 +24,6 @@ public class TransactionCreateDto {
     @JsonProperty("Operations")
     @NotEmpty(message = "Operations is empty!")
     @Size(min = 2, message = "Minimal size of operations is 2!")
+    @IsOperationCorrect
     private @Valid Set<OperationCreateDto> operations;
 }

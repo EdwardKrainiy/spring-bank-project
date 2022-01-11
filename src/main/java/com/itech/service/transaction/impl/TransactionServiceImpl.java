@@ -138,34 +138,6 @@ public class TransactionServiceImpl implements TransactionService {
 
         Set<OperationCreateDto> dtoOperations = transactionCreateDto.getOperations();
 
-        Boolean isNumbersEquals = false;
-        Boolean isCreditExists = false;
-        Boolean isDebitExists = false;
-        String accountNumberToCheck = dtoOperations.stream().findFirst().orElseThrow(() -> new EntityNotFoundException("Operations not found!")).getAccountNumber();
-
-        if(dtoOperations.size() == 2){
-            if(dtoOperations.stream().filter(operationCreateDto -> operationCreateDto.getAccountNumber().equals(accountNumberToCheck)).count() == 2){
-                isNumbersEquals = true;
-            }
-            for(OperationCreateDto operationCreateDto: dtoOperations){
-                if(operationCreateDto.getOperationType().equals(OperationType.CREDIT.name())){
-                    isCreditExists = true;
-                }
-                if(operationCreateDto.getOperationType().equals(OperationType.DEBIT.name())){
-                    isDebitExists = true;
-                }
-            }
-            if(isCreditExists && isDebitExists && isNumbersEquals){
-                requestToReject.setStatus(Status.REJECTED);
-                requestToReject.setCreatedId(transaction.getId());
-                creationRequestRepository.save(requestToReject);
-
-                transaction.setStatus(Status.REJECTED);
-                transactionRepository.save(transaction);
-                throw new EntityNotFoundException("Operations CREDIT and DEBIT cannot be applied on the same account.");
-            }
-        }
-
         Currency currencyToCheck = accountRepository.findAccountByAccountNumber(dtoOperations.stream().findFirst().orElseThrow(() -> new EntityNotFoundException("Operations is empty!")).getAccountNumber()).orElseThrow(() -> new EntityNotFoundException("Account not found!")).getCurrency();
 
         for (OperationCreateDto operationCreateDto : dtoOperations) {
