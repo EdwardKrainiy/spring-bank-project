@@ -5,6 +5,10 @@ import com.itech.model.dto.user.UserSignUpDto;
 import com.itech.security.jwt.authentication.JwtAuthenticationByUserDetails;
 import com.itech.service.user.UserService;
 import com.itech.utils.JsonEntitySerializer;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,8 +46,15 @@ public class AuthenticationController {
      * @param userSignInDto User object we need to sign-in.
      * @return ResponseEntity Response, which contains message and HTTP code.
      */
+    @ApiOperation(value = "Sign in.", notes = "Checks entered credentials and signs in user.", response = String.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful sign in."),
+            @ApiResponse(code = 400, message = "Bad request because of invalid credentials."),
+            @ApiResponse(code = 404, message = "User with this credentials not found.")
+    })
+    @ResponseStatus(value = HttpStatus.OK)
     @PostMapping("/sign-in")
-    public ResponseEntity<String> signIn(@RequestBody @Valid UserSignInDto userSignInDto) throws AuthenticationException {
+    public ResponseEntity<String> signIn(@RequestBody @Valid @ApiParam(name = "userSignInDto", value = "Dto of user, which we want to sign in.") UserSignInDto userSignInDto) throws AuthenticationException {
 
         if (log.isDebugEnabled()) {
             log.debug("RequestBody: {}", jsonEntitySerializer.serializeObjectToJson(userSignInDto));
@@ -58,8 +69,13 @@ public class AuthenticationController {
      * @param userSignUpDto User object we need to sign-up.
      * @return ResponseEntity Response, which contains message and HTTP code.
      */
+    @ApiOperation(value = "Sign up.", notes = "Checks entered credentials and signs up new user.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful sign up."),
+            @ApiResponse(code = 400, message = "Bad request because of invalid values or existing of user with this username or email.")
+    })
     @PostMapping("/sign-up")
-    public ResponseEntity<Void> signUp(@RequestBody @Valid UserSignUpDto userSignUpDto) {
+    public ResponseEntity<Void> signUp(@RequestBody @Valid @ApiParam(name = "userSignUpDto", value = "Dto of user, which we want to sign up.") UserSignUpDto userSignUpDto) {
 
         if (log.isDebugEnabled()) {
             log.debug("RequestBody: {}", jsonEntitySerializer.serializeObjectToJson(userSignUpDto));
@@ -75,8 +91,14 @@ public class AuthenticationController {
      * @param token token of user we need to confirm.
      * @return ResponseEntity Response, which contains message and HTTP code.
      */
+    @ApiOperation(value = "Email confirmation.", notes = "Confirms account by token sent to email.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful email confirmation."),
+            @ApiResponse(code = 400, message = "Bad request or this user is already activated."),
+            @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+    })
     @GetMapping("/email-confirmation")
-    public ResponseEntity<Void> emailConfirmation(@RequestParam("token") String token) {
+    public ResponseEntity<Void> emailConfirmation(@RequestParam("token") @ApiParam(name = "token", value = "Token of user, which we want to confirm.") String token) {
         userService.activateUser(token);
         return ResponseEntity.ok().build();
     }

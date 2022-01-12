@@ -42,18 +42,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
-                .csrf().disable()
-                .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/api/auth/*").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/auth/email-confirmation").hasAuthority(Role.MANAGER.name())
-                .antMatchers("/api/accounts/*").hasAnyAuthority(Role.USER.name(), Role.MANAGER.name())
-                .antMatchers("/api/transactions/*").hasAnyAuthority(Role.MANAGER.name(), Role.USER.name())
-                .antMatchers(HttpMethod.GET, "/api/*/creation-requests/*").hasAnyAuthority(Role.USER.name(), Role.MANAGER.name())
-                .antMatchers(HttpMethod.GET, "/api/accounts/creation-requests/{\\\\d+}/**").hasAuthority(Role.MANAGER.name())
-                .antMatchers("/swagger-ui.html").hasAnyAuthority(Role.MANAGER.name(), Role.USER.name())
-                .anyRequest()
-                .authenticated();
 
         http.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
     }
