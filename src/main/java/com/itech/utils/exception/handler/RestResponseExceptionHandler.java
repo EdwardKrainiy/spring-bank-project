@@ -1,7 +1,10 @@
 package com.itech.utils.exception.handler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.itech.utils.exception.*;
+import com.itech.utils.exception.EntityExistsException;
+import com.itech.utils.exception.EntityNotFoundException;
+import com.itech.utils.exception.IncorrectPasswordException;
+import com.itech.utils.exception.ValidationException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
 import lombok.extern.log4j.Log4j2;
@@ -19,7 +22,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Exception handler class.

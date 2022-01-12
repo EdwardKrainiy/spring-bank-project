@@ -1,6 +1,5 @@
 package com.itech.contoller;
 
-import com.itech.model.dto.account.AccountDto;
 import com.itech.model.dto.request.CreationRequestDto;
 import com.itech.model.dto.transaction.TransactionCreateDto;
 import com.itech.model.dto.transaction.TransactionDto;

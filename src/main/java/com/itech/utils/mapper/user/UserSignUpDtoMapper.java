@@ -1,6 +1,5 @@
 package com.itech.utils.mapper.user;
 
-import com.itech.model.dto.user.UserSignInDto;
 import com.itech.model.dto.user.UserSignUpDto;
 import com.itech.model.entity.User;
 import org.mapstruct.Mapper;

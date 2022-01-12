@@ -12,7 +12,7 @@ import javax.validation.constraints.Positive;
 
 
 /**
- * Operation data-transfer object to create Op eration.
+ * Operation data-transfer object to create Operation.
  *
  * @author Edvard Krainiy on 12/23/2021
  */

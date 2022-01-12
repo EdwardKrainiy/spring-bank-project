@@ -14,7 +14,6 @@ import com.itech.utils.JsonEntitySerializer;
 import com.itech.utils.JwtDecoder;
 import com.itech.utils.exception.EntityNotFoundException;
 import com.itech.utils.mapper.request.RequestDtoMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
