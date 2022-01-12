@@ -11,6 +11,7 @@ import com.itech.model.dto.transaction.TransactionCreateDto;
 public interface RequestService {
     /**
      * processCreationRequestMessage method. Processes message, sends to RabbitMQ queue and saves to DB.
+     *
      * @param transactionCreateDto Object, which contains all info we need to create Transaction.
      * @return CreationRequestDto Dto of creationRequest, which was sent to queue.
      */

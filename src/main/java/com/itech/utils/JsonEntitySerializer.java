@@ -25,10 +25,11 @@ public class JsonEntitySerializer {
             return "";
         }
     }
-    public <T> T serializeJsonToObject(String json, Class<T> tClass){
+
+    public <T> T serializeJsonToObject(String json, Class<T> tClass) {
         try {
             return objectMapper.readValue(json, tClass);
-        } catch (JsonProcessingException exception){
+        } catch (JsonProcessingException exception) {
             log.error("JsonProcessingException caught!");
             return null;
         }

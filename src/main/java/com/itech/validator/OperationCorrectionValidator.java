@@ -30,9 +30,7 @@ public class OperationCorrectionValidator implements ConstraintValidator<IsOpera
                     isDebitExists = true;
                 }
             }
-            if (isCreditExists && isDebitExists && isNumbersEquals) {
-                return false;
-            }
+            return !isCreditExists || !isDebitExists || !isNumbersEquals;
         }
         return true;
     }

@@ -22,7 +22,7 @@ public class ApiError {
     @JsonProperty("Errors")
     private List<String> errors;
 
-    public ApiError(int code, String error){
+    public ApiError(int code, String error) {
         this.code = code;
         this.errors = Collections.singletonList(error);
     }

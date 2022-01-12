@@ -25,13 +25,12 @@ import java.util.Set;
 @PropertySource("classpath:properties/exception.properties")
 public class TransactionServiceUtil {
     private final TransactionRepository transactionRepository;
+    @Value("${exception.credit.is.more.than.stored}")
+    private String creditIsMoreThanStoredOnAccountExceptionText;
 
     public TransactionServiceUtil(TransactionRepository transactionRepository) {
         this.transactionRepository = transactionRepository;
     }
-
-    @Value("${exception.credit.is.more.than.stored}")
-    private String creditIsMoreThanStoredOnAccountExceptionText;
 
     /**
      * changeAccountAmount method. Changes amount on all accounts.
@@ -43,9 +42,9 @@ public class TransactionServiceUtil {
     @Transactional
     public void changeAccountAmount(Set<Operation> operations) throws ChangeAccountAmountException {
         for (Operation operation : operations) {
-            if(operation.getOperationType().equals(OperationType.CREDIT) && operation.getAccount().getAmount() - operation.getAmount() >= 0){
+            if (operation.getOperationType().equals(OperationType.CREDIT) && operation.getAccount().getAmount() - operation.getAmount() >= 0) {
                 operation.getAccount().setAmount(operation.getAccount().getAmount() - operation.getAmount());
-            } else if(operation.getOperationType().equals(OperationType.DEBIT)){
+            } else if (operation.getOperationType().equals(OperationType.DEBIT)) {
                 operation.getAccount().setAmount(operation.getAccount().getAmount() + operation.getAmount());
             } else {
                 throw new ChangeAccountAmountException(creditIsMoreThanStoredOnAccountExceptionText);
@@ -75,12 +74,12 @@ public class TransactionServiceUtil {
         return areOperationTypesCorrect && isSumOfAmountsEqualsZero;
     }
 
-    private boolean checkOperationTypes(Set<Operation> operations){
+    private boolean checkOperationTypes(Set<Operation> operations) {
         boolean isDebitOperationsExists = false;
         boolean isCreditOperationsExists = false;
 
         for (Operation operation : operations) {
-            if(operation.getOperationType().equals(OperationType.CREDIT)){
+            if (operation.getOperationType().equals(OperationType.CREDIT)) {
                 isCreditOperationsExists = true;
             } else {
                 isDebitOperationsExists = true;
@@ -89,11 +88,11 @@ public class TransactionServiceUtil {
         return (isCreditOperationsExists && isDebitOperationsExists);
     }
 
-    private boolean checkSumOfOperationAmounts(Set<Operation> operations){
+    private boolean checkSumOfOperationAmounts(Set<Operation> operations) {
         double sumOfAmounts = 0;
 
         for (Operation operation : operations) {
-            if(operation.getOperationType().equals(OperationType.CREDIT)){
+            if (operation.getOperationType().equals(OperationType.CREDIT)) {
                 sumOfAmounts -= operation.getAmount();
             } else {
                 sumOfAmounts += operation.getAmount();

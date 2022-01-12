@@ -11,10 +11,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class RabbitMqPublisher {
+    private final AmqpTemplate template;
     @Value("${spring.rabbit.mq.queuename}")
     private String queueName;
-
-    private final AmqpTemplate template;
 
     public RabbitMqPublisher(AmqpTemplate template) {
         this.template = template;

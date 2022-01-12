@@ -35,38 +35,26 @@ import javax.validation.Valid;
         @PropertySource("classpath:properties/mail.properties")
 })
 public class UserServiceImpl implements UserService {
+    private final UserRepository userRepository;
+    private final PasswordEncoder encoder;
+    private final EmailService emailService;
+    private final TokenProvider tokenProvider;
+    private final JwtDecoder jwtDecoder;
+    private final UserSignUpDtoMapper userSignUpDtoMapper;
     @Value("${mail.confirmation.message}")
     private String confirmMessage;
-
     @Value("${exception.user.already.exists}")
     private String userIsAlreadyExistsExceptionText;
-
     @Value("${exception.user.not.found}")
     private String userNotFoundExceptionText;
-
     @Value("${exception.user.is.already.activated}")
     private String userIsAlreadyActivatedExceptionText;
-
     @Value("${mail.user.confirmation.title}")
     private String userConfirmationMessageTitleText;
-
     @Value("${mail.user.successful.confirmation.title}")
     private String successfulConfirmationTitle;
-
     @Value("${mail.user.successful.confirmation.message}")
     private String successfulConfirmationMessage;
-
-    private final UserRepository userRepository;
-
-    private final PasswordEncoder encoder;
-
-    private final EmailService emailService;
-
-    private final TokenProvider tokenProvider;
-
-    private final JwtDecoder jwtDecoder;
-
-    private final UserSignUpDtoMapper userSignUpDtoMapper;
 
     public UserServiceImpl(UserRepository userRepository, PasswordEncoder encoder, EmailService emailService, TokenProvider tokenProvider, JwtDecoder jwtDecoder, UserSignUpDtoMapper userSignUpDtoMapper) {
         this.userRepository = userRepository;

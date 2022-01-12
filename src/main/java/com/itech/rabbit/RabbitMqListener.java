@@ -13,10 +13,9 @@ import org.springframework.stereotype.Component;
 @Component
 @Log4j2
 public class RabbitMqListener {
+    private final RabbitMqProcessor processor;
     @Value("${spring.rabbit.mq.queuename}")
     private String queueName;
-
-    private final RabbitMqProcessor processor;
 
     public RabbitMqListener(RabbitMqProcessor processor) {
         this.processor = processor;

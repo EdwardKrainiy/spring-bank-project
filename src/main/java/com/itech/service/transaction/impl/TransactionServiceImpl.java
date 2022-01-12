@@ -151,18 +151,16 @@ public class TransactionServiceImpl implements TransactionService {
         Optional<OperationCreateDto> firstOperation = dtoOperations.stream().findFirst();
 
         Currency currencyToCheck = null;
-        
+
         if (firstOperation.isPresent()) {
             Optional<Account> expectedAccount = accountRepository.findAccountByAccountNumber(firstOperation.get().getAccountNumber());
 
-            if(expectedAccount.isPresent()){
+            if (expectedAccount.isPresent()) {
                 currencyToCheck = expectedAccount.get().getCurrency();
-            }
-            else {
+            } else {
                 rejectCreationRequest(requestToReject, transaction, accountNotFoundExceptionText);
             }
-        }
-        else {
+        } else {
             rejectCreationRequest(requestToReject, transaction, operationsAreEmptyExceptionText);
         }
 

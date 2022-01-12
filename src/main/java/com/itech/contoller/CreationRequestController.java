@@ -73,7 +73,7 @@ public class CreationRequestController {
     /**
      * getAccountCreationRequests endpoint. Returns all accountCreationRequests.
      *
-     * @return ResponseEntity<List<CreationRequestDto>> Response, which contains HTTP code and all Dtos of obtained accountCreationRequests.
+     * @return ResponseEntity<List < CreationRequestDto>> Response, which contains HTTP code and all Dtos of obtained accountCreationRequests.
      */
     @ApiOperation(value = "Obtain all account creation requests.", notes = "Returns all account creation requests.", produces = "application/json", response = Iterable.class)
     @ApiResponses(value = {
@@ -89,7 +89,7 @@ public class CreationRequestController {
     /**
      * getTransactionCreationRequests endpoint. Returns all transactionCreationRequests.
      *
-     * @return ResponseEntity<List<CreationRequestDto>> Response, which contains HTTP code and all Dtos of obtained transactionCreationRequests.
+     * @return ResponseEntity<List < CreationRequestDto>> Response, which contains HTTP code and all Dtos of obtained transactionCreationRequests.
      */
     @ApiOperation(value = "Obtain all transaction creation requests.", notes = "Returns all transaction creation requests.", produces = "application/json", response = Iterable.class)
     @ApiResponses(value = {

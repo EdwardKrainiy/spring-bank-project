@@ -38,10 +38,10 @@ public class JwtDecoder {
         return userId.orElseThrow(() -> new EntityNotFoundException("Id not found"));
     }
 
-    public String getUsernameOfLoggedUser(){
+    public String getUsernameOfLoggedUser() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof UserDetails) {
-            return ((UserDetails)principal).getUsername();
+            return ((UserDetails) principal).getUsername();
         } else {
             return principal.toString();
         }

@@ -63,7 +63,7 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     protected ResponseEntity<ApiError> handleException(RuntimeException ex) {
         log.error("IllegalArgumentException was caught!");
 
-    ApiError exceptionError = new ApiError(HttpStatus.UNAUTHORIZED.value(), fetchingExceptionText);
+        ApiError exceptionError = new ApiError(HttpStatus.UNAUTHORIZED.value(), fetchingExceptionText);
 
         return new ResponseEntity<>(exceptionError, HttpStatus.UNAUTHORIZED);
     }

@@ -18,13 +18,12 @@ import org.springframework.stereotype.Service;
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    @Value("${exception.user.not.found}")
+    private String userNotFoundExceptionText;
 
     public CustomUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
-
-    @Value("${exception.user.not.found}")
-    private String userNotFoundExceptionText;
 
     /**
      * loadUserByUsername method. Returns us userDetails of the user, found by username.
