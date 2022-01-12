@@ -1,14 +1,12 @@
 package com.itech.model.entity;
 
 import com.itech.model.enumeration.Role;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 import java.util.Set;
 
 /**
@@ -18,31 +16,23 @@ import java.util.Set;
  */
 
 @Entity
-@Table(name = "users")
 @Getter
 @Setter
+@Table(name = "users")
 @NoArgsConstructor
+@AllArgsConstructor
 public class User {
-    private static final String VALID_EMAIL_ADDRESS_REGEX = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$";
-
-    private static final String VALID_USERNAME_ADDRESS_REGEX = "^[a-zA-Z0-9._-]{3,}$";
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @NotNull(message = "Username not found!")
-    @Pattern(regexp = VALID_USERNAME_ADDRESS_REGEX, message = "Username is not valid!")
     @Column(name = "username")
     private String username;
 
-    @NotNull(message = "Password not found!")
     @Column(name = "password")
     private String password;
 
-    @NotNull(message = "Email not found!")
-    @Pattern(regexp = VALID_EMAIL_ADDRESS_REGEX, message = "Email is not valid!")
     @Column(name = "email")
     private String email;
 

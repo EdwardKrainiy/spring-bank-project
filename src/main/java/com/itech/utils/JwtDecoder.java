@@ -5,7 +5,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -21,7 +20,7 @@ import java.util.Optional;
 @Component
 public class JwtDecoder {
     @Value("${jwt.confirmation.key}")
-    private String CONFIRMATION_KEY;
+    private String confirmationKey;
 
     /**
      * getIdFromConfirmToken method. Gets id from transferred token.
@@ -32,17 +31,17 @@ public class JwtDecoder {
      */
     public Long getIdFromConfirmToken(String token) throws ExpiredJwtException {
 
-        Claims confirmationClaims = Jwts.parser().setSigningKey(CONFIRMATION_KEY).parseClaimsJws(token).getBody();
+        Claims confirmationClaims = Jwts.parser().setSigningKey(confirmationKey).parseClaimsJws(token).getBody();
 
         Optional<Long> userId = Optional.of(Long.parseLong(confirmationClaims.getSubject()));
 
-        return userId.orElseThrow(() -> new EntityNotFoundException(String.format("User with id = %d not found!", userId)));
+        return userId.orElseThrow(() -> new EntityNotFoundException("Id not found"));
     }
 
-    public String getUsernameOfLoggedUser(){
+    public String getUsernameOfLoggedUser() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof UserDetails) {
-            return ((UserDetails)principal).getUsername();
+            return ((UserDetails) principal).getUsername();
         } else {
             return principal.toString();
         }

@@ -2,11 +2,13 @@ package com.itech.model.entity;
 
 import com.itech.model.enumeration.CreationType;
 import com.itech.model.enumeration.Status;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  * Basic CreationRequest class.
@@ -15,9 +17,9 @@ import java.util.Date;
  */
 
 @Entity
-@Table(name = "creation_request")
 @Getter
 @Setter
+@Table(name = "creation_request")
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreationRequest {

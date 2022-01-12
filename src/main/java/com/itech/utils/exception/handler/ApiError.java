@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.http.HttpStatus;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,7 +22,7 @@ public class ApiError {
     @JsonProperty("Errors")
     private List<String> errors;
 
-    public ApiError(int code, String error){
+    public ApiError(int code, String error) {
         this.code = code;
         this.errors = Collections.singletonList(error);
     }

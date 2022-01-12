@@ -16,9 +16,9 @@ import javax.validation.constraints.NotNull;
  */
 
 @Entity
-@Table(name = "accounts")
 @Getter
 @Setter
+@Table(name = "accounts")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Account{

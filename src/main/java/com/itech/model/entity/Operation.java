@@ -14,9 +14,9 @@ import javax.persistence.*;
  * @author Edvard Krainiy on 12/23/2021
  */
 @Entity
-@Table(name = "operation")
 @Getter
 @Setter
+@Table(name = "operation")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Operation {

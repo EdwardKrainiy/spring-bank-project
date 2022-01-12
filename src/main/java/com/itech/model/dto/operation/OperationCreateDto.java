@@ -2,7 +2,7 @@ package com.itech.model.dto.operation;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.itech.model.enumeration.OperationType;
-import com.itech.validator.EnumValue;
+import com.itech.validator.annotation.EnumValue;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,6 +31,6 @@ public class OperationCreateDto {
 
     @JsonProperty("OperationType")
     @NotNull(message = "Operation Type number is empty!")
-    @EnumValue(enumClass = OperationType.class, message = "Incorrect operation type!")
-    private String operationType;
+    @EnumValue(enumClass = OperationType.class, message = "Incorrect OperationType!")
+    private OperationType operationType;
 }

@@ -1,7 +1,6 @@
 package com.itech.rabbit;
 
 import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -12,11 +11,13 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class RabbitMqPublisher {
-    @Value("${emp.rabbitmq.requestqueue}")
+    private final AmqpTemplate template;
+    @Value("${spring.rabbit.mq.queuename}")
     private String queueName;
 
-    @Autowired
-    private AmqpTemplate template;
+    public RabbitMqPublisher(AmqpTemplate template) {
+        this.template = template;
+    }
 
     /**
      * sendMessageToQueue method. Sends message to queue.
@@ -24,7 +25,7 @@ public class RabbitMqPublisher {
      * @param message Message, that we will send to queue.
      */
 
-    public void sendMessageToQueue(String message){
+    public void sendMessageToQueue(String message) {
         template.convertAndSend(queueName, message);
     }
 }

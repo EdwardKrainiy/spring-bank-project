@@ -2,12 +2,12 @@ package com.itech.model.dto.account;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.itech.model.enumeration.Currency;
-import com.itech.validator.EnumValue;
-import lombok.*;
+import com.itech.validator.annotation.EnumValue;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.NotNull;
 
 /**
  * Account data-transfer object to create Account.
@@ -16,18 +16,11 @@ import javax.validation.constraints.Size;
  */
 
 @Data
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AccountCreateDto {
+public class AccountCreateDto extends AccountUpdateDto {
     @JsonProperty("Currency")
-    @NotBlank(message = "Currency is empty!")
-    @Size(min = 3, max = 3, message = "Currency size must be 3 letters!")
+    @NotNull(message = "Currency is empty!")
     @EnumValue(enumClass = Currency.class, message = "Incorrect Currency!")
-    private String currency;
-
-    @JsonProperty("Amount")
-    @Positive(message = "Amount must be greater than 0!")
-    private double amount;
+    private Currency currency;
 }

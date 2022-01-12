@@ -1,13 +1,18 @@
 package com.itech.utils.exception.handler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.itech.utils.exception.*;
+import com.itech.utils.exception.EntityExistsException;
+import com.itech.utils.exception.EntityNotFoundException;
+import com.itech.utils.exception.IncorrectPasswordException;
+import com.itech.utils.exception.ValidationException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
 import lombok.extern.log4j.Log4j2;
 import org.iban4j.IbanFormatException;
 import org.iban4j.InvalidCheckDigitException;
 import org.iban4j.UnsupportedCountryException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +22,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Exception handler class.
@@ -26,7 +32,17 @@ import java.util.*;
  */
 @ControllerAdvice
 @Log4j2
+@PropertySource("classpath:properties/exception.properties")
 public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @Value("${custom.exception.authentication}")
+    private String authenticationExceptionText;
+
+    @Value("${custom.exception.expired.token}")
+    private String expiredTokenExceptionText;
+
+    @Value("${custom.exception.fetching}")
+    private String fetchingExceptionText;
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
@@ -47,7 +63,7 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     protected ResponseEntity<ApiError> handleException(RuntimeException ex) {
         log.error("IllegalArgumentException was caught!");
 
-    ApiError exceptionError = new ApiError(HttpStatus.UNAUTHORIZED.value(), "An error occurred while fetching Username from Token");
+        ApiError exceptionError = new ApiError(HttpStatus.UNAUTHORIZED.value(), fetchingExceptionText);
 
         return new ResponseEntity<>(exceptionError, HttpStatus.UNAUTHORIZED);
     }
@@ -56,7 +72,7 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     protected ResponseEntity<ApiError> handleExpiredJwtException(RuntimeException ex) {
         log.error("ExpiredJwtException was caught!");
 
-        ApiError exceptionError = new ApiError(HttpStatus.UNAUTHORIZED.value(), "The token has expired!");
+        ApiError exceptionError = new ApiError(HttpStatus.UNAUTHORIZED.value(), expiredTokenExceptionText);
 
         return new ResponseEntity<>(exceptionError, HttpStatus.UNAUTHORIZED);
     }
@@ -65,7 +81,7 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     protected ResponseEntity<ApiError> handleInvalidSignatureException(RuntimeException ex) {
         log.error("SignatureException was caught!");
 
-        ApiError exceptionError = new ApiError(HttpStatus.UNAUTHORIZED.value(), "Authentication Failed. Username or Password is not valid.");
+        ApiError exceptionError = new ApiError(HttpStatus.UNAUTHORIZED.value(), authenticationExceptionText);
 
         return new ResponseEntity<>(exceptionError, HttpStatus.UNAUTHORIZED);
     }

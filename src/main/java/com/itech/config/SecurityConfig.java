@@ -2,9 +2,11 @@ package com.itech.config;
 
 import com.itech.model.enumeration.Role;
 import com.itech.security.jwt.filter.JwtAuthenticationFilter;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -24,31 +26,29 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@PropertySources({
+        @PropertySource("classpath:properties/security.properties"),
+        @PropertySource("classpath:properties/jwt.properties")
+})
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    private final UserDetailsService customUserDetailsService;
+    @Value("${encrypt.rounds}")
+    private int encryptRounds;
 
-    @Autowired
-    private UserDetailsService customUserDetailsService;
+    public SecurityConfig(UserDetailsService customUserDetailsService) {
+        this.customUserDetailsService = customUserDetailsService;
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/api/auth/sign-in").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/auth/sign-up").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/auth/*").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/auth/email-confirmation").hasAuthority(Role.MANAGER.name())
-                .antMatchers(HttpMethod.GET, "/api/accounts").hasAnyAuthority(Role.USER.name(), Role.MANAGER.name())
-                .antMatchers(HttpMethod.POST, "/api/accounts").hasAnyAuthority(Role.USER.name(), Role.MANAGER.name())
-                .antMatchers(HttpMethod.GET, "/api/accounts/{\\\\d+}").hasAnyAuthority(Role.USER.name(), Role.MANAGER.name())
-                .antMatchers(HttpMethod.PUT, "/api/accounts/{\\\\d+}").hasAnyAuthority(Role.USER.name(), Role.MANAGER.name())
-                .antMatchers(HttpMethod.DELETE, "/api/accounts/{\\\\d+}").hasAnyAuthority(Role.USER.name(), Role.MANAGER.name())
-                .antMatchers(HttpMethod.GET, "/api/transactions").hasAnyAuthority(Role.MANAGER.name(), Role.USER.name())
-                .antMatchers(HttpMethod.GET, "/api/transactions/{\\\\d+}").hasAnyAuthority(Role.MANAGER.name(), Role.USER.name())
-                .antMatchers(HttpMethod.POST, "/api/transactions").hasAnyAuthority(Role.MANAGER.name(), Role.USER.name())
-                .antMatchers(HttpMethod.GET, "/api/transactions/creation-requests/{\\\\d+}").hasAnyAuthority(Role.USER.name(), Role.MANAGER.name())
-                .antMatchers(HttpMethod.GET, "/api/accounts/creation-requests/{\\\\d+}").hasAnyAuthority(Role.USER.name(), Role.MANAGER.name())
-                .antMatchers(HttpMethod.GET, "/api/accounts/creation-requests/").hasAnyAuthority(Role.USER.name(), Role.MANAGER.name())
-                .antMatchers(HttpMethod.GET, "/api/transactions/creation-requests/").hasAnyAuthority(Role.USER.name(), Role.MANAGER.name())
+                .antMatchers("/api/accounts/*").hasAnyAuthority(Role.USER.name(), Role.MANAGER.name())
+                .antMatchers("/api/transactions/*").hasAnyAuthority(Role.MANAGER.name(), Role.USER.name())
+                .antMatchers(HttpMethod.GET, "/api/*/creation-requests/*").hasAnyAuthority(Role.USER.name(), Role.MANAGER.name())
                 .antMatchers(HttpMethod.GET, "/api/accounts/creation-requests/{\\\\d+}/**").hasAuthority(Role.MANAGER.name())
                 .antMatchers("/swagger-ui.html").hasAnyAuthority(Role.MANAGER.name(), Role.USER.name())
                 .anyRequest()
@@ -64,7 +64,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     protected PasswordEncoder encoder() {
-        return new BCryptPasswordEncoder(12);
+        return new BCryptPasswordEncoder(encryptRounds);
     }
 
     /**

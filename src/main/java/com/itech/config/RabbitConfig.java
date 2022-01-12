@@ -1,6 +1,7 @@
 package com.itech.config;
 
 import org.springframework.amqp.core.Queue;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -11,8 +12,11 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class RabbitConfig {
+    @Value("${spring.rabbit.mq.queuename}")
+    private String queueName;
+
     @Bean
-    public Queue createBankAppQueue(){
-        return new Queue("bankAppQueue");
+    public Queue createBankAppQueue() {
+        return new Queue(queueName);
     }
 }

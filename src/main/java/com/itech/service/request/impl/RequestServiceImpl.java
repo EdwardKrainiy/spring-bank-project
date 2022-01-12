@@ -14,7 +14,6 @@ import com.itech.utils.JsonEntitySerializer;
 import com.itech.utils.JwtDecoder;
 import com.itech.utils.exception.EntityNotFoundException;
 import com.itech.utils.mapper.request.RequestDtoMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -27,26 +26,29 @@ import java.time.LocalDateTime;
 @Service
 public class RequestServiceImpl implements RequestService {
 
-    @Autowired
-    private CreationRequestRepository creationRequestRepository;
+    private final CreationRequestRepository creationRequestRepository;
 
-    @Autowired
-    private RabbitMqPublisher publisher;
+    private final RabbitMqPublisher publisher;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private JwtDecoder jwtDecoder;
+    private final JwtDecoder jwtDecoder;
 
-    @Autowired
-    private JsonEntitySerializer serializer;
+    private final JsonEntitySerializer serializer;
 
-    @Autowired
-    private RequestDtoMapper requestDtoMapper;
+    private final RequestDtoMapper requestDtoMapper;
+
+    public RequestServiceImpl(CreationRequestRepository creationRequestRepository, RabbitMqPublisher publisher, UserRepository userRepository, JwtDecoder jwtDecoder, JsonEntitySerializer serializer, RequestDtoMapper requestDtoMapper) {
+        this.creationRequestRepository = creationRequestRepository;
+        this.publisher = publisher;
+        this.userRepository = userRepository;
+        this.jwtDecoder = jwtDecoder;
+        this.serializer = serializer;
+        this.requestDtoMapper = requestDtoMapper;
+    }
 
     private CreationRequest saveRequest(TransactionCreateDto transactionCreateDto) {
-        User foundUser = userRepository.getUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("User not found!"));
+        User foundUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("User not found!"));
 
         CreationRequest creationRequest = new CreationRequest();
         creationRequest.setUser(foundUser);
@@ -57,13 +59,6 @@ public class RequestServiceImpl implements RequestService {
 
         return creationRequestRepository.save(creationRequest);
     }
-
-    /**
-     * processCreationRequestMessage method. Saves transactionCreateDto to DB, maps this one to CreationRequestDto object and sends JSON of this object to queue.
-     *
-     * @param transactionCreateDto Object of transactionCreateDto we need to store to DB and map to CreationRequestDto.
-     * @return CreationRequestDto object of CreationRequestDto.
-     */
 
     @Override
     public CreationRequestDto processCreationRequestMessage(TransactionCreateDto transactionCreateDto) {

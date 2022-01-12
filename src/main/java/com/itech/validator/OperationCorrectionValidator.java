@@ -1,7 +1,9 @@
 package com.itech.validator;
 
 import com.itech.model.dto.operation.OperationCreateDto;
+import com.itech.model.enumeration.OperationType;
 import com.itech.utils.exception.EntityNotFoundException;
+import com.itech.validator.annotation.IsOperationCorrect;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -11,9 +13,9 @@ public class OperationCorrectionValidator implements ConstraintValidator<IsOpera
 
     @Override
     public boolean isValid(Set<OperationCreateDto> dtoOperations, ConstraintValidatorContext context) {
-        Boolean isNumbersEquals = false;
-        Boolean isCreditExists = false;
-        Boolean isDebitExists = false;
+        boolean isNumbersEquals = false;
+        boolean isCreditExists = false;
+        boolean isDebitExists = false;
         String accountNumberToCheck = dtoOperations.stream().findFirst().orElseThrow(() -> new EntityNotFoundException("Operations not found!")).getAccountNumber();
 
         if (dtoOperations.size() == 2) {
@@ -21,16 +23,14 @@ public class OperationCorrectionValidator implements ConstraintValidator<IsOpera
                 isNumbersEquals = true;
             }
             for (OperationCreateDto operationCreateDto : dtoOperations) {
-                if (operationCreateDto.getOperationType().equals(com.itech.model.enumeration.OperationType.CREDIT.name())) {
+                if (operationCreateDto.getOperationType().equals(OperationType.CREDIT)) {
                     isCreditExists = true;
                 }
-                if (operationCreateDto.getOperationType().equals(com.itech.model.enumeration.OperationType.DEBIT.name())) {
+                if (operationCreateDto.getOperationType().equals(OperationType.DEBIT)) {
                     isDebitExists = true;
                 }
             }
-            if (isCreditExists && isDebitExists && isNumbersEquals) {
-                return false;
-            }
+            return !isCreditExists || !isDebitExists || !isNumbersEquals;
         }
         return true;
     }
