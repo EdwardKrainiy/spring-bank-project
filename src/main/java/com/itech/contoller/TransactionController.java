@@ -79,7 +79,7 @@ public class TransactionController {
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Successfully created transaction."),
             @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
-            @ApiResponse(code = 404, message = "Transaction not created.")
+            @ApiResponse(code = 400, message = "Transaction not created.")
     })
     @PostMapping
     public ResponseEntity<CreationRequestDto> createTransaction(@RequestBody @Valid @ApiParam(name = "transactionCreateDto", value = "Dto of transaction we want to create and save.") TransactionCreateDto transactionCreateDto) {

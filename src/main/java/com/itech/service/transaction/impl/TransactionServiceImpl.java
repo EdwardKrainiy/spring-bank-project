@@ -107,11 +107,15 @@ public class TransactionServiceImpl implements TransactionService {
     public TransactionDto findTransactionById(Long transactionId) {
         User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(authenticatedUserNotFoundExceptionText));
 
+        Optional<Transaction> foundTransaction;
+
         if (authenticatedUser.getRole().equals(Role.USER)) {
-            return transactionDtoMapper.toDto(transactionRepository.findTransactionByIdAndUser(transactionId, authenticatedUser).orElseThrow(() -> new EntityNotFoundException(transactionNotFoundExceptionText)));
+            foundTransaction = transactionRepository.findTransactionByIdAndUser(transactionId, authenticatedUser);
         } else {
-            return transactionDtoMapper.toDto(Optional.of(transactionRepository.getById(transactionId)).orElseThrow(() -> new EntityNotFoundException(transactionNotFoundExceptionText)));
+            foundTransaction =  transactionRepository.findTransactionById(transactionId);
         }
+
+        return transactionDtoMapper.toDto(foundTransaction.orElseThrow(() -> new EntityNotFoundException("Transaction not found!")));
     }
 
     @Override
