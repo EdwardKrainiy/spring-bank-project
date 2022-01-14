@@ -1,4 +1,4 @@
-package com.itech.account;
+package com.itech.controller.account;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +29,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 @AutoConfigureTestDatabase
 @AutoConfigureMockMvc
 @TestPropertySource(locations = "classpath:application-integrationtest.properties")
-@PropertySource("classpath:properties/exception.properties")
 @Transactional
 public class AccountControllerIntegrationTest {
 
@@ -53,9 +52,9 @@ public class AccountControllerIntegrationTest {
     @Sql(value = "classpath:db/test/create_accounts.sql")
     public void givenAccounts_whenGetAccounts_thenStatus200() throws Exception {
 
-        String expectedJson = "[{\"Id\":1,\"Username\":null,\"Amount\":100.0,\"Currency\":\"PLN\",\"IBAN\":\"number1\"}," +
-                "{\"Id\":2,\"Username\":null,\"Amount\":200.0,\"Currency\":\"EUR\",\"IBAN\":\"number2\"}," +
-                "{\"Id\":3,\"Username\":null,\"Amount\":300.0,\"Currency\":\"GBP\",\"IBAN\":\"number3\"}]";
+        String expectedJson = "[{\"Id\":1,\"Username\":\"EdvardKrainiy\",\"Amount\":100.0,\"Currency\":\"PLN\",\"IBAN\":\"number1\"}," +
+                "{\"Id\":2,\"Username\":\"user\",\"Amount\":200.0,\"Currency\":\"EUR\",\"IBAN\":\"number2\"}," +
+                "{\"Id\":3,\"Username\":\"user\",\"Amount\":300.0,\"Currency\":\"GBP\",\"IBAN\":\"number3\"}]";
 
         mockMvc.perform(get("/api/accounts").contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -64,6 +63,7 @@ public class AccountControllerIntegrationTest {
     }
 
     @Test
+    @Sql(value = "classpath:db/test/create_users.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "classpath:db/test/create_accounts.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void unauthorizedUser_whenGetAccounts_thenStatus403() throws Exception {
 
@@ -94,7 +94,7 @@ public class AccountControllerIntegrationTest {
     @Sql(value = "classpath:db/test/create_accounts.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void givenAccounts_whenGetAccountById_thenStatus200() throws Exception {
 
-        String expectedJson = "{\"Id\":3,\"Username\":null,\"Amount\":300.0,\"Currency\":\"GBP\",\"IBAN\":\"number3\"}";
+        String expectedJson = "{\"Id\":3,\"Username\":\"user\",\"Amount\":300.0,\"Currency\":\"GBP\",\"IBAN\":\"number3\"}";
 
         mockMvc.perform(get("/api/accounts/{accountId}/", 3).contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -118,8 +118,8 @@ public class AccountControllerIntegrationTest {
 
     @WithMockUser(username = "EdvardKrainiy")
     @Test
-    @Sql(value = "classpath:db/test/create_accounts.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = "classpath:db/test/create_users.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "classpath:db/test/create_accounts.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void emptyAccounts_whenGetAccountById_andAccountWithIdNotExists_thenStatus404() throws Exception {
 
         String expectedJson = "{\"Code\":404," +
@@ -197,7 +197,7 @@ public class AccountControllerIntegrationTest {
     public void authorizedUser_whenUpdateAccount_thenStatus204() throws Exception {
 
         String expectedCreatedUser = "{\"Amount\":10.0,\"Currency\":\"EUR\"}";
-        String expectedResponse = "{\"Id\":3,\"Username\":null,\"Amount\":10.0,\"Currency\":\"GBP\",\"IBAN\":\"number3\"}";
+        String expectedResponse = "{\"Id\":3,\"Username\":\"user\",\"Amount\":10.0,\"Currency\":\"GBP\",\"IBAN\":\"number3\"}";
 
         mockMvc.perform(put("/api/accounts/3/")
                         .content(expectedCreatedUser)
