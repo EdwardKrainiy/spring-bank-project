@@ -63,7 +63,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (header != null && header.startsWith(tokenPrefix)) {
 
             authToken = header.replace(tokenPrefix, "");
-
             username = jwtTokenUtil.getUsernameFromToken(authToken, signKey);
         }
 
