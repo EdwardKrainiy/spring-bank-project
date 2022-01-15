@@ -213,7 +213,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void approveAccountCreationRequest(Long accountCreationRequestId) {
-        CreationRequest accountCreationRequest = creationRequestRepository.findCreationRequestsByIdAndStatus(accountCreationRequestId, Status.IN_PROGRESS).orElseThrow(() -> new EntityNotFoundException(creationRequestWithIdNotFoundExceptionText));
+        CreationRequest accountCreationRequest = creationRequestRepository.findCreationRequestsByIdAndStatusAndCreationType(accountCreationRequestId, Status.IN_PROGRESS, CreationType.ACCOUNT).orElseThrow(() -> new EntityNotFoundException(creationRequestWithIdNotFoundExceptionText));
 
         User accountCreationRequestUser = accountCreationRequest.getUser();
 
@@ -252,7 +252,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     public void rejectAccountCreationRequest(Long accountCreationRequestId) {
-        CreationRequest accountCreationRequest = creationRequestRepository.findCreationRequestsByIdAndStatus(accountCreationRequestId, Status.IN_PROGRESS).orElseThrow(() -> new EntityNotFoundException(creationRequestWithIdNotFoundExceptionText));
+        CreationRequest accountCreationRequest = creationRequestRepository.findCreationRequestsByIdAndStatusAndCreationType(accountCreationRequestId, Status.IN_PROGRESS, CreationType.ACCOUNT).orElseThrow(() -> new EntityNotFoundException(creationRequestWithIdNotFoundExceptionText));
 
         User accountCreationRequestUser = accountCreationRequest.getUser();
 

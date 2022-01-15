@@ -1,2 +1,1 @@
-delete from users;
-delete from accounts;
+delete from creation_request;

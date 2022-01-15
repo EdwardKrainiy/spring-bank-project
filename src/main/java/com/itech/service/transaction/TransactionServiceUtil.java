@@ -27,6 +27,8 @@ public class TransactionServiceUtil {
     private final TransactionRepository transactionRepository;
     @Value("${exception.credit.is.more.than.stored}")
     private String creditIsMoreThanStoredOnAccountExceptionText;
+    @Value("${exception.creation.request.expired}")
+    private String creationRequestIsExpiredExceptionText;
 
     public TransactionServiceUtil(TransactionRepository transactionRepository) {
         this.transactionRepository = transactionRepository;
@@ -62,10 +64,10 @@ public class TransactionServiceUtil {
 
     public boolean checkRequestDtoValidity(Set<Operation> operations, Transaction transaction) {
         LocalDate date = transaction.getIssuedAt().atZone(ZoneId.systemDefault()).toLocalDate();
-        if (!date.isBefore(LocalDate.now().plusDays(1))) {
+        if (date.isBefore(LocalDate.now().minusDays(1))) {
             transaction.setStatus(Status.EXPIRED);
             transactionRepository.save(transaction);
-            throw new ValidationException("Time of transaction is over!");
+            throw new ValidationException(creationRequestIsExpiredExceptionText);
         }
 
         boolean areOperationTypesCorrect = checkOperationTypes(operations);

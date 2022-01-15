@@ -29,5 +29,8 @@ public interface CreationRequestRepository extends JpaRepository<CreationRequest
 
     Optional<CreationRequest> findCreationRequestsByIdAndStatus(Long id, Status status);
 
+    Optional<CreationRequest> findCreationRequestsByIdAndStatusAndCreationType(Long id, Status status, CreationType creationType);
+
     List<CreationRequest> findCreationRequestsByCreationTypeAndStatus(CreationType creationType, Status status);
+
 }

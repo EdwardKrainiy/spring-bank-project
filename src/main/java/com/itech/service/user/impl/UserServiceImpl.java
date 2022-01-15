@@ -68,7 +68,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void createUser(UserSignUpDto userDto) {
 
-        @Valid User mappedUser = userSignUpDtoMapper.toEntity(userDto);
+        User mappedUser = userSignUpDtoMapper.toEntity(userDto);
 
         if (userRepository.findUserByUsername(mappedUser.getUsername()).isPresent() || userRepository.findUserByEmail(mappedUser.getEmail()).isPresent())
             throw new ValidationException(userIsAlreadyExistsExceptionText);

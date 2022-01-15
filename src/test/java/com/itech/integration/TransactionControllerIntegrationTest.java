@@ -1,48 +1,46 @@
-package com.itech.controller.transaction;
+package com.itech.integration;
 
-import com.itech.repository.CreationRequestRepository;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
-import static junit.framework.TestCase.assertEquals;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 @SpringBootTest
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @AutoConfigureTestDatabase
 @AutoConfigureMockMvc
 @TestPropertySource(locations = "classpath:application-integrationtest.properties")
 @Transactional
-public class TransactionControllerIntegrationTest {
+class TransactionControllerIntegrationTest {
 
     @Autowired
-    private WebApplicationContext context;
+    WebApplicationContext context;
 
     @Autowired
-    private MockMvc mockMvc;
+    MockMvc mockMvc;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .apply(springSecurity())
@@ -53,7 +51,7 @@ public class TransactionControllerIntegrationTest {
     @Test
     @Sql(value = "classpath:db/test/create_users.sql")
     @Sql(value = "classpath:db/test/create_transactions.sql")
-    public void givenTransactions_whenGetTransactions_thenStatus200() throws Exception {
+    void givenTransactions_whenGetTransactions_thenStatus200() throws Exception {
 
         String expectedJson = "[{\"Id\":1,\"UserId\":1,\"IssuedAt\":\"2022-01-11T23:58:07.858+00:00\",\"Status\":\"REJECTED\",\"Operations\":[]}," +
                 "{\"Id\":2,\"UserId\":2,\"IssuedAt\":\"2020-01-11T00:00:00.858+00:00\",\"Status\":\"CREATED\",\"Operations\":[]}," +
@@ -68,7 +66,7 @@ public class TransactionControllerIntegrationTest {
     @WithMockUser(username = "EdvardKrainiy")
     @Test
     @Sql(value = "classpath:db/test/create_users.sql")
-    public void emptyTransactions_whenGetTransactions_thenStatus404() throws Exception {
+    void emptyTransactions_whenGetTransactions_thenStatus404() throws Exception {
 
         String expectedJson = "{\"Code\":404," +
                 "\"Errors\":[\"Transaction not found!\"]}";
@@ -82,7 +80,7 @@ public class TransactionControllerIntegrationTest {
     @Test
     @Sql(value = "classpath:db/test/create_users.sql")
     @Sql(value = "classpath:db/test/create_transactions.sql")
-    public void unauthorizedUser_whenGetTransactions_thenStatus403() throws Exception {
+    void unauthorizedUser_whenGetTransactions_thenStatus403() throws Exception {
 
         String expectedErrorMessage = "Access Denied";
 
@@ -96,7 +94,7 @@ public class TransactionControllerIntegrationTest {
     @Test
     @Sql(value = "classpath:db/test/create_users.sql")
     @Sql(value = "classpath:db/test/create_transactions.sql")
-    public void givenTransactions_whenGetTransactionById_thenStatus200() throws Exception {
+    void givenTransactions_whenGetTransactionById_thenStatus200() throws Exception {
 
         String expectedJson = "{\"Id\":1,\"UserId\":1,\"IssuedAt\":\"2022-01-11T23:58:07.858+00:00\",\"Status\":\"REJECTED\",\"Operations\":[]}";
         mockMvc.perform(get("/api/transactions/1/").contentType(MediaType.APPLICATION_JSON))
@@ -108,7 +106,7 @@ public class TransactionControllerIntegrationTest {
     @Test
     @Sql(value = "classpath:db/test/create_users.sql")
     @Sql(value = "classpath:db/test/create_transactions.sql")
-    public void unauthorizedUser_whenGetTransactionById_thenStatus403() throws Exception {
+    void unauthorizedUser_whenGetTransactionById_thenStatus403() throws Exception {
 
         String expectedErrorMessage = "Access Denied";
         mockMvc.perform(get("/api/transactions/1/").contentType(MediaType.APPLICATION_JSON))
@@ -121,7 +119,7 @@ public class TransactionControllerIntegrationTest {
     @Test
     @Sql(value = "classpath:db/test/create_users.sql")
     @Sql(value = "classpath:db/test/create_transactions.sql")
-    public void givenTransactions_whenGetTransactionById_andTransactionWithIdNotExists_thenStatus404() throws Exception {
+    void givenTransactions_whenGetTransactionById_andTransactionWithIdNotExists_thenStatus404() throws Exception {
 
         String expectedJson = "{\"Code\":404," +
                 "\"Errors\":[\"Transaction not found!\"]}";
@@ -134,7 +132,7 @@ public class TransactionControllerIntegrationTest {
     @WithMockUser(username = "EdvardKrainiy")
     @Test
     @Sql(value = "classpath:db/test/create_users.sql")
-    public void emptyTransactions_whenGetTransactionById_thenStatus404() throws Exception {
+    void emptyTransactions_whenGetTransactionById_thenStatus404() throws Exception {
 
         String expectedJson = "{\"Code\":404," +
                 "\"Errors\":[\"Transaction not found!\"]}";
@@ -148,30 +146,7 @@ public class TransactionControllerIntegrationTest {
     @Test
     @Sql(value = "classpath:db/test/create_users.sql")
     @Sql(value = "classpath:db/test/create_accounts.sql")
-    public void authorizedUser_whenCreateTransactionCreationRequest_thenStatus201() throws Exception {
-        String expectedCreatedTransactionRequest = "{\"Operations\":[{\"AccountNumber\":\"number3\",\"Amount\":\"1\",\"OperationType\":\"DEBIT\"}," +
-                "{\"AccountNumber\":\"number4\",\"Amount\":\"1\",\"OperationType\":\"CREDIT\"}]}";
-
-        String expectedCreationType = "\"CreationType\":\"TRANSACTION\"}";
-
-        String expectedResponse = "{\"Id\":1,\"UserId\":1,\"Payload\":\"{\\\"Operations\\\":[" +
-                "{\\\"AccountNumber\\\":\\\"number4\\\",\\\"Amount\\\":1.0,\\\"OperationType\\\":\\\"CREDIT\\\"}," +
-                "{\\\"AccountNumber\\\":\\\"number3\\\",\\\"Amount\\\":1.0,\\\"OperationType\\\":\\\"DEBIT\\\"}]}\",\"Status\":\"IN_PROGRESS\",\"CreatedId\":null";
-        mockMvc.perform(post("/api/transactions").contentType(MediaType.APPLICATION_JSON)
-                        .content(expectedCreatedTransactionRequest)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(result -> assertEquals(HttpStatus.CREATED.value(), result.getResponse().getStatus()))
-                .andExpect(result -> assertThat(result.getResponse().getContentAsString()).contains(expectedCreationType))
-                .andExpect(result -> assertThat(result.getResponse().getContentAsString()).contains(expectedResponse));
-
-    }
-
-    @WithMockUser(username = "EdvardKrainiy")
-    @Test
-    @Sql(value = "classpath:db/test/create_users.sql")
-    public void authorizedUser_whenCreateTransactionCreationRequest_andValuesAreInvalid_thenStatus400() throws Exception {
+    void authorizedUser_whenCreateTransactionCreationRequest_andValuesAreInvalid_thenStatus400() throws Exception {
         String expectedCreatedTransactionRequest = "{\"Operations\":[{\"AccountNumber\":\"test2\",\"Amount\":\"test2\",\"OperationType\":\"test2\"},{\"AccountNumber\":\"test1\",\"Amount\":\"test1\",\"OperationType\":\"test1\"}]}";
 
         mockMvc.perform(post("/api/transactions").contentType(MediaType.APPLICATION_JSON)
@@ -182,9 +157,23 @@ public class TransactionControllerIntegrationTest {
                 .andExpect(result -> assertEquals(HttpStatus.BAD_REQUEST.value(), result.getResponse().getStatus()));
     }
 
+    @WithMockUser(username = "EdvardKrainiy")
     @Test
     @Sql(value = "classpath:db/test/create_users.sql")
-    public void unauthorizedUser_whenCreateTransactionCreationRequest_thenStatus403() throws Exception {
+    void authorizedUser_whenCreateTransactionCreationRequest_thenStatus201() throws Exception {
+        String expectedCreatedTransactionRequest = "{\"Operations\":[{\"AccountNumber\":\"number1\",\"Amount\":\"1\",\"OperationType\":\"CREDIT\"}," +
+                "{\"AccountNumber\":\"number2\",\"Amount\":\"1\",\"OperationType\":\"DEBIT\"}]}";
+
+        mockMvc.perform(post("/api/transactions").contentType(MediaType.APPLICATION_JSON)
+                        .content(expectedCreatedTransactionRequest)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(result -> assertEquals(HttpStatus.CREATED.value(), result.getResponse().getStatus()));
+    }
+
+    @Test
+    @Sql(value = "classpath:db/test/create_users.sql")
+    void unauthorizedUser_whenCreateTransactionCreationRequest_thenStatus403() throws Exception {
         String expectedCreatedTransactionRequest = "{\"Operations\":[{\"AccountNumber\":\"test2\",\"Amount\":\"1\",\"OperationType\":\"DEBIT\"},{\"AccountNumber\":\"test1\",\"Amount\":\"1\",\"OperationType\":\"CREDIT\"}]}";
 
         String expectedErrorMessage = "Access Denied";
