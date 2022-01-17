@@ -2,6 +2,7 @@ package com.itech.service.user.impl;
 
 import com.itech.repository.UserRepository;
 import com.itech.utils.exception.EntityNotFoundException;
+import com.itech.utils.exception.message.ExceptionMessageText;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,8 +19,6 @@ import org.springframework.stereotype.Service;
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
-    @Value("${exception.user.not.found}")
-    private String userNotFoundExceptionText;
 
     public CustomUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -34,7 +33,7 @@ public class CustomUserDetailsService implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) {
-        com.itech.model.entity.User user = userRepository.findUserByUsername(username).orElseThrow(() -> new EntityNotFoundException(userNotFoundExceptionText));
+        com.itech.model.entity.User user = userRepository.findUserByUsername(username).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.USER_NOT_FOUND));
         return User.withUsername(user.getUsername()).password(user.getPassword()).authorities(user.getRole().name()).build();
     }
 }
