@@ -23,6 +23,7 @@ import com.itech.utils.JsonEntitySerializer;
 import com.itech.utils.JwtDecoder;
 import com.itech.utils.exception.EntityNotFoundException;
 import com.itech.utils.exception.ValidationException;
+import com.itech.utils.exception.message.ExceptionMessageText;
 import com.itech.utils.mapper.account.AccountDtoMapperImpl;
 import com.itech.utils.mapper.request.RequestDtoMapperImpl;
 import org.junit.jupiter.api.Test;
@@ -57,7 +58,6 @@ import static org.mockito.Mockito.*;
         ObjectMapper.class,
         JavaMailSenderImpl.class})
 @ExtendWith(SpringExtension.class)
-@TestPropertySource(locations = "classpath:properties/exception.properties")
 @TestPropertySource(locations = "classpath:properties/jwt.properties")
 @TestPropertySource(locations = "classpath:properties/mail.properties")
 @TestPropertySource(locations = "classpath:properties/scheduler.properties")
@@ -70,16 +70,8 @@ class AccountServiceUnitTest {
     ArgumentCaptor<String> titleCaptor;
     @Captor
     ArgumentCaptor<String> messageCaptor;
-    @Value("${exception.id.of.logged.user.not.equals.id.of.account}")
-    private String idOfLoggedUserNotEqualsIdOfAccountExceptionText;
-    @Value("${exception.account.creation.request.with.id.not.found}")
-    private String creationRequestWithIdNotFoundExceptionText;
-    @Value("${exception.account.creation.requests.not.found}")
-    private String accountCreationRequestsNotFoundExceptionText;
     @Value("${mail.approve.message}")
     private String approveMessage;
-    @Value("${exception.user.email.not.found}")
-    private String userEmailNotFoundExceptionText;
     @Value("${mail.rejected.message.title}")
     private String rejectedMessageTitleText;
     @Value("${mail.reject.message}")
@@ -149,7 +141,7 @@ class AccountServiceUnitTest {
         Exception exception = assertThrows(ValidationException.class, () ->
                 accountService.updateAccount(accountToUpdate, 2L));
 
-        String expectedMessage = idOfLoggedUserNotEqualsIdOfAccountExceptionText;
+        String expectedMessage = ExceptionMessageText.ID_OF_LOGGED_USER_NOT_EQUALS_ID_OF_ACCOUNT;
         String actualMessage = exception.getMessage();
 
         assertTrue(actualMessage.contains(expectedMessage));
@@ -169,7 +161,7 @@ class AccountServiceUnitTest {
         Exception exception = assertThrows(ValidationException.class, () ->
                 accountService.deleteAccountByAccountId(2L));
 
-        String expectedMessage = idOfLoggedUserNotEqualsIdOfAccountExceptionText;
+        String expectedMessage = ExceptionMessageText.ID_OF_LOGGED_USER_NOT_EQUALS_ID_OF_ACCOUNT;
         String actualMessage = exception.getMessage();
 
         assertTrue(actualMessage.contains(expectedMessage));
@@ -198,7 +190,7 @@ class AccountServiceUnitTest {
         Exception exception = assertThrows(EntityNotFoundException.class, () ->
                 accountService.findAccountCreationRequestById(1L));
 
-        String expectedMessage = creationRequestWithIdNotFoundExceptionText;
+        String expectedMessage = ExceptionMessageText.ACCOUNT_CREATION_REQUEST_WITH_ID_NOT_FOUND;
         String actualMessage = exception.getMessage();
 
         assertTrue(actualMessage.contains(expectedMessage));
@@ -227,7 +219,7 @@ class AccountServiceUnitTest {
         Exception exception = assertThrows(EntityNotFoundException.class, () ->
                 accountService.findAccountCreationRequestById(1L));
 
-        String expectedMessage = creationRequestWithIdNotFoundExceptionText;
+        String expectedMessage = ExceptionMessageText.ACCOUNT_CREATION_REQUEST_WITH_ID_NOT_FOUND;
         String actualMessage = exception.getMessage();
 
         assertTrue(actualMessage.contains(expectedMessage));
@@ -263,7 +255,7 @@ class AccountServiceUnitTest {
         Exception exception = assertThrows(EntityNotFoundException.class, () ->
                 accountService.findAccountCreationRequests());
 
-        String expectedMessage = accountCreationRequestsNotFoundExceptionText;
+        String expectedMessage = ExceptionMessageText.ACCOUNT_CREATION_REQUESTS_NOT_FOUND;
         String actualMessage = exception.getMessage();
 
         assertTrue(actualMessage.contains(expectedMessage));
@@ -297,7 +289,7 @@ class AccountServiceUnitTest {
         Exception exception = assertThrows(EntityNotFoundException.class, () ->
                 accountService.approveAccountCreationRequest(1L));
 
-        String expectedMessage = creationRequestWithIdNotFoundExceptionText;
+        String expectedMessage = ExceptionMessageText.ACCOUNT_CREATION_REQUEST_WITH_ID_NOT_FOUND;
         String actualMessage = exception.getMessage();
 
         assertTrue(actualMessage.contains(expectedMessage));
@@ -367,7 +359,7 @@ class AccountServiceUnitTest {
         Exception exception = assertThrows(EntityNotFoundException.class, () ->
                 accountService.approveAccountCreationRequest(1L));
 
-        String expectedMessage = userEmailNotFoundExceptionText;
+        String expectedMessage = ExceptionMessageText.USER_EMAIL_NOT_FOUND;
         String actualMessage = exception.getMessage();
 
         assertTrue(actualMessage.contains(expectedMessage));
@@ -382,7 +374,7 @@ class AccountServiceUnitTest {
         Exception exception = assertThrows(EntityNotFoundException.class, () ->
                 accountService.rejectAccountCreationRequest(1L));
 
-        String expectedMessage = creationRequestWithIdNotFoundExceptionText;
+        String expectedMessage = ExceptionMessageText.ACCOUNT_CREATION_REQUEST_WITH_ID_NOT_FOUND;
         String actualMessage = exception.getMessage();
 
         assertTrue(actualMessage.contains(expectedMessage));
@@ -419,7 +411,7 @@ class AccountServiceUnitTest {
         Exception exception = assertThrows(EntityNotFoundException.class, () ->
                 accountService.rejectAccountCreationRequest(1L));
 
-        String expectedMessage = userEmailNotFoundExceptionText;
+        String expectedMessage = ExceptionMessageText.USER_EMAIL_NOT_FOUND;
         String actualMessage = exception.getMessage();
 
         assertTrue(actualMessage.contains(expectedMessage));

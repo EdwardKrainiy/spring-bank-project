@@ -26,6 +26,9 @@ import java.util.stream.Collectors;
 @Component
 @PropertySource("classpath:properties/jwt.properties")
 public class TokenProvider implements Serializable {
+    private static final String DELIMITER = ",";
+    private static final int AUTH_TOKEN_EXPIRATION_TIME_MULTIPLICATOR = 1000;
+    private static final int CONFIRM_TOKEN_EXPIRATION_TIME_MULTIPLICATOR = 100;
     @Value("${jwt.authorities.key}")
     private String authoritiesKey;
     @Value("${jwt.token.validity}")
@@ -55,17 +58,6 @@ public class TokenProvider implements Serializable {
      */
     public Date getExpirationDateFromToken(String token, String key) {
         return getClaimFromToken(token, Claims::getExpiration, key);
-    }
-
-    /**
-     * getSubjectFromToken method.
-     *
-     * @param token Token, from which we want to obtain subject.
-     * @param key   Secret key to decode our token correctly.
-     * @return subject Returns obtained subject.
-     */
-    public String getSubjectFromToken(String token, String key) {
-        return getClaimFromToken(token, Claims::getSubject, key);
     }
 
     /**
@@ -116,13 +108,13 @@ public class TokenProvider implements Serializable {
     public String generateAuthToken(Authentication authentication) {
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
+                .collect(Collectors.joining(DELIMITER));
 
         return Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim(authoritiesKey, authorities)
                 .setIssuedAt(new Date(System.currentTimeMillis())) // Дата создания токена
-                .setExpiration(new Date(System.currentTimeMillis() + tokenValidity * 1000)) //Дата истечения токена
+                .setExpiration(new Date(System.currentTimeMillis() + tokenValidity * AUTH_TOKEN_EXPIRATION_TIME_MULTIPLICATOR)) //Дата истечения токена
                 .signWith(SignatureAlgorithm.HS256, signingKey) //Ключ расшифровки
                 .compact();
     }
@@ -137,7 +129,7 @@ public class TokenProvider implements Serializable {
         return Jwts.builder()
                 .setSubject(userId.toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + tokenValidity * 100))
+                .setExpiration(new Date(System.currentTimeMillis() + tokenValidity * CONFIRM_TOKEN_EXPIRATION_TIME_MULTIPLICATOR))
                 .signWith(SignatureAlgorithm.HS256, confirmationKey)
                 .compact();
     }
@@ -171,7 +163,7 @@ public class TokenProvider implements Serializable {
         final Claims claims = claimsJws.getBody();
 
         final Collection<? extends GrantedAuthority> authorities =
-                Arrays.stream(claims.get(authoritiesKey).toString().split(","))
+                Arrays.stream(claims.get(authoritiesKey).toString().split(DELIMITER))
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 

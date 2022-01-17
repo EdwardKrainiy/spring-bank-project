@@ -11,16 +11,15 @@ import com.itech.utils.JwtDecoder;
 import com.itech.utils.exception.EntityNotFoundException;
 import com.itech.utils.exception.IncorrectPasswordException;
 import com.itech.utils.exception.ValidationException;
+import com.itech.utils.exception.message.ExceptionMessageText;
 import com.itech.utils.mapper.user.UserSignUpDtoMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.validation.Valid;
 
 /**
  * Implementation of UserService interface. Provides us different methods of Service layer to work with Repository layer of User objects.
@@ -30,10 +29,8 @@ import javax.validation.Valid;
 
 @Service
 @Log4j2
-@PropertySources({
-        @PropertySource("classpath:properties/exception.properties"),
-        @PropertySource("classpath:properties/mail.properties")
-})
+@PropertySource("classpath:properties/mail.properties")
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
@@ -43,12 +40,6 @@ public class UserServiceImpl implements UserService {
     private final UserSignUpDtoMapper userSignUpDtoMapper;
     @Value("${mail.confirmation.message}")
     private String confirmMessage;
-    @Value("${exception.user.already.exists}")
-    private String userIsAlreadyExistsExceptionText;
-    @Value("${exception.user.not.found}")
-    private String userNotFoundExceptionText;
-    @Value("${exception.user.is.already.activated}")
-    private String userIsAlreadyActivatedExceptionText;
     @Value("${mail.user.confirmation.title}")
     private String userConfirmationMessageTitleText;
     @Value("${mail.user.successful.confirmation.title}")
@@ -56,22 +47,13 @@ public class UserServiceImpl implements UserService {
     @Value("${mail.user.successful.confirmation.message}")
     private String successfulConfirmationMessage;
 
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder encoder, EmailService emailService, TokenProvider tokenProvider, JwtDecoder jwtDecoder, UserSignUpDtoMapper userSignUpDtoMapper) {
-        this.userRepository = userRepository;
-        this.encoder = encoder;
-        this.emailService = emailService;
-        this.tokenProvider = tokenProvider;
-        this.jwtDecoder = jwtDecoder;
-        this.userSignUpDtoMapper = userSignUpDtoMapper;
-    }
-
     @Override
     public void createUser(UserSignUpDto userDto) {
 
         User mappedUser = userSignUpDtoMapper.toEntity(userDto);
 
         if (userRepository.findUserByUsername(mappedUser.getUsername()).isPresent() || userRepository.findUserByEmail(mappedUser.getEmail()).isPresent())
-            throw new ValidationException(userIsAlreadyExistsExceptionText);
+            throw new ValidationException(ExceptionMessageText.USER_IS_ALREADY_EXISTS);
 
         User createdUser = new User(mappedUser.getUsername(), encoder.encode(mappedUser.getPassword()), mappedUser.getEmail(), Role.USER);
 
@@ -83,7 +65,7 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(createdUser);
 
-        emailService.sendEmail(userRepository.findUserByRole(Role.MANAGER).orElseThrow(() -> new EntityNotFoundException(userNotFoundExceptionText)).getEmail(),
+        emailService.sendEmail(userRepository.findUserByRole(Role.MANAGER).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.USER_NOT_FOUND)).getEmail(),
                 String.format(userConfirmationMessageTitleText, mappedUser.getUsername()),
                 String.format(("%s%s"), confirmMessage, confirmationToken));
 
@@ -92,13 +74,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findUserByUsername(String username) {
-        return userRepository.findUserByUsername(username).orElseThrow(() -> new EntityNotFoundException(userNotFoundExceptionText));
+        return userRepository.findUserByUsername(username).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.USER_NOT_FOUND));
     }
 
     @Override
     public User findUserByUsernameAndPassword(String username, String password) {
 
-        User foundUser = userRepository.findUserByUsername(username).orElseThrow(() -> new EntityNotFoundException(userNotFoundExceptionText));
+        User foundUser = userRepository.findUserByUsername(username).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.USER_NOT_FOUND));
 
         if (foundUser.getPassword().equals(password)) {
             return foundUser;
@@ -113,7 +95,7 @@ public class UserServiceImpl implements UserService {
         User activatedUser = userRepository.getById(userId);
 
         if (activatedUser.getConfirmationToken() == null) {
-            throw new ValidationException(userIsAlreadyActivatedExceptionText);
+            throw new ValidationException(ExceptionMessageText.USER_IS_ALREADY_ACTIVATED);
         }
 
         activatedUser.setConfirmationToken(null);
