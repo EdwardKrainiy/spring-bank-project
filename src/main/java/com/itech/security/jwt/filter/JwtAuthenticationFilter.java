@@ -63,7 +63,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (header != null && header.startsWith(tokenPrefix)) {
 
             authToken = header.replace(tokenPrefix, "");
-
             username = jwtTokenUtil.getUsernameFromToken(authToken, signKey);
         }
 
@@ -71,7 +70,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
 
-            if (jwtTokenUtil.validateToken(authToken, userDetails, signKey)) {
+            if (Boolean.TRUE.equals(jwtTokenUtil.validateToken(authToken, userDetails, signKey))) {
                 UsernamePasswordAuthenticationToken authentication = jwtTokenUtil.getAuthenticationToken(authToken, userDetails);
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
                 SecurityContextHolder.getContext().setAuthentication(authentication);

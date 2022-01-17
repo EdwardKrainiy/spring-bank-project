@@ -22,6 +22,7 @@ import com.itech.utils.exception.EntityNotFoundException;
 import com.itech.utils.exception.ValidationException;
 import com.itech.utils.mapper.account.AccountDtoMapper;
 import com.itech.utils.mapper.request.RequestDtoMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -45,6 +46,7 @@ import java.util.stream.Collectors;
         @PropertySource("classpath:properties/exception.properties"),
         @PropertySource("classpath:properties/mail.properties")
 })
+@RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
@@ -90,19 +92,6 @@ public class AccountServiceImpl implements AccountService {
 
     @Value("${mail.rejected.message.title}")
     private String rejectedMessageTitleText;
-
-    public AccountServiceImpl(AccountRepository accountRepository, AccountDtoMapper accountDtoMapper, IbanGenerator ibanGenerator, JsonEntitySerializer serializer, UserRepository userRepository, JwtDecoder jwtDecoder, CreationRequestRepository creationRequestRepository, JsonEntitySerializer jsonEntitySerializer, RequestDtoMapper requestDtoMapper, EmailService emailService) {
-        this.accountRepository = accountRepository;
-        this.accountDtoMapper = accountDtoMapper;
-        this.ibanGenerator = ibanGenerator;
-        this.serializer = serializer;
-        this.userRepository = userRepository;
-        this.jwtDecoder = jwtDecoder;
-        this.creationRequestRepository = creationRequestRepository;
-        this.jsonEntitySerializer = jsonEntitySerializer;
-        this.requestDtoMapper = requestDtoMapper;
-        this.emailService = emailService;
-    }
 
     @Override
     public List<AccountDto> findAllAccounts() {
@@ -224,7 +213,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void approveAccountCreationRequest(Long accountCreationRequestId) {
-        CreationRequest accountCreationRequest = creationRequestRepository.findCreationRequestsByIdAndStatus(accountCreationRequestId, Status.IN_PROGRESS).orElseThrow(() -> new EntityNotFoundException(creationRequestWithIdNotFoundExceptionText));
+        CreationRequest accountCreationRequest = creationRequestRepository.findCreationRequestsByIdAndStatusAndCreationType(accountCreationRequestId, Status.IN_PROGRESS, CreationType.ACCOUNT).orElseThrow(() -> new EntityNotFoundException(creationRequestWithIdNotFoundExceptionText));
 
         User accountCreationRequestUser = accountCreationRequest.getUser();
 
@@ -263,7 +252,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     public void rejectAccountCreationRequest(Long accountCreationRequestId) {
-        CreationRequest accountCreationRequest = creationRequestRepository.findCreationRequestsByIdAndStatus(accountCreationRequestId, Status.IN_PROGRESS).orElseThrow(() -> new EntityNotFoundException(creationRequestWithIdNotFoundExceptionText));
+        CreationRequest accountCreationRequest = creationRequestRepository.findCreationRequestsByIdAndStatusAndCreationType(accountCreationRequestId, Status.IN_PROGRESS, CreationType.ACCOUNT).orElseThrow(() -> new EntityNotFoundException(creationRequestWithIdNotFoundExceptionText));
 
         User accountCreationRequestUser = accountCreationRequest.getUser();
 

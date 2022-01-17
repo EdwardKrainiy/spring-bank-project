@@ -85,7 +85,7 @@ public class AccountController {
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Successfully created account."),
             @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
-            @ApiResponse(code = 404, message = "Account not created.")
+            @ApiResponse(code = 400, message = "Field is not valid!")
     })
     @Transactional
     @PostMapping
@@ -105,7 +105,8 @@ public class AccountController {
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Successfully updated account."),
             @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
-            @ApiResponse(code = 404, message = "Account not updated.")
+            @ApiResponse(code = 400, message = "Field is not valid!"),
+            @ApiResponse(code = 404, message = "Account not found.")
     })
     @Transactional
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
@@ -130,7 +131,7 @@ public class AccountController {
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Successfully deleted account."),
             @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
-            @ApiResponse(code = 404, message = "Account not deleted.")
+            @ApiResponse(code = 404, message = "Account not found.")
     })
     @Transactional
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
