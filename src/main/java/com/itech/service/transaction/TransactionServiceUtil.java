@@ -7,8 +7,7 @@ import com.itech.model.enumeration.Status;
 import com.itech.repository.TransactionRepository;
 import com.itech.utils.exception.ChangeAccountAmountException;
 import com.itech.utils.exception.ValidationException;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
+import com.itech.utils.exception.message.ExceptionMessageText;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,13 +21,8 @@ import java.util.Set;
  * @author Edvard Krainiy on 12/27/2021
  */
 @Component
-@PropertySource("classpath:properties/exception.properties")
 public class TransactionServiceUtil {
     private final TransactionRepository transactionRepository;
-    @Value("${exception.credit.is.more.than.stored}")
-    private String creditIsMoreThanStoredOnAccountExceptionText;
-    @Value("${exception.creation.request.expired}")
-    private String creationRequestIsExpiredExceptionText;
 
     public TransactionServiceUtil(TransactionRepository transactionRepository) {
         this.transactionRepository = transactionRepository;
@@ -49,7 +43,7 @@ public class TransactionServiceUtil {
             } else if (operation.getOperationType().equals(OperationType.DEBIT)) {
                 operation.getAccount().setAmount(operation.getAccount().getAmount() + operation.getAmount());
             } else {
-                throw new ChangeAccountAmountException(creditIsMoreThanStoredOnAccountExceptionText);
+                throw new ChangeAccountAmountException(ExceptionMessageText.CREDIT_IS_MORE_THAN_STORED_ON_ACCOUNT);
             }
         }
     }
@@ -67,7 +61,7 @@ public class TransactionServiceUtil {
         if (date.isBefore(LocalDate.now().minusDays(1))) {
             transaction.setStatus(Status.EXPIRED);
             transactionRepository.save(transaction);
-            throw new ValidationException(creationRequestIsExpiredExceptionText);
+            throw new ValidationException(ExceptionMessageText.CREATION_REQUEST_EXPIRED);
         }
 
         boolean areOperationTypesCorrect = checkOperationTypes(operations);

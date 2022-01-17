@@ -1,7 +1,6 @@
 package com.itech.unit;
 
 import com.itech.config.SecurityConfig;
-import com.itech.model.dto.account.AccountDto;
 import com.itech.model.dto.user.UserSignUpDto;
 import com.itech.model.entity.User;
 import com.itech.model.enumeration.Role;
@@ -16,6 +15,7 @@ import com.itech.utils.JwtDecoder;
 import com.itech.utils.exception.EntityNotFoundException;
 import com.itech.utils.exception.IncorrectPasswordException;
 import com.itech.utils.exception.ValidationException;
+import com.itech.utils.exception.message.ExceptionMessageText;
 import com.itech.utils.mapper.user.UserSignUpDtoMapper;
 import com.itech.utils.mapper.user.UserSignUpDtoMapperImpl;
 import org.junit.jupiter.api.Test;
@@ -27,19 +27,16 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import javax.swing.text.html.parser.Entity;
-import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.*;
 
 @ContextConfiguration(classes = {UserServiceImpl.class,
@@ -51,33 +48,26 @@ import static org.mockito.Mockito.*;
         JavaMailSenderImpl.class,
         UserSignUpDtoMapperImpl.class})
 @ExtendWith(SpringExtension.class)
-@TestPropertySource(locations = "classpath:properties/exception.properties")
 @TestPropertySource(locations = "classpath:properties/jwt.properties")
 @TestPropertySource(locations = "classpath:properties/mail.properties")
 @TestPropertySource(locations = "classpath:properties/scheduler.properties")
 @TestPropertySource(locations = "classpath:properties/security.properties")
 @TestPropertySource(locations = "classpath:application.properties")
 class UserServiceUnitTest {
-    @Value("${mail.confirmation.message}")
-    private String confirmMessage;
-    @Value("${exception.user.already.exists}")
-    private String userIsAlreadyExistsExceptionText;
-    @Value("${exception.user.not.found}")
-    private String userNotFoundExceptionText;
-    @Value("${exception.user.is.already.activated}")
-    private String userIsAlreadyActivatedExceptionText;
-    @Value("${mail.user.confirmation.title}")
-    private String userConfirmationMessageTitleText;
-    @Value("${mail.user.successful.confirmation.title}")
-    private String successfulConfirmationTitle;
-    @Value("${mail.user.successful.confirmation.message}")
-    private String successfulConfirmationMessage;
     @Captor
     ArgumentCaptor<String> emailCaptor;
     @Captor
     ArgumentCaptor<String> titleCaptor;
     @Captor
     ArgumentCaptor<String> messageCaptor;
+    @Value("${mail.confirmation.message}")
+    private String confirmMessage;
+    @Value("${mail.user.confirmation.title}")
+    private String userConfirmationMessageTitleText;
+    @Value("${mail.user.successful.confirmation.title}")
+    private String successfulConfirmationTitle;
+    @Value("${mail.user.successful.confirmation.message}")
+    private String successfulConfirmationMessage;
     @MockBean
     private UserRepository userRepository;
     @MockBean
@@ -149,7 +139,7 @@ class UserServiceUnitTest {
         Exception exception = assertThrows(ValidationException.class, () ->
                 userService.createUser(anyUser));
 
-        String expectedMessage = userIsAlreadyExistsExceptionText;
+        String expectedMessage = ExceptionMessageText.USER_IS_ALREADY_EXISTS;
         String actualMessage = exception.getMessage();
 
         assertTrue(actualMessage.contains(expectedMessage));
@@ -172,7 +162,7 @@ class UserServiceUnitTest {
         Exception exception = assertThrows(EntityNotFoundException.class, () ->
                 userService.findUserByUsername("user"));
 
-        String expectedMessage = userNotFoundExceptionText;
+        String expectedMessage = ExceptionMessageText.USER_NOT_FOUND;
         String actualMessage = exception.getMessage();
 
         assertTrue(actualMessage.contains(expectedMessage));
@@ -229,7 +219,7 @@ class UserServiceUnitTest {
         Exception exception = assertThrows(ValidationException.class, () ->
                 userService.activateUser("token1"));
 
-        String expectedMessage = userIsAlreadyActivatedExceptionText;
+        String expectedMessage = ExceptionMessageText.USER_IS_ALREADY_ACTIVATED;
         String actualMessage = exception.getMessage();
 
         assertTrue(actualMessage.contains(expectedMessage));

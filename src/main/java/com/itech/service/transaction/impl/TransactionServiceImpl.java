@@ -18,6 +18,7 @@ import com.itech.utils.exception.ChangeAccountAmountException;
 import com.itech.utils.exception.EntityNotFoundException;
 import com.itech.utils.mapper.request.RequestDtoMapper;
 import com.itech.utils.mapper.transaction.TransactionDtoMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Log4j2
+@RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
 
@@ -90,19 +92,6 @@ public class TransactionServiceImpl implements TransactionService {
     @Value("${exception.transaction.creation.request.with.id.not.found}")
     private String transactionCreationRequestWithThoseIdNotFoundExceptionText;
 
-    public TransactionServiceImpl(TransactionRepository transactionRepository, TransactionDtoMapper transactionDtoMapper, AccountRepository accountRepository, UserRepository userRepository, OperationRepository operationRepository, TransactionServiceUtil transactionServiceUtil, JsonEntitySerializer serializer, CreationRequestRepository creationRequestRepository, RequestDtoMapper requestDtoMapper, JwtDecoder jwtDecoder) {
-        this.transactionRepository = transactionRepository;
-        this.transactionDtoMapper = transactionDtoMapper;
-        this.accountRepository = accountRepository;
-        this.userRepository = userRepository;
-        this.operationRepository = operationRepository;
-        this.transactionServiceUtil = transactionServiceUtil;
-        this.serializer = serializer;
-        this.creationRequestRepository = creationRequestRepository;
-        this.requestDtoMapper = requestDtoMapper;
-        this.jwtDecoder = jwtDecoder;
-    }
-
     @Override
     public TransactionDto findTransactionById(Long transactionId) {
         User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(authenticatedUserNotFoundExceptionText));
@@ -112,7 +101,7 @@ public class TransactionServiceImpl implements TransactionService {
         if (authenticatedUser.getRole().equals(Role.USER)) {
             foundTransaction = transactionRepository.findTransactionByIdAndUser(transactionId, authenticatedUser);
         } else {
-            foundTransaction =  transactionRepository.findTransactionById(transactionId);
+            foundTransaction = transactionRepository.findTransactionById(transactionId);
         }
 
         return transactionDtoMapper.toDto(foundTransaction.orElseThrow(() -> new EntityNotFoundException("Transaction not found!")));

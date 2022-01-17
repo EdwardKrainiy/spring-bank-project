@@ -3,6 +3,7 @@ package com.itech.security.jwt.filter;
 import com.itech.security.jwt.provider.TokenProvider;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -62,7 +63,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (header != null && header.startsWith(tokenPrefix)) {
 
-            authToken = header.replace(tokenPrefix, "");
+            authToken = header.replace(tokenPrefix, Strings.EMPTY);
             username = jwtTokenUtil.getUsernameFromToken(authToken, signKey);
         }
 

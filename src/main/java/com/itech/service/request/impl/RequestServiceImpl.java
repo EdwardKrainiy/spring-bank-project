@@ -14,6 +14,7 @@ import com.itech.utils.JsonEntitySerializer;
 import com.itech.utils.JwtDecoder;
 import com.itech.utils.exception.EntityNotFoundException;
 import com.itech.utils.mapper.request.RequestDtoMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -24,6 +25,7 @@ import java.time.LocalDateTime;
  * @author Edvard Krainiy on 01/05/2022
  */
 @Service
+@RequiredArgsConstructor
 public class RequestServiceImpl implements RequestService {
 
     private final CreationRequestRepository creationRequestRepository;
@@ -37,15 +39,6 @@ public class RequestServiceImpl implements RequestService {
     private final JsonEntitySerializer serializer;
 
     private final RequestDtoMapper requestDtoMapper;
-
-    public RequestServiceImpl(CreationRequestRepository creationRequestRepository, RabbitMqPublisher publisher, UserRepository userRepository, JwtDecoder jwtDecoder, JsonEntitySerializer serializer, RequestDtoMapper requestDtoMapper) {
-        this.creationRequestRepository = creationRequestRepository;
-        this.publisher = publisher;
-        this.userRepository = userRepository;
-        this.jwtDecoder = jwtDecoder;
-        this.serializer = serializer;
-        this.requestDtoMapper = requestDtoMapper;
-    }
 
     private CreationRequest saveRequest(TransactionCreateDto transactionCreateDto) {
         User foundUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("User not found!"));
