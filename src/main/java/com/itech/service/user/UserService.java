@@ -51,4 +51,13 @@ public interface UserService {
      */
 
     void activateUser(String token);
+
+    /**
+     * isUserActivated method. Checks, is User activated.
+     *
+     * @param user User object, which we need to check.
+     * @return Boolean isUserActivated flag.
+     */
+
+    boolean isUserActivated(User user);
 }

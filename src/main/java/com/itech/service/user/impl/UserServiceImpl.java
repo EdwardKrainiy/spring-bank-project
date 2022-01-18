@@ -106,4 +106,9 @@ public class UserServiceImpl implements UserService {
         emailService.sendEmail(activatedUser.getEmail(), successfulConfirmationTitle, successfulConfirmationMessage);
         log.info("Mail about confirmation was sent.");
     }
+
+    public boolean isUserActivated(User user){
+        return user.getConfirmationToken() == null && user.isActivated();
+    }
 }
+

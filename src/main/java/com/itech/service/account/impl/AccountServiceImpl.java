@@ -16,6 +16,8 @@ import com.itech.repository.CreationRequestRepository;
 import com.itech.repository.UserRepository;
 import com.itech.service.account.AccountService;
 import com.itech.service.mail.EmailService;
+import com.itech.service.user.UserService;
+import com.itech.service.user.impl.UserServiceImpl;
 import com.itech.utils.IbanGenerator;
 import com.itech.utils.JsonEntitySerializer;
 import com.itech.utils.JwtDecoder;
@@ -28,8 +30,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
-import org.springframework.integration.router.ErrorMessageExceptionTypeRouter;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -50,6 +50,7 @@ import java.util.stream.Collectors;
 public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
+    private final UserService userService;
     private final AccountDtoMapper accountDtoMapper;
     private final IbanGenerator ibanGenerator;
     private final JsonEntitySerializer serializer;
@@ -110,7 +111,7 @@ public class AccountServiceImpl implements AccountService {
     public Long createAccount(AccountCreateDto accountChangeDto) {
         User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.AUTHENTICATED_USER_NOT_FOUND));
 
-        if(!authenticatedUser.isActivated()) throw new ValidationException(ExceptionMessageText.USER_NOT_ACTIVATED);
+        if (!userService.isUserActivated(authenticatedUser)) throw new ValidationException(ExceptionMessageText.USER_NOT_ACTIVATED);
 
         CreationRequest accountCreatingRequest = new CreationRequest();
         log.debug("CreationRequest empty object created.");
@@ -138,7 +139,7 @@ public class AccountServiceImpl implements AccountService {
     public AccountDto updateAccount(AccountUpdateDto accountUpdateDto, Long accountId) {
         User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.AUTHENTICATED_USER_NOT_FOUND));
 
-        if(!authenticatedUser.isActivated()) throw new ValidationException(ExceptionMessageText.USER_NOT_ACTIVATED);
+        if (!userService.isUserActivated(authenticatedUser)) throw new ValidationException(ExceptionMessageText.USER_NOT_ACTIVATED);
 
         Account accountToUpdate = accountRepository.findAccountById(accountId).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.ACCOUNT_NOT_FOUND));
 
@@ -155,7 +156,7 @@ public class AccountServiceImpl implements AccountService {
     public void deleteAccountByAccountId(Long accountId) {
         User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.AUTHENTICATED_USER_NOT_FOUND));
 
-        if(!authenticatedUser.isActivated()) throw new ValidationException(ExceptionMessageText.USER_NOT_ACTIVATED);
+        if (!userService.isUserActivated(authenticatedUser)) throw new ValidationException(ExceptionMessageText.USER_NOT_ACTIVATED);
 
         Account foundAccountToDelete = accountRepository.findAccountById(accountId).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.ACCOUNT_NOT_FOUND));
 
@@ -266,9 +267,5 @@ public class AccountServiceImpl implements AccountService {
                 log.info(String.format("Expired account creation request id: %d", accountCreationRequest.getId()));
             }
         }
-    }
-
-    private boolean isUserActivated(User user){
-        return user.getConfirmationToken() == null;
     }
 }
