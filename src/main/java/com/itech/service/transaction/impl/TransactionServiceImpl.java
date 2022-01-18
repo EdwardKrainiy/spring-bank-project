@@ -5,10 +5,7 @@ import com.itech.model.dto.request.CreationRequestDto;
 import com.itech.model.dto.transaction.TransactionCreateDto;
 import com.itech.model.dto.transaction.TransactionDto;
 import com.itech.model.entity.*;
-import com.itech.model.enumeration.CreationType;
-import com.itech.model.enumeration.Currency;
-import com.itech.model.enumeration.Role;
-import com.itech.model.enumeration.Status;
+import com.itech.model.enumeration.*;
 import com.itech.repository.*;
 import com.itech.service.transaction.TransactionService;
 import com.itech.service.transaction.TransactionServiceUtil;
@@ -24,6 +21,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -175,7 +173,7 @@ public class TransactionServiceImpl implements TransactionService {
         operation.setAccount(account);
         operation.setTransaction(transaction);
 
-        operation.setOperationType(operationCreateDto.getOperationType());
+        operation.setOperationType(OperationType.valueOf(operationCreateDto.getOperationType()));
 
         operation.setAmount(operationCreateDto.getAmount());
         operations.add(operationRepository.save(operation));

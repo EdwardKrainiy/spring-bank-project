@@ -8,6 +8,7 @@ import com.itech.model.entity.Account;
 import com.itech.model.entity.CreationRequest;
 import com.itech.model.entity.User;
 import com.itech.model.enumeration.CreationType;
+import com.itech.model.enumeration.Currency;
 import com.itech.model.enumeration.Role;
 import com.itech.model.enumeration.Status;
 import com.itech.repository.AccountRepository;
@@ -28,6 +29,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
+import org.springframework.integration.router.ErrorMessageExceptionTypeRouter;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -108,6 +110,8 @@ public class AccountServiceImpl implements AccountService {
     public Long createAccount(AccountCreateDto accountChangeDto) {
         User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.AUTHENTICATED_USER_NOT_FOUND));
 
+        if(!authenticatedUser.isActivated()) throw new ValidationException(ExceptionMessageText.USER_NOT_ACTIVATED);
+
         CreationRequest accountCreatingRequest = new CreationRequest();
         log.debug("CreationRequest empty object created.");
 
@@ -134,6 +138,8 @@ public class AccountServiceImpl implements AccountService {
     public AccountDto updateAccount(AccountUpdateDto accountUpdateDto, Long accountId) {
         User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.AUTHENTICATED_USER_NOT_FOUND));
 
+        if(!authenticatedUser.isActivated()) throw new ValidationException(ExceptionMessageText.USER_NOT_ACTIVATED);
+
         Account accountToUpdate = accountRepository.findAccountById(accountId).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.ACCOUNT_NOT_FOUND));
 
         accountToUpdate.setAmount(accountUpdateDto.getAmount());
@@ -148,6 +154,8 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void deleteAccountByAccountId(Long accountId) {
         User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.AUTHENTICATED_USER_NOT_FOUND));
+
+        if(!authenticatedUser.isActivated()) throw new ValidationException(ExceptionMessageText.USER_NOT_ACTIVATED);
 
         Account foundAccountToDelete = accountRepository.findAccountById(accountId).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.ACCOUNT_NOT_FOUND));
 
@@ -199,7 +207,7 @@ public class AccountServiceImpl implements AccountService {
         Account accountToCreate = new Account();
         accountToCreate.setUser(accountCreationRequestUser);
         accountToCreate.setAmount(accountChangeDtoFromCreationRequest.getAmount());
-        accountToCreate.setCurrency(accountChangeDtoFromCreationRequest.getCurrency());
+        accountToCreate.setCurrency(Currency.valueOf(accountChangeDtoFromCreationRequest.getCurrency()));
 
         String accountNumber = ibanGenerator.generateIban(accountToCreate.getCurrency().getCountryCode());
 
@@ -258,5 +266,9 @@ public class AccountServiceImpl implements AccountService {
                 log.info(String.format("Expired account creation request id: %d", accountCreationRequest.getId()));
             }
         }
+    }
+
+    private boolean isUserActivated(User user){
+        return user.getConfirmationToken() == null;
     }
 }

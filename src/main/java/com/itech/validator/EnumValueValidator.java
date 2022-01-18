@@ -9,20 +9,22 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class EnumValueValidator implements ConstraintValidator<EnumValue, Enum<?>> {
-    private List<? extends Enum<?>> enumValues;
+public class EnumValueValidator implements ConstraintValidator<EnumValue, CharSequence> {
+    private List<String> enumValues;
 
     @Override
     public void initialize(EnumValue annotation) {
-        enumValues = Stream.of(annotation.enumClass().getEnumConstants()).collect(Collectors.toList());
+        enumValues = Stream.of(annotation.enumClass().getEnumConstants())
+                .map(Enum::name)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public boolean isValid(Enum<?> value, ConstraintValidatorContext context) {
+    public boolean isValid(CharSequence value, ConstraintValidatorContext context) {
         if (value == null) {
-            return true;
-        }
+            return false;
 
-        return enumValues.contains(value);
+        }
+        return enumValues.contains(value.toString());
     }
 }

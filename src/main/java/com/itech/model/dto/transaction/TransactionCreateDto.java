@@ -21,12 +21,12 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Transaction data-transfer object to create new Transaction.")
+@Schema(description = "Transaction data-transfer object to create new Transaction." )
 public class TransactionCreateDto {
     @JsonProperty("Operations")
     @NotEmpty(message = "Operations is empty!")
     @Size(min = 2, message = "Minimal size of operations is 2!")
     @IsOperationCorrect
-    @Schema(description = "Set of operations of Transaction  to create new Transaction.")
-    private @Valid Set<OperationCreateDto> operations;
+    @Schema(description = "Set of operations of Transaction to create new Transaction." )
+    private Set<@Valid OperationCreateDto> operations;
 }
