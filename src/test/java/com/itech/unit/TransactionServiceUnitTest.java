@@ -1,6 +1,7 @@
 package com.itech.unit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.itech.config.SecurityConfig;
 import com.itech.model.dto.request.CreationRequestDto;
 import com.itech.model.dto.transaction.TransactionDto;
 import com.itech.model.entity.*;
@@ -9,9 +10,13 @@ import com.itech.model.enumeration.Currency;
 import com.itech.model.enumeration.Role;
 import com.itech.model.enumeration.Status;
 import com.itech.repository.*;
+import com.itech.security.jwt.provider.TokenProvider;
+import com.itech.service.mail.impl.EmailServiceImpl;
 import com.itech.service.transaction.TransactionService;
 import com.itech.service.transaction.TransactionServiceUtil;
 import com.itech.service.transaction.impl.TransactionServiceImpl;
+import com.itech.service.user.impl.CustomUserDetailsService;
+import com.itech.service.user.impl.UserServiceImpl;
 import com.itech.utils.JsonEntitySerializer;
 import com.itech.utils.JwtDecoder;
 import com.itech.utils.exception.EntityNotFoundException;
@@ -20,11 +25,12 @@ import com.itech.utils.exception.message.ExceptionMessageText;
 import com.itech.utils.mapper.operation.OperationDtoMapperImpl;
 import com.itech.utils.mapper.request.RequestDtoMapperImpl;
 import com.itech.utils.mapper.transaction.TransactionDtoMapperImpl;
+import com.itech.utils.mapper.user.UserSignUpDtoMapperImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -40,6 +46,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ContextConfiguration(classes = {
+        UserServiceImpl.class,
         TransactionServiceImpl.class,
         ObjectMapper.class,
         OperationDtoMapperImpl.class,
@@ -47,7 +54,13 @@ import static org.mockito.Mockito.when;
         TransactionServiceUtil.class,
         JsonEntitySerializer.class,
         RequestDtoMapperImpl.class,
-        JwtDecoder.class})
+        JwtDecoder.class,
+        CustomUserDetailsService.class,
+        SecurityConfig.class,
+        EmailServiceImpl.class,
+        TokenProvider.class,
+        JavaMailSenderImpl.class,
+        UserSignUpDtoMapperImpl.class})
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(locations = "classpath:properties/jwt.properties")
 @TestPropertySource(locations = "classpath:properties/mail.properties")
@@ -104,6 +117,8 @@ class TransactionServiceUnitTest {
     void givenAccounts_whenCreateTransaction_thenCompareResults() {
         User anyUser = new User("user", "user", "mail1@mail.ru", Role.USER);
         anyUser.setId(1L);
+        anyUser.setActivated(true);
+        anyUser.setConfirmationToken(null);
         String payloadOfTransactionCreationRequest = "{\"Operations\":[" +
                 "{\"AccountNumber\":\"number1\",\"Amount\":\"1\",\"OperationType\":\"CREDIT\"}," +
                 "{\"AccountNumber\":\"number2\",\"Amount\":\"1\",\"OperationType\":\"DEBIT\"}]}";
@@ -142,6 +157,8 @@ class TransactionServiceUnitTest {
     void emptyAccounts_whenCreateTransaction_thenEntityNotFound() {
         User anyUser = new User("user", "user", "mail1@mail.ru", Role.USER);
         anyUser.setId(1L);
+        anyUser.setActivated(true);
+        anyUser.setConfirmationToken(null);
         String payloadOfTransactionCreationRequest = "{\"Operations\":[" +
                 "{\"AccountNumber\":\"number1\",\"Amount\":\"1\",\"OperationType\":\"CREDIT\"}," +
                 "{\"AccountNumber\":\"number2\",\"Amount\":\"1\",\"OperationType\":\"DEBIT\"}]}";
@@ -172,6 +189,8 @@ class TransactionServiceUnitTest {
     void givenAccounts_andAccountOnOperationNotExists_whenCreateTransaction_thenEntityNotFound() {
         User anyUser = new User("user", "user", "mail1@mail.ru", Role.USER);
         anyUser.setId(1L);
+        anyUser.setActivated(true);
+        anyUser.setConfirmationToken(null);
         String payloadOfTransactionCreationRequest = "{\"Operations\":[" +
                 "{\"AccountNumber\":\"number1\",\"Amount\":\"1\",\"OperationType\":\"CREDIT\"}," +
                 "{\"AccountNumber\":\"number2\",\"Amount\":\"1\",\"OperationType\":\"DEBIT\"}]}";
@@ -209,6 +228,8 @@ class TransactionServiceUnitTest {
     void givenAccounts_andEmptyOperations_whenCreateTransaction_thenEntityNotFound() {
         User anyUser = new User("user", "user", "mail1@mail.ru", Role.USER);
         anyUser.setId(1L);
+        anyUser.setActivated(true);
+        anyUser.setConfirmationToken(null);
         String payloadOfTransactionCreationRequest = "{\"Operations\":[" +
                 "{\"AccountNumber\":\"number1\",\"Amount\":\"1\",\"OperationType\":\"CREDIT\"}," +
                 "{\"AccountNumber\":\"number2\",\"Amount\":\"1\",\"OperationType\":\"DEBIT\"}]}";
@@ -244,6 +265,8 @@ class TransactionServiceUnitTest {
     void givenAccounts_andInvalidTransactionStructureWithTwoDebits_whenCreateTransaction_thenEntityNotFound() {
         User anyUser = new User("user", "user", "mail1@mail.ru", Role.USER);
         anyUser.setId(1L);
+        anyUser.setActivated(true);
+        anyUser.setConfirmationToken(null);
         String payloadOfTransactionCreationRequest = "{\"Operations\":[" +
                 "{\"AccountNumber\":\"number1\",\"Amount\":\"1\",\"OperationType\":\"DEBIT\"}," +
                 "{\"AccountNumber\":\"number2\",\"Amount\":\"1\",\"OperationType\":\"DEBIT\"}]}";
@@ -281,6 +304,8 @@ class TransactionServiceUnitTest {
     void givenAccounts_andTransactionBetweenTwoAccountsWithDifferentCurrencies_whenCreateTransaction_thenEntityNotFound() {
         User anyUser = new User("user", "user", "mail1@mail.ru", Role.USER);
         anyUser.setId(1L);
+        anyUser.setActivated(true);
+        anyUser.setConfirmationToken(null);
         String payloadOfTransactionCreationRequest = "{\"Operations\":[" +
                 "{\"AccountNumber\":\"number1\",\"Amount\":\"1\",\"OperationType\":\"DEBIT\"}," +
                 "{\"AccountNumber\":\"number2\",\"Amount\":\"1\",\"OperationType\":\"CREDIT\"}]}";
@@ -318,6 +343,8 @@ class TransactionServiceUnitTest {
     void givenAccounts_andTransactionWhereCreditAmountIsMoreThanStoredOnThisAccount_whenCreateTransaction_thenChangeAccountAmountException() {
         User anyUser = new User("user", "user", "mail1@mail.ru", Role.USER);
         anyUser.setId(1L);
+        anyUser.setActivated(true);
+        anyUser.setConfirmationToken(null);
         String payloadOfTransactionCreationRequest = "{\"Operations\":[" +
                 "{\"AccountNumber\":\"number1\",\"Amount\":\"5\",\"OperationType\":\"DEBIT\"}," +
                 "{\"AccountNumber\":\"number2\",\"Amount\":\"5\",\"OperationType\":\"CREDIT\"}]}";
@@ -355,6 +382,8 @@ class TransactionServiceUnitTest {
     void givenAccounts_andExpiredTransaction_whenCreateTransaction_thenValidationException() {
         User anyUser = new User("user", "user", "mail1@mail.ru", Role.USER);
         anyUser.setId(1L);
+        anyUser.setActivated(true);
+        anyUser.setConfirmationToken(null);
         String payloadOfTransactionCreationRequest = "{\"Operations\":[" +
                 "{\"AccountNumber\":\"number1\",\"Amount\":\"5\",\"OperationType\":\"DEBIT\"}," +
                 "{\"AccountNumber\":\"number2\",\"Amount\":\"5\",\"OperationType\":\"CREDIT\"}]}";

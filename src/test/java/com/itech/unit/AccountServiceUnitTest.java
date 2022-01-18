@@ -1,6 +1,7 @@
 package com.itech.unit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.itech.config.SecurityConfig;
 import com.itech.model.dto.account.AccountDto;
 import com.itech.model.dto.account.AccountUpdateDto;
 import com.itech.model.dto.request.CreationRequestDto;
@@ -14,10 +15,13 @@ import com.itech.model.enumeration.Status;
 import com.itech.repository.AccountRepository;
 import com.itech.repository.CreationRequestRepository;
 import com.itech.repository.UserRepository;
+import com.itech.security.jwt.provider.TokenProvider;
 import com.itech.service.account.AccountService;
 import com.itech.service.account.impl.AccountServiceImpl;
 import com.itech.service.mail.EmailService;
 import com.itech.service.mail.impl.EmailServiceImpl;
+import com.itech.service.user.impl.CustomUserDetailsService;
+import com.itech.service.user.impl.UserServiceImpl;
 import com.itech.utils.IbanGenerator;
 import com.itech.utils.JsonEntitySerializer;
 import com.itech.utils.JwtDecoder;
@@ -26,6 +30,7 @@ import com.itech.utils.exception.ValidationException;
 import com.itech.utils.exception.message.ExceptionMessageText;
 import com.itech.utils.mapper.account.AccountDtoMapperImpl;
 import com.itech.utils.mapper.request.RequestDtoMapperImpl;
+import com.itech.utils.mapper.user.UserSignUpDtoMapperImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -48,6 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 @ContextConfiguration(classes = {AccountServiceImpl.class,
+        UserServiceImpl.class,
         AccountDtoMapperImpl.class,
         IbanGenerator.class,
         JsonEntitySerializer.class,
@@ -56,7 +62,11 @@ import static org.mockito.Mockito.*;
         RequestDtoMapperImpl.class,
         EmailServiceImpl.class,
         ObjectMapper.class,
-        JavaMailSenderImpl.class})
+        JavaMailSenderImpl.class,
+        CustomUserDetailsService.class,
+        SecurityConfig.class,
+        TokenProvider.class,
+        UserSignUpDtoMapperImpl.class})
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(locations = "classpath:properties/jwt.properties")
 @TestPropertySource(locations = "classpath:properties/mail.properties")
@@ -132,7 +142,11 @@ class AccountServiceUnitTest {
         User authorizedUser = new User("user", "user", "mail1@mail.ru", Role.USER);
         User anotherUser = new User("user2", "user2", "mail2@mail.ru", Role.USER);
         authorizedUser.setId(1L);
+        authorizedUser.setActivated(true);
+        authorizedUser.setConfirmationToken(null);
         anotherUser.setId(2L);
+        anotherUser.setActivated(true);
+        anotherUser.setConfirmationToken(null);
 
         AccountUpdateDto accountToUpdate = new AccountUpdateDto(0);
         when(userRepository.findUserByUsername("user")).thenReturn(Optional.of(authorizedUser));
@@ -153,7 +167,11 @@ class AccountServiceUnitTest {
         User authorizedUser = new User("user", "user", "mail1@mail.ru", Role.USER);
         User anotherUser = new User("user2", "user2", "mail2@mail.ru", Role.USER);
         authorizedUser.setId(1L);
+        authorizedUser.setActivated(true);
+        authorizedUser.setConfirmationToken(null);
         anotherUser.setId(2L);
+        anotherUser.setActivated(true);
+        anotherUser.setConfirmationToken(null);
 
         when(userRepository.findUserByUsername("user")).thenReturn(Optional.of(authorizedUser));
         when(accountRepository.findAccountById(2L)).thenReturn(Optional.of(new Account(2L, anotherUser, 0, Currency.PLN, "number1")));
