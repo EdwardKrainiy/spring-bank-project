@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import springfox.documentation.service.ApiKey;
 
 /**
  * Security configuration class.
@@ -50,9 +51,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/transactions/*").hasAnyAuthority(Role.MANAGER.name(), Role.USER.name())
                 .antMatchers(HttpMethod.GET, "/api/*/creation-requests/*").hasAnyAuthority(Role.USER.name(), Role.MANAGER.name())
                 .antMatchers(HttpMethod.GET, "/api/accounts/creation-requests/{\\\\d+}/**").hasAuthority(Role.MANAGER.name())
-                .antMatchers("/swagger-ui.html").hasAnyAuthority(Role.MANAGER.name(), Role.USER.name())
-                .anyRequest()
-                .authenticated();
+                .antMatchers("/*").permitAll()
+                .anyRequest().permitAll();
 
         http.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
     }
