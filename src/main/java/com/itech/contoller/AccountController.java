@@ -71,7 +71,7 @@ public class AccountController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<AccountDto> getAccountById(@PathVariable("id")
-                                                     @ApiParam(name = "accountId", value = "Id of account we need to obtain.") Long accountId) {
+                                                     @ApiParam(name = "id", value = "Id of account we need to obtain.") Long accountId) {
         return ResponseEntity.ok(accountService.findAccountByAccountId(accountId));
     }
 
@@ -113,7 +113,7 @@ public class AccountController {
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @PutMapping("/{id}")
     public ResponseEntity<AccountDto> updateAccount(@RequestBody @Valid @ApiParam(name = "accountUpdateDto", value = "Dto of account, which we use to update other account.") AccountUpdateDto accountUpdateDto,
-                                                    @PathVariable("id") @ApiParam(name = "accountId", value = "Id of account we want to update.") Long accountId) {
+                                                    @PathVariable("id") @ApiParam(name = "id", value = "Id of account we want to update.") Long accountId) {
 
         if (log.isDebugEnabled()) {
             log.debug("RequestBody: {}", jsonEntitySerializer.serializeObjectToJson(accountUpdateDto));
@@ -137,7 +137,7 @@ public class AccountController {
     @Transactional
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAccountById(@PathVariable("id") @ApiParam(name = "accountId", value = "Id of account we want to delete.") Long accountId) {
+    public ResponseEntity<Void> deleteAccountById(@PathVariable("id") @ApiParam(name = "id", value = "Id of account we want to delete.") Long accountId) {
         accountService.deleteAccountByAccountId(accountId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
