@@ -49,7 +49,7 @@ public class CreationRequestController {
             @ApiResponse(code = 404, message = "Transaction creation request with this id not found.")
     })
     @GetMapping("/transactions/creation-requests/{id}")
-    public ResponseEntity<CreationRequestDto> getTransactionCreationRequestById(@PathVariable("id") @ApiParam(name = "transactionCreationRequestId", value = "Id of transaction creation request we want to obtain.") Long transactionCreationRequestId) {
+    public ResponseEntity<CreationRequestDto> getTransactionCreationRequestById(@PathVariable("id") @ApiParam(name = "id", value = "Id of transaction creation request we want to obtain.", required = true) Long transactionCreationRequestId) {
         return ResponseEntity.ok(transactionService.findTransactionCreationRequestById(transactionCreationRequestId));
     }
 
@@ -66,7 +66,7 @@ public class CreationRequestController {
             @ApiResponse(code = 404, message = "Account creation request with this id not found.")
     })
     @GetMapping("/accounts/creation-requests/{id}")
-    public ResponseEntity<CreationRequestDto> getAccountCreationRequestById(@PathVariable("id") @ApiParam(name = "accountCreationRequestId", value = "Id of account creation request we want to obtain.") Long accountCreationRequestId) {
+    public ResponseEntity<CreationRequestDto> getAccountCreationRequestById(@PathVariable("id") @ApiParam(name = "id", value = "Id of account creation request we want to obtain.", required = true) Long accountCreationRequestId) {
         return ResponseEntity.ok(accountService.findAccountCreationRequestById(accountCreationRequestId));
     }
 
@@ -115,7 +115,7 @@ public class CreationRequestController {
             @ApiResponse(code = 404, message = "Account creation request with this id not found.")
     })
     @GetMapping("/accounts/creation-requests/{id}/approve")
-    public ResponseEntity<Void> approveAccountCreationRequest(@PathVariable("id") @ApiParam(name = "accountCreationRequest", value = "Id of account creation request we want to approve.") Long accountCreationRequestId) {
+    public ResponseEntity<Void> approveAccountCreationRequest(@PathVariable("id") @ApiParam(name = "id", value = "Id of account creation request we want to approve.", required = true) Long accountCreationRequestId) {
         accountService.approveAccountCreationRequest(accountCreationRequestId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
@@ -133,7 +133,7 @@ public class CreationRequestController {
             @ApiResponse(code = 404, message = "Account creation request with this id not found.")
     })
     @GetMapping("/accounts/creation-requests/{id}/reject")
-    public ResponseEntity<Void> rejectAccountCreationRequest(@PathVariable("id") @ApiParam(name = "accountCreationRequest", value = "Id of account creation request we want to reject.") Long accountCreationRequestId) {
+    public ResponseEntity<Void> rejectAccountCreationRequest(@PathVariable("id") @ApiParam(name = "id", value = "Id of account creation request we want to reject.", required = true) Long accountCreationRequestId) {
         accountService.rejectAccountCreationRequest(accountCreationRequestId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }

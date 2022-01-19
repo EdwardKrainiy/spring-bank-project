@@ -49,7 +49,7 @@ public class TransactionController {
             @ApiResponse(code = 404, message = "Transaction with this id not found.")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<TransactionDto> getTransactionById(@PathVariable("id") @ApiParam(name = "transactionId", value = "Id of transaction we need to obtain.") Long transactionId) {
+    public ResponseEntity<TransactionDto> getTransactionById(@PathVariable("id") @ApiParam(name = "id", value = "Id of transaction we need to obtain.") Long transactionId) {
         return ResponseEntity.status(HttpStatus.OK).body(transactionService.findTransactionById(transactionId));
     }
 
