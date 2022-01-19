@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -22,8 +23,7 @@ import javax.validation.constraints.NotNull;
 @Schema(description = "Account data-transfer object to create new Account.")
 public class AccountCreateDto extends AccountUpdateDto {
     @JsonProperty("Currency")
-    @NotNull(message = "Currency is empty!")
     @EnumValue(enumClass = Currency.class, message = "Incorrect Currency!")
     @Schema(description = "Currency field to create unique IBAN.")
-    private Currency currency;
+    private String currency;
 }

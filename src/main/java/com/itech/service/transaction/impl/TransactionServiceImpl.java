@@ -5,17 +5,16 @@ import com.itech.model.dto.request.CreationRequestDto;
 import com.itech.model.dto.transaction.TransactionCreateDto;
 import com.itech.model.dto.transaction.TransactionDto;
 import com.itech.model.entity.*;
-import com.itech.model.enumeration.CreationType;
-import com.itech.model.enumeration.Currency;
-import com.itech.model.enumeration.Role;
-import com.itech.model.enumeration.Status;
+import com.itech.model.enumeration.*;
 import com.itech.repository.*;
 import com.itech.service.transaction.TransactionService;
 import com.itech.service.transaction.TransactionServiceUtil;
+import com.itech.service.user.UserService;
 import com.itech.utils.JsonEntitySerializer;
 import com.itech.utils.JwtDecoder;
 import com.itech.utils.exception.ChangeAccountAmountException;
 import com.itech.utils.exception.EntityNotFoundException;
+import com.itech.utils.exception.ValidationException;
 import com.itech.utils.exception.message.ExceptionMessageText;
 import com.itech.utils.mapper.request.RequestDtoMapper;
 import com.itech.utils.mapper.transaction.TransactionDtoMapper;
@@ -24,6 +23,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -51,6 +51,8 @@ public class TransactionServiceImpl implements TransactionService {
     private final OperationRepository operationRepository;
 
     private final TransactionServiceUtil transactionServiceUtil;
+
+    private final UserService userService;
 
     private final JsonEntitySerializer serializer;
 
@@ -99,6 +101,8 @@ public class TransactionServiceImpl implements TransactionService {
         TransactionCreateDto transactionCreateDto = serializer.serializeJsonToObject(creationRequestDto.getPayload(), TransactionCreateDto.class);
         CreationRequest requestToReject = creationRequestRepository.findCreationRequestById(creationRequestDto.getId()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.TRANSACTION_CREATION_REQUEST_WITH_ID_NOT_FOUND));
         User foundUser = userRepository.findById(creationRequestDto.getUserId()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.USER_NOT_FOUND));
+
+        if (!userService.isUserActivated(foundUser)) throw new ValidationException(ExceptionMessageText.USER_NOT_ACTIVATED);
 
         Transaction transaction = createAndSaveTransaction(foundUser);
 
@@ -175,7 +179,7 @@ public class TransactionServiceImpl implements TransactionService {
         operation.setAccount(account);
         operation.setTransaction(transaction);
 
-        operation.setOperationType(operationCreateDto.getOperationType());
+        operation.setOperationType(OperationType.valueOf(operationCreateDto.getOperationType()));
 
         operation.setAmount(operationCreateDto.getAmount());
         operations.add(operationRepository.save(operation));

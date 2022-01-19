@@ -13,6 +13,7 @@ public class ExceptionMessageText {
     public static final String LOGGED_USER_NOT_FOUND = "Logged user not found!";
     public static final String USER_EMAIL_NOT_FOUND = "User email is not found!";
     public static final String USER_NOT_FOUND = "User not found!";
+    public static final String USER_NOT_ACTIVATED = "This user not activated!";
     public static final String USER_IS_ALREADY_EXISTS = "This user is already exists!";
     public static final String USER_IS_ALREADY_ACTIVATED = "This user is already activated!";
 
