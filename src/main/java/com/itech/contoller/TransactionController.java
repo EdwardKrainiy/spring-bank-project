@@ -25,7 +25,7 @@ import java.util.List;
  */
 @RestController
 @Log4j2
-@RequestMapping("api/transactions")
+@RequestMapping("/api/transactions")
 @RequiredArgsConstructor
 public class TransactionController {
 
