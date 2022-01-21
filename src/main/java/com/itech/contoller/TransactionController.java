@@ -58,8 +58,7 @@ public class TransactionController {
     @ApiOperation(value = "Obtain all transactions.", notes = "Returns all transactions, stored in DB", produces = "application/json", response = Iterable.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully retrieved list of transactions."),
-            @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
-            @ApiResponse(code = 404, message = "Transactions not found.")
+            @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden")
     })
     @GetMapping
     public ResponseEntity<List<TransactionDto>> getAllTransactions() {

@@ -75,8 +75,7 @@ public class CreationRequestController {
     @ApiOperation(value = "Obtain all account creation requests.", notes = "Returns all account creation requests.", produces = "application/json", response = Iterable.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully retrieved list of account creation requests."),
-            @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
-            @ApiResponse(code = 404, message = "Account creation requests not found.")
+            @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden")
     })
     @GetMapping("/accounts/creation-requests")
     public ResponseEntity<List<CreationRequestDto>> getAccountCreationRequests() {
@@ -91,8 +90,7 @@ public class CreationRequestController {
     @ApiOperation(value = "Obtain all transaction creation requests.", notes = "Returns all transaction creation requests.", produces = "application/json", response = Iterable.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully retrieved list of transaction creation requests."),
-            @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
-            @ApiResponse(code = 404, message = "Transaction creation requests not found.")
+            @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden")
     })
     @GetMapping("/transactions/creation-requests")
     public ResponseEntity<List<CreationRequestDto>> getTransactionCreationRequests() {

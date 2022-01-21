@@ -82,10 +82,6 @@ public class AccountServiceImpl implements AccountService {
             accounts = accountRepository.findAll();
         }
 
-        if (accounts.isEmpty()) {
-            throw new EntityNotFoundException(ExceptionMessageText.ACCOUNT_NOT_FOUND);
-        }
-
         return accounts.stream().map(accountDtoMapper::toDto).collect(Collectors.toList());
     }
 
@@ -179,10 +175,6 @@ public class AccountServiceImpl implements AccountService {
             creationRequests = creationRequestRepository.findCreationRequestsByCreationTypeAndUser(CreationType.ACCOUNT, authenticatedUser);
         } else {
             creationRequests = creationRequestRepository.findCreationRequestsByCreationType(CreationType.ACCOUNT);
-        }
-
-        if (creationRequests.isEmpty()) {
-            throw new EntityNotFoundException(ExceptionMessageText.ACCOUNT_CREATION_REQUESTS_NOT_FOUND);
         }
 
         return creationRequests.stream().map(requestDtoMapper::toDto).collect(Collectors.toList());

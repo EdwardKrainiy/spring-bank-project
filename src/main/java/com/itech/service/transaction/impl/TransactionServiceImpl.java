@@ -9,7 +9,6 @@ import com.itech.model.enumeration.*;
 import com.itech.repository.*;
 import com.itech.service.transaction.TransactionService;
 import com.itech.service.transaction.TransactionServiceUtil;
-import com.itech.service.user.UserService;
 import com.itech.utils.JsonEntitySerializer;
 import com.itech.utils.JwtDecoder;
 import com.itech.utils.exception.ChangeAccountAmountException;
@@ -83,9 +82,6 @@ public class TransactionServiceImpl implements TransactionService {
         } else {
             transactions = transactionRepository.findAll();
         }
-
-        if (transactions.isEmpty())
-            throw new EntityNotFoundException(ExceptionMessageText.TRANSACTION_CREATION_REQUESTS_NOT_FOUND);
 
         return transactions.stream().map(transactionDtoMapper::toDto).collect(Collectors.toList());
 
@@ -223,9 +219,6 @@ public class TransactionServiceImpl implements TransactionService {
         } else {
             creationRequests = creationRequestRepository.findCreationRequestsByCreationType(CreationType.TRANSACTION);
         }
-
-        if (creationRequests.isEmpty())
-            throw new EntityNotFoundException(ExceptionMessageText.TRANSACTION_CREATION_REQUESTS_NOT_FOUND);
 
         return creationRequests.stream().map(requestDtoMapper::toDto).collect(Collectors.toList());
     }

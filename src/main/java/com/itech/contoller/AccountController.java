@@ -44,8 +44,7 @@ public class AccountController {
     @ApiOperation(value = "Obtain all accounts.", notes = "Returns all accounts, stored in DB", produces = "application/json", response = Iterable.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully retrieved list of accounts."),
-            @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
-            @ApiResponse(code = 404, message = "Accounts not found.")
+            @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden")
     })
     @GetMapping
     public ResponseEntity<List<AccountDto>> getAllAccounts() {
