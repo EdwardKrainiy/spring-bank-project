@@ -14,16 +14,13 @@ import com.itech.utils.JsonEntitySerializer;
 import com.itech.utils.JwtDecoder;
 import com.itech.utils.exception.ChangeAccountAmountException;
 import com.itech.utils.exception.EntityNotFoundException;
-import com.itech.utils.exception.ValidationException;
 import com.itech.utils.exception.message.ExceptionMessageText;
 import com.itech.utils.mapper.request.RequestDtoMapper;
 import com.itech.utils.mapper.transaction.TransactionDtoMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -51,8 +48,6 @@ public class TransactionServiceImpl implements TransactionService {
     private final OperationRepository operationRepository;
 
     private final TransactionServiceUtil transactionServiceUtil;
-
-    private final UserService userService;
 
     private final JsonEntitySerializer serializer;
 
@@ -89,7 +84,8 @@ public class TransactionServiceImpl implements TransactionService {
             transactions = transactionRepository.findAll();
         }
 
-        if (transactions.isEmpty()) throw new EntityNotFoundException(ExceptionMessageText.TRANSACTION_CREATION_REQUESTS_NOT_FOUND);
+        if (transactions.isEmpty())
+            throw new EntityNotFoundException(ExceptionMessageText.TRANSACTION_CREATION_REQUESTS_NOT_FOUND);
 
         return transactions.stream().map(transactionDtoMapper::toDto).collect(Collectors.toList());
 
@@ -101,8 +97,6 @@ public class TransactionServiceImpl implements TransactionService {
         TransactionCreateDto transactionCreateDto = serializer.serializeJsonToObject(creationRequestDto.getPayload(), TransactionCreateDto.class);
         CreationRequest requestToReject = creationRequestRepository.findCreationRequestById(creationRequestDto.getId()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.TRANSACTION_CREATION_REQUEST_WITH_ID_NOT_FOUND));
         User foundUser = userRepository.findById(creationRequestDto.getUserId()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.USER_NOT_FOUND));
-
-        if (!userService.isUserActivated(foundUser)) throw new ValidationException(ExceptionMessageText.USER_NOT_ACTIVATED);
 
         Transaction transaction = createAndSaveTransaction(foundUser);
 
@@ -230,7 +224,8 @@ public class TransactionServiceImpl implements TransactionService {
             creationRequests = creationRequestRepository.findCreationRequestsByCreationType(CreationType.TRANSACTION);
         }
 
-        if (creationRequests.isEmpty()) throw new EntityNotFoundException(ExceptionMessageText.TRANSACTION_CREATION_REQUESTS_NOT_FOUND);
+        if (creationRequests.isEmpty())
+            throw new EntityNotFoundException(ExceptionMessageText.TRANSACTION_CREATION_REQUESTS_NOT_FOUND);
 
         return creationRequests.stream().map(requestDtoMapper::toDto).collect(Collectors.toList());
     }

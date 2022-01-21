@@ -3,7 +3,7 @@ package com.itech.service.user.impl;
 import com.itech.repository.UserRepository;
 import com.itech.utils.exception.EntityNotFoundException;
 import com.itech.utils.exception.message.ExceptionMessageText;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,13 +16,10 @@ import org.springframework.stereotype.Service;
  */
 
 @Service
+@RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
-
-    public CustomUserDetailsService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     /**
      * loadUserByUsername method. Returns us userDetails of the user, found by username.

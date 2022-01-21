@@ -3,8 +3,8 @@ package com.itech.security.jwt.filter;
 import com.itech.security.jwt.provider.TokenProvider;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
+import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,22 +27,17 @@ import java.io.IOException;
  */
 
 @PropertySource("classpath:properties/jwt.properties")
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    private final UserDetailsService customUserDetailsService;
+    private final TokenProvider jwtTokenUtil;
     @Value("${jwt.header.string}")
     private String headerString;
-
     @Value("${jwt.token.prefix}")
     private String tokenPrefix;
-
     @Value("${jwt.signing.key}")
     private String signKey;
-
-    @Autowired
-    private UserDetailsService customUserDetailsService;
-
-    @Autowired
-    private TokenProvider jwtTokenUtil;
 
     /**
      * JwtFilter method.

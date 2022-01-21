@@ -2,11 +2,11 @@ package com.itech.config;
 
 import com.itech.model.enumeration.Role;
 import com.itech.security.jwt.filter.JwtAuthenticationFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -26,18 +26,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@PropertySources({
-        @PropertySource("classpath:properties/security.properties"),
-        @PropertySource("classpath:properties/jwt.properties")
-})
+@PropertySource({"classpath:properties/security.properties", "classpath:properties/jwt.properties"})
+@RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsService customUserDetailsService;
     @Value("${encrypt.rounds}")
     private int encryptRounds;
-
-    public SecurityConfig(UserDetailsService customUserDetailsService) {
-        this.customUserDetailsService = customUserDetailsService;
-    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {

@@ -111,17 +111,16 @@ public class UserServiceImpl implements UserService {
         log.info("Mail about confirmation was sent.");
     }
 
-    public boolean isUserActivated(User user){
+    public boolean isUserActivated(User user) {
         return user.getConfirmationToken() == null && user.isActivated();
     }
 
     @Override
     public ResponseEntity<String> authenticateUser(UserSignInDto userSignInDto) {
         User userToSignIn = userRepository.findUserByUsername(userSignInDto.getUsername()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.USER_NOT_FOUND));
-        if(isUserActivated(userToSignIn)){
+        if (isUserActivated(userToSignIn)) {
             return jwtAuthenticationByUserDetails.authenticate(userSignInDto);
-        }
-        else throw new ValidationException(ExceptionMessageText.USER_NOT_ACTIVATED);
+        } else throw new ValidationException(ExceptionMessageText.USER_NOT_ACTIVATED);
     }
 }
 

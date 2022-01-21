@@ -8,6 +8,7 @@ import com.itech.repository.TransactionRepository;
 import com.itech.utils.exception.ChangeAccountAmountException;
 import com.itech.utils.exception.ValidationException;
 import com.itech.utils.exception.message.ExceptionMessageText;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,12 +22,9 @@ import java.util.Set;
  * @author Edvard Krainiy on 12/27/2021
  */
 @Component
+@RequiredArgsConstructor
 public class TransactionServiceUtil {
     private final TransactionRepository transactionRepository;
-
-    public TransactionServiceUtil(TransactionRepository transactionRepository) {
-        this.transactionRepository = transactionRepository;
-    }
 
     /**
      * changeAccountAmount method. Changes amount on all accounts.

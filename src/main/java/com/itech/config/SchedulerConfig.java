@@ -1,6 +1,7 @@
 package com.itech.config;
 
 import com.itech.service.account.AccountService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -13,13 +14,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 @Configuration
 @EnableScheduling
 @PropertySource("classpath:properties/scheduler.properties")
+@RequiredArgsConstructor
 public class SchedulerConfig {
 
     private final AccountService accountService;
-
-    public SchedulerConfig(AccountService accountService) {
-        this.accountService = accountService;
-    }
 
     /**
      * checkExpiredCreationRequests method. Scheduler, which marks all AccountCreationRequests, which was created more than 4 hours ago as EXPIRED, and checks that every 5 minutes.

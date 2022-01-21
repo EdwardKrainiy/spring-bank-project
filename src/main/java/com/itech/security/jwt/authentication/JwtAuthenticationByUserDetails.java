@@ -2,6 +2,7 @@ package com.itech.security.jwt.authentication;
 
 import com.itech.model.dto.user.UserSignInDto;
 import com.itech.security.jwt.provider.TokenProvider;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,16 +17,12 @@ import org.springframework.stereotype.Component;
  */
 
 @Component
+@RequiredArgsConstructor
 public class JwtAuthenticationByUserDetails {
 
     private final AuthenticationManager authenticationManager;
 
     private final TokenProvider jwtTokenUtil;
-
-    public JwtAuthenticationByUserDetails(AuthenticationManager authenticationManager, TokenProvider jwtTokenUtil) {
-        this.authenticationManager = authenticationManager;
-        this.jwtTokenUtil = jwtTokenUtil;
-    }
 
     /**
      * Authenticate method.

@@ -10,7 +10,6 @@ public class ExceptionMessageText {
 
     public static final String AUTHENTICATED_USER_NOT_FOUND = "Authenticated user not found!";
     public static final String ID_OF_LOGGED_USER_NOT_EQUALS_ID_OF_ACCOUNT = "Id of this account is not equals id of logged user!";
-    public static final String LOGGED_USER_NOT_FOUND = "Logged user not found!";
     public static final String USER_EMAIL_NOT_FOUND = "User email is not found!";
     public static final String USER_NOT_FOUND = "User not found!";
     public static final String USER_NOT_ACTIVATED = "This user not activated!";

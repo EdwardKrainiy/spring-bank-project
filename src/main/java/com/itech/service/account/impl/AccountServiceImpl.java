@@ -16,8 +16,6 @@ import com.itech.repository.CreationRequestRepository;
 import com.itech.repository.UserRepository;
 import com.itech.service.account.AccountService;
 import com.itech.service.mail.EmailService;
-import com.itech.service.user.UserService;
-import com.itech.service.user.impl.UserServiceImpl;
 import com.itech.utils.IbanGenerator;
 import com.itech.utils.JsonEntitySerializer;
 import com.itech.utils.JwtDecoder;
@@ -50,7 +48,6 @@ import java.util.stream.Collectors;
 public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
-    private final UserService userService;
     private final AccountDtoMapper accountDtoMapper;
     private final IbanGenerator ibanGenerator;
     private final JsonEntitySerializer serializer;
@@ -76,7 +73,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public List<AccountDto> findAllAccounts() {
 
-        User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.LOGGED_USER_NOT_FOUND));
+        User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.AUTHENTICATED_USER_NOT_FOUND));
         List<Account> accounts;
 
         if (authenticatedUser.getRole().equals(Role.USER)) {
@@ -111,8 +108,6 @@ public class AccountServiceImpl implements AccountService {
     public Long createAccount(AccountCreateDto accountChangeDto) {
         User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.AUTHENTICATED_USER_NOT_FOUND));
 
-        if (!userService.isUserActivated(authenticatedUser)) throw new ValidationException(ExceptionMessageText.USER_NOT_ACTIVATED);
-
         CreationRequest accountCreatingRequest = new CreationRequest();
         log.debug("CreationRequest empty object created.");
 
@@ -139,8 +134,6 @@ public class AccountServiceImpl implements AccountService {
     public AccountDto updateAccount(AccountUpdateDto accountUpdateDto, Long accountId) {
         User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.AUTHENTICATED_USER_NOT_FOUND));
 
-        if (!userService.isUserActivated(authenticatedUser)) throw new ValidationException(ExceptionMessageText.USER_NOT_ACTIVATED);
-
         Account accountToUpdate = accountRepository.findAccountById(accountId).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.ACCOUNT_NOT_FOUND));
 
         accountToUpdate.setAmount(accountUpdateDto.getAmount());
@@ -155,8 +148,6 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void deleteAccountByAccountId(Long accountId) {
         User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.AUTHENTICATED_USER_NOT_FOUND));
-
-        if (!userService.isUserActivated(authenticatedUser)) throw new ValidationException(ExceptionMessageText.USER_NOT_ACTIVATED);
 
         Account foundAccountToDelete = accountRepository.findAccountById(accountId).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.ACCOUNT_NOT_FOUND));
 

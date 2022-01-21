@@ -1,8 +1,11 @@
 package com.itech.rabbit;
 
+import com.itech.config.RabbitConfig;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Component;
 
 /**
@@ -12,14 +15,12 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Log4j2
+@RequiredArgsConstructor
+@Import(RabbitConfig.class)
 public class RabbitMqListener {
     private final RabbitMqProcessor processor;
     @Value("${spring.rabbit.mq.queuename}")
     private String queueName;
-
-    public RabbitMqListener(RabbitMqProcessor processor) {
-        this.processor = processor;
-    }
 
     /**
      * processRabbitQueue method. Creates RabbitMQ listener for queue, which will process messages from queue.
@@ -27,7 +28,7 @@ public class RabbitMqListener {
      * @param message Message from queue.
      */
 
-    @RabbitListener(queues = "${spring.rabbit.mq.queuename}")
+    @RabbitListener(queues = "#{createBankAppQueue.name}")
     public void processRabbitQueue(String message) {
         if (log.isDebugEnabled()) {
             log.debug(String.format("Message received from %s: %s", queueName, message));
