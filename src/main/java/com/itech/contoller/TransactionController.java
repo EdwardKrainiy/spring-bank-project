@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,16 +26,12 @@ import java.util.List;
 @RestController
 @Log4j2
 @RequestMapping("api/transactions")
+@RequiredArgsConstructor
 public class TransactionController {
 
     private final TransactionService transactionService;
 
     private final RequestService requestService;
-
-    public TransactionController(TransactionService transactionService, RequestService requestService) {
-        this.transactionService = transactionService;
-        this.requestService = requestService;
-    }
 
     /**
      * getTransactionById endpoint.

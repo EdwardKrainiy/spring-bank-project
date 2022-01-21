@@ -1,9 +1,11 @@
 package com.itech.service.user.impl;
 
+import com.itech.model.dto.user.UserSignInDto;
 import com.itech.model.dto.user.UserSignUpDto;
 import com.itech.model.entity.User;
 import com.itech.model.enumeration.Role;
 import com.itech.repository.UserRepository;
+import com.itech.security.jwt.authentication.JwtAuthenticationByUserDetails;
 import com.itech.security.jwt.provider.TokenProvider;
 import com.itech.service.mail.EmailService;
 import com.itech.service.user.UserService;
@@ -17,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +41,7 @@ public class UserServiceImpl implements UserService {
     private final TokenProvider tokenProvider;
     private final JwtDecoder jwtDecoder;
     private final UserSignUpDtoMapper userSignUpDtoMapper;
+    private final JwtAuthenticationByUserDetails jwtAuthenticationByUserDetails;
     @Value("${mail.confirmation.message}")
     private String confirmMessage;
     @Value("${mail.user.confirmation.title}")
@@ -109,6 +113,15 @@ public class UserServiceImpl implements UserService {
 
     public boolean isUserActivated(User user){
         return user.getConfirmationToken() == null && user.isActivated();
+    }
+
+    @Override
+    public ResponseEntity<String> authenticateUser(UserSignInDto userSignInDto) {
+        User userToSignIn = userRepository.findUserByUsername(userSignInDto.getUsername()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.USER_NOT_FOUND));
+        if(isUserActivated(userToSignIn)){
+            return jwtAuthenticationByUserDetails.authenticate(userSignInDto);
+        }
+        else throw new ValidationException(ExceptionMessageText.USER_NOT_ACTIVATED);
     }
 }
 

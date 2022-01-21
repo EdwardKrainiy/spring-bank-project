@@ -1,4 +1,4 @@
-package com.itech.utils.exception.handler;
+package com.itech.model.dto.exception;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -16,13 +16,13 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ApiError {
+public class ApiErrorDto {
     @JsonProperty("Code")
     private int code;
     @JsonProperty("Errors")
     private List<String> errors;
 
-    public ApiError(int code, String error) {
+    public ApiErrorDto(int code, String error) {
         this.code = code;
         this.errors = Collections.singletonList(error);
     }

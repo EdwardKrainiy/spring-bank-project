@@ -1,9 +1,11 @@
 package com.itech.service.user;
 
+import com.itech.model.dto.user.UserSignInDto;
 import com.itech.model.dto.user.UserSignUpDto;
 import com.itech.model.entity.User;
 import com.itech.utils.exception.EntityExistsException;
 import com.itech.utils.exception.EntityNotFoundException;
+import org.springframework.http.ResponseEntity;
 
 /**
  * UserService interface. Provides us different methods to work with User objects on Service layer.
@@ -47,7 +49,6 @@ public interface UserService {
      * activateUser method. Activates user, found by token.
      *
      * @param token Transferred token of the user we need to activate.
-     * @return ResponseEntity Response, which contains message and HTTP code.
      */
 
     void activateUser(String token);
@@ -60,4 +61,11 @@ public interface UserService {
      */
 
     boolean isUserActivated(User user);
+
+    /**
+     * authenticateUser method. Checks potential user and authenticate him. If this user is not activated or not exists, Exception will be thrown.
+     * @param userSignInDto UserSignInDto object, which contains all necessary information to signing in.
+     * @return
+     */
+    ResponseEntity<String> authenticateUser(UserSignInDto userSignInDto);
 }

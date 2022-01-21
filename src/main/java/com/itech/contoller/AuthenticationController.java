@@ -2,13 +2,13 @@ package com.itech.contoller;
 
 import com.itech.model.dto.user.UserSignInDto;
 import com.itech.model.dto.user.UserSignUpDto;
-import com.itech.security.jwt.authentication.JwtAuthenticationByUserDetails;
 import com.itech.service.user.UserService;
 import com.itech.utils.JsonEntitySerializer;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,19 +26,12 @@ import javax.validation.Valid;
 @RestController
 @Log4j2
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthenticationController {
 
     private final UserService userService;
 
-    private final JwtAuthenticationByUserDetails jwtAuthenticationByUserDetails;
-
     private final JsonEntitySerializer jsonEntitySerializer;
-
-    public AuthenticationController(UserService userService, JwtAuthenticationByUserDetails jwtAuthenticationByUserDetails, JsonEntitySerializer jsonEntitySerializer) {
-        this.userService = userService;
-        this.jwtAuthenticationByUserDetails = jwtAuthenticationByUserDetails;
-        this.jsonEntitySerializer = jsonEntitySerializer;
-    }
 
     /**
      * Sign-in endpoint.
@@ -59,8 +52,7 @@ public class AuthenticationController {
         if (log.isDebugEnabled()) {
             log.debug("RequestBody: {}", jsonEntitySerializer.serializeObjectToJson(userSignInDto));
         }
-
-        return jwtAuthenticationByUserDetails.authenticate(userSignInDto);
+        return userService.authenticateUser(userSignInDto);
     }
 
     /**
@@ -71,7 +63,7 @@ public class AuthenticationController {
      */
     @ApiOperation(value = "Sign up.", notes = "Checks entered credentials and signs up new user.")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successful sign up."),
+            @ApiResponse(code = 201, message = "Successful sign up."),
             @ApiResponse(code = 400, message = "Bad request because of invalid values or existing of user with this username or email.")
     })
     @PostMapping("/sign-up")

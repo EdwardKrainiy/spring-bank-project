@@ -3,13 +3,13 @@ package com.itech.contoller;
 import com.itech.model.dto.account.AccountCreateDto;
 import com.itech.model.dto.account.AccountDto;
 import com.itech.model.dto.account.AccountUpdateDto;
-import com.itech.model.entity.User;
 import com.itech.service.account.AccountService;
 import com.itech.utils.JsonEntitySerializer;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,16 +28,12 @@ import java.util.List;
 @RestController
 @Log4j2
 @RequestMapping("/api/accounts")
+@RequiredArgsConstructor
 public class AccountController {
 
     private final AccountService accountService;
 
     private final JsonEntitySerializer jsonEntitySerializer;
-
-    public AccountController(AccountService accountService, JsonEntitySerializer jsonEntitySerializer) {
-        this.accountService = accountService;
-        this.jsonEntitySerializer = jsonEntitySerializer;
-    }
 
     /**
      * getAllAccounts endpoint.
