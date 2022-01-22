@@ -13,7 +13,7 @@ import com.itech.utils.JsonEntitySerializer;
 import com.itech.utils.JwtDecoder;
 import com.itech.utils.exception.ChangeAccountAmountException;
 import com.itech.utils.exception.EntityNotFoundException;
-import com.itech.utils.exception.message.ExceptionMessageText;
+import com.itech.utils.literal.ExceptionMessageText;
 import com.itech.utils.mapper.request.RequestDtoMapper;
 import com.itech.utils.mapper.transaction.TransactionDtoMapper;
 import lombok.RequiredArgsConstructor;

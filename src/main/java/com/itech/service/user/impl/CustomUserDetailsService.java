@@ -2,7 +2,7 @@ package com.itech.service.user.impl;
 
 import com.itech.repository.UserRepository;
 import com.itech.utils.exception.EntityNotFoundException;
-import com.itech.utils.exception.message.ExceptionMessageText;
+import com.itech.utils.literal.ExceptionMessageText;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

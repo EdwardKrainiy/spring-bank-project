@@ -6,6 +6,7 @@ import com.itech.validator.annotation.EnumValue;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -25,6 +26,6 @@ public class EnumValueValidator implements ConstraintValidator<EnumValue, CharSe
             return false;
 
         }
-        return enumValues.contains(value.toString());
+        return enumValues.contains(value.toString().toUpperCase(Locale.ROOT));
     }
 }

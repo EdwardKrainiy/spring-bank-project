@@ -6,6 +6,7 @@ import com.itech.utils.exception.EntityExistsException;
 import com.itech.utils.exception.EntityNotFoundException;
 import com.itech.utils.exception.IncorrectPasswordException;
 import com.itech.utils.exception.ValidationException;
+import com.itech.utils.literal.ExceptionMessageText;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
 import lombok.extern.log4j.Log4j2;
@@ -34,13 +35,13 @@ import java.util.List;
 public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        log.error("MethodArgumentNotValidException was caught!");
-
         List<String> errors = new ArrayList<>();
         ex.getBindingResult().getAllErrors().forEach(error -> {
             String errorMessage = error.getDefaultMessage();
             errors.add(errorMessage);
         });
+
+        log.warn(String.format(ExceptionMessageText.METHOD_ARGUMENT_NOT_VALID_EXCEPTION_LOG_TEXT, ex.getObjectName(), errors));
 
         ApiErrorDto error = new ApiErrorDto(HttpStatus.BAD_REQUEST.value(), errors);
 

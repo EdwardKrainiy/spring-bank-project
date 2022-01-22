@@ -17,7 +17,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Constraint(validatedBy = OperationCorrectionValidator.class)
 public @interface IsOperationCorrect {
-    String message() default "Operations CREDIT and DEBIT cannot be applied on the same account.";
+    String message();
 
     Class<?>[] groups() default {};
 

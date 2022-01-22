@@ -2,6 +2,7 @@ package com.itech.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 
@@ -10,12 +11,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Log4j2
+@RequiredArgsConstructor
 public class JsonEntitySerializer {
     private final ObjectMapper objectMapper;
-
-    public JsonEntitySerializer(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
 
     public <T> String serializeObjectToJson(T object) {
         try {

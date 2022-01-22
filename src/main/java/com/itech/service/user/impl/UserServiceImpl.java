@@ -13,7 +13,7 @@ import com.itech.utils.JwtDecoder;
 import com.itech.utils.exception.EntityNotFoundException;
 import com.itech.utils.exception.IncorrectPasswordException;
 import com.itech.utils.exception.ValidationException;
-import com.itech.utils.exception.message.ExceptionMessageText;
+import com.itech.utils.literal.ExceptionMessageText;
 import com.itech.utils.mapper.user.UserSignUpDtoMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;

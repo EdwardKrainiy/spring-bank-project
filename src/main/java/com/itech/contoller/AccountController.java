@@ -5,6 +5,7 @@ import com.itech.model.dto.account.AccountDto;
 import com.itech.model.dto.account.AccountUpdateDto;
 import com.itech.service.account.AccountService;
 import com.itech.utils.JsonEntitySerializer;
+import com.itech.utils.literal.ExceptionMessageText;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -74,7 +75,7 @@ public class AccountController {
     /**
      * createAccount endpoint.
      *
-     * @param accountChangeDto Data-transfer object of account that will be transformed to Account and put into DB.
+     * @param accountCreateDto Data-transfer object of account that will be transformed to Account and put into DB.
      * @return ResponseEntity<Long> 201 HTTP code and id of created account.
      */
     @ApiOperation(value = "Create account.", notes = "Creates new account and saves that one into DB.", response = Long.class)
@@ -86,8 +87,12 @@ public class AccountController {
     @Transactional
     @PostMapping
     @ResponseStatus(value = HttpStatus.CREATED)
-    public ResponseEntity<Long> createAccount(@RequestBody @Valid @ApiParam(name = "accountChangeDto", value = "Dto of account we want to create and save.") AccountCreateDto accountChangeDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createAccount(accountChangeDto));
+    public ResponseEntity<Long> createAccount(@RequestBody @Valid @ApiParam(name = "accountChangeDto", value = "Dto of account we want to create and save.") AccountCreateDto accountCreateDto) {
+        if (log.isDebugEnabled()) {
+            log.debug(String.format(ExceptionMessageText.DEBUG_REQUEST_BODY_LOG_TEXT, jsonEntitySerializer.serializeObjectToJson(accountCreateDto)));
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createAccount(accountCreateDto));
     }
 
     /**
@@ -111,7 +116,7 @@ public class AccountController {
                                                     @PathVariable("id") @ApiParam(name = "id", value = "Id of account we want to update.") Long accountId) {
 
         if (log.isDebugEnabled()) {
-            log.debug("RequestBody: {}", jsonEntitySerializer.serializeObjectToJson(accountUpdateDto));
+            log.debug(String.format(ExceptionMessageText.DEBUG_REQUEST_BODY_LOG_TEXT, jsonEntitySerializer.serializeObjectToJson(accountUpdateDto)));
         }
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(accountService.updateAccount(accountUpdateDto, accountId));

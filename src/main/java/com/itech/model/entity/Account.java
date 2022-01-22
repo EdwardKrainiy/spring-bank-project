@@ -35,7 +35,6 @@ public class Account {
     @Column(name = "amount")
     private double amount;
 
-    @NotNull(message = "Missing currency!")
     @Column(name = "currency")
     @Enumerated(EnumType.STRING)
     private Currency currency;

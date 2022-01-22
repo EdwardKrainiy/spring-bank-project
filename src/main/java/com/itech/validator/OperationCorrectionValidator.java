@@ -23,10 +23,10 @@ public class OperationCorrectionValidator implements ConstraintValidator<IsOpera
                 isNumbersEquals = true;
             }
             for (OperationCreateDto operationCreateDto : dtoOperations) {
-                if (operationCreateDto.getOperationType().equals(OperationType.CREDIT)) {
+                if (operationCreateDto.getOperationType().equals(OperationType.CREDIT.name())) {
                     isCreditExists = true;
                 }
-                if (operationCreateDto.getOperationType().equals(OperationType.DEBIT)) {
+                if (operationCreateDto.getOperationType().equals(OperationType.DEBIT.name())) {
                     isDebitExists = true;
                 }
             }

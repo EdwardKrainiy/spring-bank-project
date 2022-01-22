@@ -1,6 +1,8 @@
 package com.itech.model.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.itech.utils.literal.RegexPattern;
+import com.itech.utils.literal.ValidationMessageText;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,17 +23,15 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 @Schema(description = "User data-transfer object to sign in application.")
 public class UserSignInDto {
-    private static final String VALID_USERNAME_ADDRESS_REGEX = "^[a-zA-Z0-9._-]{3,}$";
-
     @JsonProperty("Username")
-    @Pattern(regexp = VALID_USERNAME_ADDRESS_REGEX, message = "Username is not valid!")
-    @NotBlank(message = "Username is empty!")
+    @Pattern(regexp = RegexPattern.VALID_USERNAME_ADDRESS_REGEX, message = ValidationMessageText.USERNAME_IS_NOT_VALID_EXCEPTION_MESSAGE)
+    @NotBlank(message = ValidationMessageText.USERNAME_IS_EMPTY_EXCEPTION_MESSAGE)
     @Schema(description = "Unique Username field of User.")
     private String username;
 
     @JsonProperty("Password")
-    @NotBlank(message = "Password is empty!")
-    @Size(min = 5, max = 20, message = "Incorrect password length! It must be from 5 to 20.")
+    @NotBlank(message = ValidationMessageText.PASSWORD_IS_EMPTY_MESSAGE_TEXT)
+    @Size(min = 5, max = 20, message = ValidationMessageText.INCORRECT_PASSWORD_LENGTH_MESSAGE_TEXT)
     @Schema(description = "Password field of User.")
     private String password;
 }

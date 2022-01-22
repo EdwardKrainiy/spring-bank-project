@@ -7,7 +7,7 @@ import com.itech.model.enumeration.Status;
 import com.itech.repository.TransactionRepository;
 import com.itech.utils.exception.ChangeAccountAmountException;
 import com.itech.utils.exception.ValidationException;
-import com.itech.utils.exception.message.ExceptionMessageText;
+import com.itech.utils.literal.ExceptionMessageText;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
