@@ -46,7 +46,8 @@ import static org.mockito.Mockito.*;
         TokenProvider.class,
         JwtDecoder.class,
         JavaMailSenderImpl.class,
-        UserSignUpDtoMapperImpl.class})
+        UserSignUpDtoMapperImpl.class,
+        UserRepository.class})
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(locations = "classpath:properties/jwt.properties")
 @TestPropertySource(locations = "classpath:properties/mail.properties")

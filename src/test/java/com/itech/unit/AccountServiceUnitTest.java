@@ -66,7 +66,8 @@ import static org.mockito.Mockito.*;
         CustomUserDetailsService.class,
         SecurityConfig.class,
         TokenProvider.class,
-        UserSignUpDtoMapperImpl.class})
+        UserSignUpDtoMapperImpl.class,
+        UserRepository.class})
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(locations = "classpath:properties/jwt.properties")
 @TestPropertySource(locations = "classpath:properties/mail.properties")
@@ -208,7 +209,7 @@ class AccountServiceUnitTest {
         Exception exception = assertThrows(EntityNotFoundException.class, () ->
                 accountService.findAccountCreationRequestById(1L));
 
-        String expectedMessage = ExceptionMessageText.ACCOUNT_CREATION_REQUEST_WITH_ID_NOT_FOUND;
+        String expectedMessage = ExceptionMessageText.ACCOUNT_CREATION_REQUEST_NOT_FOUND;
         String actualMessage = exception.getMessage();
 
         assertTrue(actualMessage.contains(expectedMessage));
@@ -237,7 +238,7 @@ class AccountServiceUnitTest {
         Exception exception = assertThrows(EntityNotFoundException.class, () ->
                 accountService.findAccountCreationRequestById(1L));
 
-        String expectedMessage = ExceptionMessageText.ACCOUNT_CREATION_REQUEST_WITH_ID_NOT_FOUND;
+        String expectedMessage = ExceptionMessageText.ACCOUNT_CREATION_REQUEST_NOT_FOUND;
         String actualMessage = exception.getMessage();
 
         assertTrue(actualMessage.contains(expectedMessage));
@@ -259,24 +260,6 @@ class AccountServiceUnitTest {
         for (CreationRequestDto request : accountService.findAccountCreationRequests()) {
             assertThat(request.getCreationType()).isEqualTo(CreationType.ACCOUNT.name());
         }
-    }
-
-    @WithMockUser(username = "user")
-    @Test
-    void emptyAccountCreationRequests_andAnyRole_whenGetAccountCreationRequests_thenThrowsEntityNotFoundException() {
-        User authorizedUser = new User("user", "user", "mail1@mail.ru", Role.MANAGER);
-        authorizedUser.setId(1L);
-
-        when(userRepository.findUserByUsername("user")).thenReturn(Optional.of(authorizedUser));
-        when(creationRequestRepository.findCreationRequestsByCreationType(CreationType.ACCOUNT)).thenReturn(Collections.emptyList());
-
-        Exception exception = assertThrows(EntityNotFoundException.class, () ->
-                accountService.findAccountCreationRequests());
-
-        String expectedMessage = ExceptionMessageText.ACCOUNT_CREATION_REQUESTS_NOT_FOUND;
-        String actualMessage = exception.getMessage();
-
-        assertTrue(actualMessage.contains(expectedMessage));
     }
 
     @WithMockUser(username = "user")
@@ -307,7 +290,7 @@ class AccountServiceUnitTest {
         Exception exception = assertThrows(EntityNotFoundException.class, () ->
                 accountService.approveAccountCreationRequest(1L));
 
-        String expectedMessage = ExceptionMessageText.ACCOUNT_CREATION_REQUEST_WITH_ID_NOT_FOUND;
+        String expectedMessage = ExceptionMessageText.ACCOUNT_CREATION_REQUEST_NOT_FOUND;
         String actualMessage = exception.getMessage();
 
         assertTrue(actualMessage.contains(expectedMessage));
@@ -392,7 +375,7 @@ class AccountServiceUnitTest {
         Exception exception = assertThrows(EntityNotFoundException.class, () ->
                 accountService.rejectAccountCreationRequest(1L));
 
-        String expectedMessage = ExceptionMessageText.ACCOUNT_CREATION_REQUEST_WITH_ID_NOT_FOUND;
+        String expectedMessage = ExceptionMessageText.ACCOUNT_CREATION_REQUEST_NOT_FOUND;
         String actualMessage = exception.getMessage();
 
         assertTrue(actualMessage.contains(expectedMessage));

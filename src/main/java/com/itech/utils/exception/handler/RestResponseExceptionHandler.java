@@ -51,8 +51,6 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
 
     @ExceptionHandler(value = {IllegalArgumentException.class})
     protected ResponseEntity<ApiErrorDto> handleException(IllegalArgumentException ex) {
-        log.error("IllegalArgumentException was caught!");
-
         ApiErrorDto exceptionError = new ApiErrorDto(HttpStatus.UNAUTHORIZED.value(), ex.getMessage());
 
         return new ResponseEntity<>(exceptionError, HttpStatus.UNAUTHORIZED);
@@ -60,8 +58,6 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
 
     @ExceptionHandler(value = {ExpiredJwtException.class})
     protected ResponseEntity<ApiErrorDto> handleExpiredJwtException(ExpiredJwtException ex) {
-        log.error("ExpiredJwtException was caught!");
-
         ApiErrorDto exceptionError = new ApiErrorDto(HttpStatus.UNAUTHORIZED.value(), ex.getMessage());
 
         return new ResponseEntity<>(exceptionError, HttpStatus.UNAUTHORIZED);
@@ -69,8 +65,6 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
 
     @ExceptionHandler(value = {SignatureException.class})
     protected ResponseEntity<ApiErrorDto> handleInvalidSignatureException(SignatureException ex) {
-        log.error("SignatureException was caught!");
-
         ApiErrorDto exceptionError = new ApiErrorDto(HttpStatus.UNAUTHORIZED.value(), ex.getMessage());
 
         return new ResponseEntity<>(exceptionError, HttpStatus.UNAUTHORIZED);
@@ -78,8 +72,6 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
 
     @ExceptionHandler(value = {EntityExistsException.class})
     protected ResponseEntity<ApiErrorDto> handleUserExistsException(EntityExistsException ex) {
-        log.error("EntityExistsException was caught!");
-
         ApiErrorDto exceptionError = new ApiErrorDto(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
 
         return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
@@ -87,8 +79,6 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
 
     @ExceptionHandler(value = {IncorrectPasswordException.class})
     protected ResponseEntity<ApiErrorDto> handleIncorrectPasswordException(IncorrectPasswordException ex) {
-        log.error("IncorrectPasswordException was caught!");
-
         ApiErrorDto exceptionError = new ApiErrorDto(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
 
         return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
@@ -96,8 +86,6 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
 
     @ExceptionHandler(value = {NullPointerException.class})
     protected ResponseEntity<ApiErrorDto> handleNullPointerException(NullPointerException ex) {
-        log.error("NullPointerException was caught!");
-
         ApiErrorDto exceptionError = new ApiErrorDto(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
 
         return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
@@ -105,8 +93,6 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
 
     @ExceptionHandler(value = {EntityNotFoundException.class})
     protected ResponseEntity<ApiErrorDto> handleEntityNotFoundException(EntityNotFoundException ex) {
-        log.error("EntityNotFoundException was caught!");
-
         ApiErrorDto exceptionError = new ApiErrorDto(HttpStatus.NOT_FOUND.value(), ex.getMessage());
 
         return new ResponseEntity<>(exceptionError, HttpStatus.NOT_FOUND);
@@ -114,8 +100,6 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
 
     @ExceptionHandler(value = {ValidationException.class})
     protected ResponseEntity<ApiErrorDto> handleValidationException(ValidationException ex) {
-        log.error("ValidationException was caught!");
-
         ApiErrorDto exceptionError = new ApiErrorDto(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
 
         return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
@@ -123,8 +107,6 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
 
     @ExceptionHandler(value = {IbanFormatException.class, InvalidCheckDigitException.class, UnsupportedCountryException.class})
     protected ResponseEntity<ApiErrorDto> handleIbanExceptions(RuntimeException ex) {
-        log.error("IbanException was caught!");
-
         ApiErrorDto exceptionError = new ApiErrorDto(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
 
         return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
@@ -132,8 +114,6 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
 
     @ExceptionHandler(value = {JsonProcessingException.class})
     protected ResponseEntity<ApiErrorDto> handleJsonProcessingException(JsonProcessingException ex) {
-        log.error("JsonProcessingException was caught!");
-
         ApiErrorDto exceptionError = new ApiErrorDto(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
 
         return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);

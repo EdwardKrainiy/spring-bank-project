@@ -13,7 +13,6 @@ import com.itech.model.enumeration.Role;
 import com.itech.model.enumeration.Status;
 import com.itech.repository.AccountRepository;
 import com.itech.repository.CreationRequestRepository;
-import com.itech.repository.UserRepository;
 import com.itech.service.account.AccountService;
 import com.itech.service.mail.EmailService;
 import com.itech.utils.IbanGenerator;
@@ -53,7 +52,6 @@ public class AccountServiceImpl implements AccountService {
     private final AccountDtoMapper accountDtoMapper;
     private final IbanGenerator ibanGenerator;
     private final JsonEntitySerializer serializer;
-    private final UserRepository userRepository;
     private final JwtDecoder jwtDecoder;
     private final CreationRequestRepository creationRequestRepository;
     private final JsonEntitySerializer jsonEntitySerializer;
@@ -75,7 +73,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public List<AccountDto> findAllAccounts() {
 
-        User authenticatedUser = getLoggedUser();
+        User authenticatedUser = jwtDecoder.getLoggedUser();
         List<Account> accounts;
 
         if (authenticatedUser.getRole().equals(Role.USER)) {
@@ -89,7 +87,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public AccountDto findAccountByAccountId(Long accountId) {
-        User authenticatedUser = getLoggedUser();
+        User authenticatedUser = jwtDecoder.getLoggedUser();
         Optional<Account> foundAccount;
 
         if (authenticatedUser.getRole().equals(Role.USER)) {
@@ -101,14 +99,14 @@ public class AccountServiceImpl implements AccountService {
         if (foundAccount.isPresent()) {
             return accountDtoMapper.toDto(foundAccount.get());
         } else {
-            log.error(String.format(LogMessageText.ACCOUNT_WITH_ID_NOT_FOUND_LOG, accountId));
+            log.error(String.format(LogMessageText.ACCOUNT_NOT_FOUND_LOG, accountId));
             throw new EntityNotFoundException(ExceptionMessageText.ACCOUNT_NOT_FOUND);
         }
     }
 
     @Override
     public Long createAccount(AccountCreateDto accountChangeDto) {
-        User authenticatedUser = getLoggedUser();
+        User authenticatedUser = jwtDecoder.getLoggedUser();
 
         CreationRequest accountCreatingRequest = new CreationRequest();
 
@@ -125,12 +123,12 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public AccountDto updateAccount(AccountUpdateDto accountUpdateDto, Long accountId) {
-        User authenticatedUser = getLoggedUser();
+        User authenticatedUser = jwtDecoder.getLoggedUser();
 
         Optional<Account> accountToUpdateOptional = accountRepository.findAccountById(accountId);
         Account accountToUpdate;
-        if(!accountToUpdateOptional.isPresent()){
-            log.error(String.format(LogMessageText.ACCOUNT_WITH_ID_NOT_FOUND_LOG, accountId));
+        if (!accountToUpdateOptional.isPresent()) {
+            log.error(String.format(LogMessageText.ACCOUNT_NOT_FOUND_LOG, accountId));
             throw new EntityNotFoundException(ExceptionMessageText.ACCOUNT_NOT_FOUND);
         } else {
             accountToUpdate = accountToUpdateOptional.get();
@@ -139,8 +137,8 @@ public class AccountServiceImpl implements AccountService {
             if (authenticatedUser.getRole().equals(Role.USER) && !authenticatedUser.getId().equals(accountToUpdate.getUser().getId())) {
                 log.error(String.format(LogMessageText.ID_OF_LOGGED_USER_NOT_EQUALS_ID_OF_ACCOUNT_LOG, authenticatedUser.getId(), accountToUpdate.getUser().getId()));
                 throw new ValidationException(ExceptionMessageText.ID_OF_LOGGED_USER_NOT_EQUALS_ID_OF_ACCOUNT);
-            }
-            else {
+            } else {
+                log.info(String.format(LogMessageText.ACCOUNT_UPDATED_LOG, accountId));
                 return accountDtoMapper.toDto(accountRepository.save(accountToUpdate));
             }
         }
@@ -148,11 +146,11 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void deleteAccountByAccountId(Long accountId) {
-        User authenticatedUser = getLoggedUser();
+        User authenticatedUser = jwtDecoder.getLoggedUser();
         Optional<Account> accountToDeleteOptional = accountRepository.findAccountById(accountId);
 
-        if(!accountToDeleteOptional.isPresent()){
-            log.error(String.format(LogMessageText.ACCOUNT_WITH_ID_NOT_FOUND_LOG, accountId));
+        if (!accountToDeleteOptional.isPresent()) {
+            log.error(String.format(LogMessageText.ACCOUNT_NOT_FOUND_LOG, accountId));
             throw new EntityNotFoundException(ExceptionMessageText.ACCOUNT_NOT_FOUND);
         } else {
             Account accountToDelete = accountToDeleteOptional.get();
@@ -160,6 +158,7 @@ public class AccountServiceImpl implements AccountService {
                 log.error(String.format(LogMessageText.ID_OF_LOGGED_USER_NOT_EQUALS_ID_OF_ACCOUNT_LOG, authenticatedUser.getId(), accountToDelete.getUser().getId()));
                 throw new ValidationException(ExceptionMessageText.ID_OF_LOGGED_USER_NOT_EQUALS_ID_OF_ACCOUNT);
             } else {
+                log.info(String.format(LogMessageText.ACCOUNT_DELETED_LOG, accountId));
                 accountRepository.deleteById(accountToDelete.getId());
             }
         }
@@ -167,18 +166,25 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public CreationRequestDto findAccountCreationRequestById(Long creationRequestId) {
-        User authenticatedUser = getLoggedUser();
+        User authenticatedUser = jwtDecoder.getLoggedUser();
+        Optional<CreationRequest> foundCreationRequestOptional;
 
         if (authenticatedUser.getRole().equals(Role.USER)) {
-            return requestDtoMapper.toDto(creationRequestRepository.findCreationRequestsByCreationTypeAndIdAndUser(CreationType.ACCOUNT, creationRequestId, authenticatedUser).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.ACCOUNT_CREATION_REQUEST_WITH_ID_NOT_FOUND)));
+            foundCreationRequestOptional = creationRequestRepository.findCreationRequestsByCreationTypeAndIdAndUser(CreationType.ACCOUNT, creationRequestId, authenticatedUser);
         } else {
-            return requestDtoMapper.toDto(creationRequestRepository.findCreationRequestsByCreationTypeAndId(CreationType.ACCOUNT, creationRequestId).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.ACCOUNT_CREATION_REQUEST_WITH_ID_NOT_FOUND)));
+            foundCreationRequestOptional = creationRequestRepository.findCreationRequestsByCreationTypeAndId(CreationType.ACCOUNT, creationRequestId);
+        }
+        if (!foundCreationRequestOptional.isPresent()) {
+            log.error(String.format(LogMessageText.ACCOUNT_CREATION_REQUEST_NOT_FOUND_LOG, creationRequestId));
+            throw new EntityNotFoundException(ExceptionMessageText.ACCOUNT_CREATION_REQUEST_NOT_FOUND);
+        } else {
+            return requestDtoMapper.toDto(foundCreationRequestOptional.get());
         }
     }
 
     @Override
     public List<CreationRequestDto> findAccountCreationRequests() {
-        User authenticatedUser = getLoggedUser();
+        User authenticatedUser = jwtDecoder.getLoggedUser();
 
         List<CreationRequest> creationRequests;
 
@@ -193,7 +199,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void approveAccountCreationRequest(Long accountCreationRequestId) {
-        CreationRequest accountCreationRequest = creationRequestRepository.findCreationRequestsByIdAndStatusAndCreationType(accountCreationRequestId, Status.IN_PROGRESS, CreationType.ACCOUNT).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.ACCOUNT_CREATION_REQUEST_WITH_ID_NOT_FOUND));
+        CreationRequest accountCreationRequest = findAccountCreationRequest(accountCreationRequestId);
 
         User accountCreationRequestUser = accountCreationRequest.getUser();
 
@@ -206,44 +212,45 @@ public class AccountServiceImpl implements AccountService {
 
         String accountNumber = ibanGenerator.generateIban(accountToCreate.getCurrency().getCountryCode());
 
-        if (!accountRepository.findAccountByAccountNumber(accountNumber).isPresent()) {
-            accountToCreate.setAccountNumber(accountNumber);
-        } else {
+        while (accountRepository.findAccountByAccountNumber(accountNumber).isPresent()) {
             accountNumber = ibanGenerator.generateIban(accountToCreate.getCurrency().getCountryCode());
-            accountToCreate.setAccountNumber(accountNumber);
         }
+        accountToCreate.setAccountNumber(accountNumber);
 
-        accountRepository.save(accountToCreate);
+        Long createdAccountId = accountRepository.save(accountToCreate).getId();
+        log.info(String.format(LogMessageText.ACCOUNT_CREATED_LOG, createdAccountId));
 
         accountCreationRequest.setStatus(Status.CREATED);
 
-        Long createdAccountId = accountRepository.findAccountByAccountNumber(accountToCreate.getAccountNumber()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.ACCOUNT_NOT_FOUND)).getId();
         accountCreationRequest.setCreatedId(createdAccountId);
         creationRequestRepository.save(accountCreationRequest);
+        log.info(String.format(LogMessageText.ACCOUNT_CREATION_REQUEST_UPDATED_LOG, accountCreationRequest.getId()));
 
         String userEmail = accountCreationRequestUser.getEmail();
         if (userEmail != null) {
             emailService.sendEmail(userEmail,
                     String.format("Request approved. Id of created account: %d", createdAccountId),
                     approveMessage);
+            log.info(String.format(LogMessageText.MESSAGE_SENT_LOG, userEmail));
         } else {
-            throw new EntityNotFoundException(ExceptionMessageText.USER_EMAIL_NOT_FOUND);
+            log.warn(String.format(LogMessageText.EMAIL_NOT_FOUND_LOG, accountCreationRequestUser.getId()));
         }
     }
 
     public void rejectAccountCreationRequest(Long accountCreationRequestId) {
-        CreationRequest accountCreationRequest = creationRequestRepository.findCreationRequestsByIdAndStatusAndCreationType(accountCreationRequestId, Status.IN_PROGRESS, CreationType.ACCOUNT).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.ACCOUNT_CREATION_REQUEST_WITH_ID_NOT_FOUND));
-
+        CreationRequest accountCreationRequest = findAccountCreationRequest(accountCreationRequestId);
         User accountCreationRequestUser = accountCreationRequest.getUser();
 
         accountCreationRequest.setStatus(Status.REJECTED);
         creationRequestRepository.save(accountCreationRequest);
+        log.info(String.format(LogMessageText.ACCOUNT_CREATION_REQUEST_UPDATED_LOG, accountCreationRequestId));
 
         String userEmail = accountCreationRequestUser.getEmail();
 
         if (userEmail != null) {
             emailService.sendEmail(userEmail, rejectedMessageTitleText,
                     rejectMessage);
+            log.info(String.format(LogMessageText.MESSAGE_SENT_LOG, userEmail));
         } else {
             log.warn(String.format(LogMessageText.EMAIL_NOT_FOUND_LOG, accountCreationRequestUser.getId()));
         }
@@ -263,14 +270,13 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
-    private User getLoggedUser() {
-        Optional<User> authenticatedUserOptional = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser());
-
-        if (authenticatedUserOptional.isPresent()) {
-            return authenticatedUserOptional.get();
+    private CreationRequest findAccountCreationRequest(Long accountCreationRequestId) {
+        Optional<CreationRequest> accountCreationRequestOptional = creationRequestRepository.findCreationRequestsByIdAndStatusAndCreationType(accountCreationRequestId, Status.IN_PROGRESS, CreationType.ACCOUNT);
+        if (!accountCreationRequestOptional.isPresent()) {
+            log.error(String.format(LogMessageText.ACCOUNT_CREATION_REQUEST_NOT_FOUND_LOG, accountCreationRequestId));
+            throw new EntityNotFoundException(ExceptionMessageText.ACCOUNT_CREATION_REQUEST_NOT_FOUND);
         } else {
-            log.error(LogMessageText.AUTHENTICATED_USER_NOT_FOUND_LOG);
-            throw new EntityNotFoundException(ExceptionMessageText.AUTHENTICATED_USER_NOT_FOUND);
+            return accountCreationRequestOptional.get();
         }
     }
 }

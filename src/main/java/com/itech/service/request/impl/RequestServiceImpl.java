@@ -12,9 +12,10 @@ import com.itech.repository.UserRepository;
 import com.itech.service.request.RequestService;
 import com.itech.utils.JsonEntitySerializer;
 import com.itech.utils.JwtDecoder;
-import com.itech.utils.exception.EntityNotFoundException;
+import com.itech.utils.literal.LogMessageText;
 import com.itech.utils.mapper.request.RequestDtoMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -26,13 +27,12 @@ import java.time.LocalDateTime;
  */
 @Service
 @RequiredArgsConstructor
+@Log4j2
 public class RequestServiceImpl implements RequestService {
 
     private final CreationRequestRepository creationRequestRepository;
 
     private final RabbitMqPublisher publisher;
-
-    private final UserRepository userRepository;
 
     private final JwtDecoder jwtDecoder;
 
@@ -41,10 +41,10 @@ public class RequestServiceImpl implements RequestService {
     private final RequestDtoMapper requestDtoMapper;
 
     private CreationRequest saveRequest(TransactionCreateDto transactionCreateDto) {
-        User foundUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException("User not found!"));
+        User loggedUser = jwtDecoder.getLoggedUser();
 
         CreationRequest creationRequest = new CreationRequest();
-        creationRequest.setUser(foundUser);
+        creationRequest.setUser(loggedUser);
         creationRequest.setCreationType(CreationType.TRANSACTION);
         creationRequest.setStatus(Status.IN_PROGRESS);
         creationRequest.setIssuedAt(LocalDateTime.now());
@@ -57,8 +57,7 @@ public class RequestServiceImpl implements RequestService {
     public CreationRequestDto processCreationRequestMessage(TransactionCreateDto transactionCreateDto) {
         CreationRequestDto creationRequestDto = requestDtoMapper.toDto(saveRequest(transactionCreateDto));
         publisher.sendMessageToQueue(serializer.serializeObjectToJson(creationRequestDto));
+        log.info(LogMessageText.MESSAGE_SENT_TO_QUEUE_LOG);
         return creationRequestDto;
     }
-
-
 }

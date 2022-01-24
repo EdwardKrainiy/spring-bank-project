@@ -14,6 +14,7 @@ import com.itech.utils.JwtDecoder;
 import com.itech.utils.exception.ChangeAccountAmountException;
 import com.itech.utils.exception.EntityNotFoundException;
 import com.itech.utils.literal.ExceptionMessageText;
+import com.itech.utils.literal.LogMessageText;
 import com.itech.utils.mapper.request.RequestDtoMapper;
 import com.itech.utils.mapper.transaction.TransactionDtoMapper;
 import lombok.RequiredArgsConstructor;
@@ -58,7 +59,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public TransactionDto findTransactionById(Long transactionId) {
-        User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.AUTHENTICATED_USER_NOT_FOUND));
+        User authenticatedUser = jwtDecoder.getLoggedUser();
 
         Optional<Transaction> foundTransaction;
 
@@ -68,12 +69,17 @@ public class TransactionServiceImpl implements TransactionService {
             foundTransaction = transactionRepository.findTransactionById(transactionId);
         }
 
-        return transactionDtoMapper.toDto(foundTransaction.orElseThrow(() -> new EntityNotFoundException("Transaction not found!")));
+        if (!foundTransaction.isPresent()) {
+            log.error(String.format(LogMessageText.TRANSACTION_NOT_FOUND_LOG, transactionId));
+            throw new EntityNotFoundException(ExceptionMessageText.TRANSACTION_CREATION_REQUEST_NOT_FOUND);
+        } else {
+            return transactionDtoMapper.toDto(foundTransaction.get());
+        }
     }
 
     @Override
     public List<TransactionDto> findAllTransactions() {
-        User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.AUTHENTICATED_USER_NOT_FOUND));
+        User authenticatedUser = jwtDecoder.getLoggedUser();
 
         List<Transaction> transactions;
 
@@ -91,8 +97,25 @@ public class TransactionServiceImpl implements TransactionService {
     public TransactionDto createTransaction(String creationRequestDtoJson) {
         CreationRequestDto creationRequestDto = serializer.serializeJsonToObject(creationRequestDtoJson, CreationRequestDto.class);
         TransactionCreateDto transactionCreateDto = serializer.serializeJsonToObject(creationRequestDto.getPayload(), TransactionCreateDto.class);
-        CreationRequest requestToReject = creationRequestRepository.findCreationRequestById(creationRequestDto.getId()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.TRANSACTION_CREATION_REQUEST_WITH_ID_NOT_FOUND));
-        User foundUser = userRepository.findById(creationRequestDto.getUserId()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.USER_NOT_FOUND));
+
+        Optional<CreationRequest> requestToRejectOptional = creationRequestRepository.findCreationRequestById(creationRequestDto.getId());
+        CreationRequest requestToReject;
+
+        if (!requestToRejectOptional.isPresent()) {
+            log.error(String.format(LogMessageText.TRANSACTION_NOT_FOUND_LOG, creationRequestDto.getId()));
+            throw new EntityNotFoundException(ExceptionMessageText.TRANSACTION_CREATION_REQUEST_NOT_FOUND);
+        } else {
+            requestToReject = requestToRejectOptional.get();
+        }
+
+        Optional<User> foundUserOptional = userRepository.findById(creationRequestDto.getUserId());
+        User foundUser;
+        if (!foundUserOptional.isPresent()) {
+            log.error(String.format(LogMessageText.USER_NOT_FOUND_LOG, creationRequestDto.getId()));
+            throw new EntityNotFoundException(ExceptionMessageText.USER_NOT_FOUND);
+        } else {
+            foundUser = foundUserOptional.get();
+        }
 
         Transaction transaction = createAndSaveTransaction(foundUser);
 
@@ -153,9 +176,12 @@ public class TransactionServiceImpl implements TransactionService {
         requestToReject.setStatus(Status.REJECTED);
         requestToReject.setCreatedId(transaction.getId());
         creationRequestRepository.save(requestToReject);
+        log.error(String.format(LogMessageText.TRANSACTION_CREATION_REQUEST_REJECTED_LOG, requestToReject.getId()));
 
         transaction.setStatus(Status.REJECTED);
         transactionRepository.save(transaction);
+        log.error(String.format(LogMessageText.TRANSACTION_REJECTED_LOG, transaction.getId()));
+
         throw new EntityNotFoundException(exceptionMessage);
     }
 
@@ -176,7 +202,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     private TransactionDto completeTransaction(Transaction transaction, Set<Operation> operations, CreationRequestDto creationRequestDto) {
-        CreationRequest creationRequest = creationRequestRepository.findCreationRequestById(creationRequestDto.getId()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.TRANSACTION_CREATION_REQUEST_WITH_ID_NOT_FOUND));
+        CreationRequest creationRequest = creationRequestRepository.findCreationRequestById(creationRequestDto.getId()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.TRANSACTION_CREATION_REQUEST_NOT_FOUND));
 
         creationRequest.setStatus(Status.CREATED);
         transaction.setStatus(Status.CREATED);
@@ -191,26 +217,34 @@ public class TransactionServiceImpl implements TransactionService {
         operationRepository.saveAll(transaction.getOperations());
 
         creationRequestRepository.save(creationRequest);
+        log.info(String.format(LogMessageText.TRANSACTION_CREATION_REQUEST_CREATED_LOG, creationRequest.getId()));
         Transaction createdTransaction = transactionRepository.save(transaction);
 
-        log.info("Transaction was created successfully!");
+        log.info(String.format(LogMessageText.TRANSACTION_CREATED_LOG, transaction.getId()));
         return transactionDtoMapper.toDto(createdTransaction);
     }
 
     @Override
     public CreationRequestDto findTransactionCreationRequestById(Long creationRequestId) {
-        User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.AUTHENTICATED_USER_NOT_FOUND));
+        User authenticatedUser = jwtDecoder.getLoggedUser();
+        Optional<CreationRequest> foundCreationRequestOptional;
 
         if (authenticatedUser.getRole().equals(Role.USER)) {
-            return requestDtoMapper.toDto(creationRequestRepository.findCreationRequestsByCreationTypeAndIdAndUser(CreationType.TRANSACTION, creationRequestId, authenticatedUser).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.TRANSACTION_CREATION_REQUEST_WITH_ID_NOT_FOUND)));
+            foundCreationRequestOptional = creationRequestRepository.findCreationRequestsByCreationTypeAndIdAndUser(CreationType.TRANSACTION, creationRequestId, authenticatedUser);
         } else {
-            return requestDtoMapper.toDto(creationRequestRepository.findCreationRequestsByCreationTypeAndId(CreationType.TRANSACTION, creationRequestId).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.TRANSACTION_CREATION_REQUEST_WITH_ID_NOT_FOUND)));
+            foundCreationRequestOptional = creationRequestRepository.findCreationRequestsByCreationTypeAndId(CreationType.TRANSACTION, creationRequestId);
+        }
+        if (!foundCreationRequestOptional.isPresent()) {
+            log.error(String.format(LogMessageText.TRANSACTION_CREATION_REQUEST_NOT_FOUND_LOG, creationRequestId));
+            throw new EntityNotFoundException(ExceptionMessageText.TRANSACTION_CREATION_REQUEST_NOT_FOUND);
+        } else {
+            return requestDtoMapper.toDto(foundCreationRequestOptional.get());
         }
     }
 
     @Override
     public List<CreationRequestDto> findTransactionCreationRequests() {
-        User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.AUTHENTICATED_USER_NOT_FOUND));
+        User authenticatedUser = jwtDecoder.getLoggedUser();
 
         List<CreationRequest> creationRequests;
 

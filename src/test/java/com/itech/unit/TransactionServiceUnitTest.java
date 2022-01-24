@@ -60,7 +60,9 @@ import static org.mockito.Mockito.when;
         EmailServiceImpl.class,
         TokenProvider.class,
         JavaMailSenderImpl.class,
-        UserSignUpDtoMapperImpl.class})
+        UserSignUpDtoMapperImpl.class,
+        UserRepository.class
+})
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(locations = "classpath:properties/jwt.properties")
 @TestPropertySource(locations = "classpath:properties/mail.properties")
@@ -418,24 +420,6 @@ class TransactionServiceUnitTest {
 
     @WithMockUser(username = "user")
     @Test
-    void emptyTransactionCreationRequests_andAnyRole_whenGetTransactionCreationRequests_thenThrowsEntityNotFoundException() {
-        User authorizedUser = new User("user", "user", "mail1@mail.ru", Role.MANAGER);
-        authorizedUser.setId(1L);
-
-        when(userRepository.findUserByUsername("user")).thenReturn(Optional.of(authorizedUser));
-        when(creationRequestRepository.findCreationRequestsByCreationTypeAndUser(CreationType.ACCOUNT, authorizedUser)).thenReturn(Collections.emptyList());
-
-        Exception exception = assertThrows(EntityNotFoundException.class, () ->
-                transactionService.findTransactionCreationRequests());
-
-        String expectedMessage = ExceptionMessageText.TRANSACTION_CREATION_REQUESTS_NOT_FOUND;
-        String actualMessage = exception.getMessage();
-
-        assertTrue(actualMessage.contains(expectedMessage));
-    }
-
-    @WithMockUser(username = "user")
-    @Test
     void givenTransactionCreationRequests_andUserRole_whenGetTransactionCreationRequests_thenCheckCreationTypeAndIdOfRequest() {
         User authorizedUser = new User("user", "user", "mail1@mail.ru", Role.USER);
         authorizedUser.setId(1L);
@@ -493,7 +477,7 @@ class TransactionServiceUnitTest {
         Exception exception = assertThrows(EntityNotFoundException.class, () ->
                 transactionService.findTransactionCreationRequestById(1L));
 
-        String expectedMessage = ExceptionMessageText.TRANSACTION_CREATION_REQUEST_WITH_ID_NOT_FOUND;
+        String expectedMessage = ExceptionMessageText.TRANSACTION_CREATION_REQUEST_NOT_FOUND;
         String actualMessage = exception.getMessage();
 
         assertTrue(actualMessage.contains(expectedMessage));
