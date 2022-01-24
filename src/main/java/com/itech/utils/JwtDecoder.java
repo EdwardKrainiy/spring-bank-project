@@ -38,6 +38,10 @@ public class JwtDecoder {
         return userId.orElseThrow(() -> new EntityNotFoundException("Id not found"));
     }
 
+    /**
+     * getUsernameOfLoggedUser method. Returns username of logged user.
+     * @return String username of logged user.
+     */
     public String getUsernameOfLoggedUser() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof UserDetails) {

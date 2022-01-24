@@ -4,7 +4,7 @@ import com.itech.model.dto.user.UserSignInDto;
 import com.itech.model.dto.user.UserSignUpDto;
 import com.itech.service.user.UserService;
 import com.itech.utils.JsonEntitySerializer;
-import com.itech.utils.literal.ExceptionMessageText;
+import com.itech.utils.literal.LogMessageText;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -51,7 +51,7 @@ public class AuthenticationController {
     public ResponseEntity<String> signIn(@RequestBody @Valid @ApiParam(name = "userSignInDto", value = "Dto of user, which we want to sign in.") UserSignInDto userSignInDto) throws AuthenticationException {
 
         if (log.isDebugEnabled()) {
-            log.debug(String.format(ExceptionMessageText.DEBUG_REQUEST_BODY_LOG_TEXT, jsonEntitySerializer.serializeObjectToJson(userSignInDto)));
+            log.debug(String.format(LogMessageText.DEBUG_REQUEST_BODY_LOG, jsonEntitySerializer.serializeObjectToJson(userSignInDto)));
         }
         return userService.authenticateUser(userSignInDto);
     }
@@ -71,7 +71,7 @@ public class AuthenticationController {
     public ResponseEntity<Void> signUp(@RequestBody @Valid @ApiParam(name = "userSignUpDto", value = "Dto of user, which we want to sign up.") UserSignUpDto userSignUpDto) {
 
         if (log.isDebugEnabled()) {
-            log.debug(String.format(ExceptionMessageText.DEBUG_REQUEST_BODY_LOG_TEXT, jsonEntitySerializer.serializeObjectToJson(userSignUpDto)));
+            log.debug(String.format(LogMessageText.DEBUG_REQUEST_BODY_LOG, jsonEntitySerializer.serializeObjectToJson(userSignUpDto)));
         }
 
         userService.createUser(userSignUpDto);

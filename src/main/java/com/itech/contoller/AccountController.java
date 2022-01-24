@@ -5,7 +5,7 @@ import com.itech.model.dto.account.AccountDto;
 import com.itech.model.dto.account.AccountUpdateDto;
 import com.itech.service.account.AccountService;
 import com.itech.utils.JsonEntitySerializer;
-import com.itech.utils.literal.ExceptionMessageText;
+import com.itech.utils.literal.LogMessageText;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -71,7 +71,6 @@ public class AccountController {
         return ResponseEntity.ok(accountService.findAccountByAccountId(accountId));
     }
 
-
     /**
      * createAccount endpoint.
      *
@@ -89,7 +88,7 @@ public class AccountController {
     @ResponseStatus(value = HttpStatus.CREATED)
     public ResponseEntity<Long> createAccount(@RequestBody @Valid @ApiParam(name = "accountChangeDto", value = "Dto of account we want to create and save.") AccountCreateDto accountCreateDto) {
         if (log.isDebugEnabled()) {
-            log.debug(String.format(ExceptionMessageText.DEBUG_REQUEST_BODY_LOG_TEXT, jsonEntitySerializer.serializeObjectToJson(accountCreateDto)));
+            log.debug(String.format(LogMessageText.DEBUG_REQUEST_BODY_LOG, jsonEntitySerializer.serializeObjectToJson(accountCreateDto)));
         }
 
         return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createAccount(accountCreateDto));
@@ -116,7 +115,7 @@ public class AccountController {
                                                     @PathVariable("id") @ApiParam(name = "id", value = "Id of account we want to update.") Long accountId) {
 
         if (log.isDebugEnabled()) {
-            log.debug(String.format(ExceptionMessageText.DEBUG_REQUEST_BODY_LOG_TEXT, jsonEntitySerializer.serializeObjectToJson(accountUpdateDto)));
+            log.debug(String.format(LogMessageText.DEBUG_REQUEST_BODY_LOG, jsonEntitySerializer.serializeObjectToJson(accountUpdateDto)));
         }
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(accountService.updateAccount(accountUpdateDto, accountId));

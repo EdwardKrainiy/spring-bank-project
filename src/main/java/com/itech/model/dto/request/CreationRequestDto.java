@@ -1,6 +1,7 @@
 package com.itech.model.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.itech.utils.literal.JsonPropertyText;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,31 +17,31 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Schema(description = "CreationRequest data-transfer object to manipulate with DB.")
 public class CreationRequestDto {
-    @JsonProperty("Id")
+    @JsonProperty(JsonPropertyText.ID)
     @Schema(description = "Unique Id field of CreationRequest.")
     private Long id;
 
-    @JsonProperty("UserId")
+    @JsonProperty(JsonPropertyText.USER_ID)
     @Schema(description = "UserId field of CreationRequest.")
     private Long userId;
 
-    @JsonProperty("Payload")
+    @JsonProperty(JsonPropertyText.PAYLOAD)
     @Schema(description = "Payload field of CreationRequest. Contains JSON to create Transaction or Account.")
     private String payload;
 
-    @JsonProperty("Status")
+    @JsonProperty(JsonPropertyText.STATUS)
     @Schema(description = "Status field of CreationRequest. Can be IN_PROGRESS, CREATED, REJECTED, EXPIRED.")
     private String status;
 
-    @JsonProperty("CreatedId")
+    @JsonProperty(JsonPropertyText.CREATED_ID)
     @Schema(description = "Unique CreatedId of CreationRequest.")
     private Long createdId;
 
-    @JsonProperty("IssuedAt")
+    @JsonProperty(JsonPropertyText.ISSUED_AT)
     @Schema(description = "IssuedAt field of CreationRequest. Contains time and date of creation.")
     private String issuedAt;
 
-    @JsonProperty("CreationType")
+    @JsonProperty(JsonPropertyText.CREATION_TYPE)
     @Schema(description = "CreationType field of CreationRequest. Can be ACCOUNT, TRANSACTION.")
     private String creationType;
 }

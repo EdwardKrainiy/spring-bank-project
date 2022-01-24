@@ -1,5 +1,6 @@
 package com.itech.service.mail;
 
+import com.itech.utils.literal.PropertySourceClasspath;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.PropertySource;
@@ -15,7 +16,7 @@ import java.util.Properties;
  * @author Edvard Krainiy on 12/9/2021
  */
 
-@PropertySource("classpath:properties/mail.properties")
+@PropertySource(PropertySourceClasspath.MAIL_PROPERTIES_CLASSPATH)
 @Component
 public class EmailSender {
     @Value("${spring.mail.host}")

@@ -2,6 +2,7 @@ package com.itech.config;
 
 import com.itech.model.enumeration.Role;
 import com.itech.security.jwt.filter.JwtAuthenticationFilter;
+import com.itech.utils.literal.PropertySourceClasspath;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -26,7 +27,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@PropertySource({"classpath:properties/security.properties", "classpath:properties/jwt.properties"})
+@PropertySource({PropertySourceClasspath.SECURITY_PROPERTIES_CLASSPATH, PropertySourceClasspath.JWT_PROPERTIES_CLASSPATH})
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsService customUserDetailsService;

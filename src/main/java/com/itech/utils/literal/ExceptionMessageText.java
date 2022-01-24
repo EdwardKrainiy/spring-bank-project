@@ -25,7 +25,4 @@ public class ExceptionMessageText {
     public static final String OPERATIONS_ARE_EMPTY = "Operations are empty!";
     public static final String CURRENCIES_ARE_NOT_SAME = "Currencies aren't same!";
     public static final String CREDIT_IS_MORE_THAN_STORED_ON_ACCOUNT = "CREDIT amount is more than stored in this account.";
-
-    public static final String METHOD_ARGUMENT_NOT_VALID_EXCEPTION_LOG_TEXT = "MethodArgumentNotValidException was caught and successfully handled. Name of object: %s. List of all validation errors: %s";
-    public static final String DEBUG_REQUEST_BODY_LOG_TEXT = "Request body: {%s}";
 }

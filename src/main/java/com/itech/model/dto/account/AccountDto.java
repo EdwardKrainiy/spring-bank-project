@@ -1,6 +1,7 @@
 package com.itech.model.dto.account;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.itech.utils.literal.JsonPropertyText;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,22 +19,22 @@ import lombok.NoArgsConstructor;
 @Schema(description = "Account data-transfer object to manipulate with DB.")
 public class AccountDto {
     @Schema(description = "Unique Id field of Account.")
-    @JsonProperty("Id")
+    @JsonProperty(JsonPropertyText.ID)
     private Long id;
 
-    @JsonProperty("Username")
+    @JsonProperty(JsonPropertyText.USERNAME)
     @Schema(description = "Unique username field of Account.")
     private String username;
 
-    @JsonProperty("Amount")
+    @JsonProperty(JsonPropertyText.AMOUNT)
     @Schema(description = "Amount field of Account.")
     private double amount;
 
-    @JsonProperty("Currency")
+    @JsonProperty(JsonPropertyText.CURRENCY)
     @Schema(description = "Currency field of Account.")
     private String currency;
 
-    @JsonProperty("IBAN")
+    @JsonProperty(JsonPropertyText.IBAN)
     @Schema(description = "Unique Currency field of Account.")
     private String iban;
 }

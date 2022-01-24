@@ -22,6 +22,8 @@ import com.itech.utils.JwtDecoder;
 import com.itech.utils.exception.EntityNotFoundException;
 import com.itech.utils.exception.ValidationException;
 import com.itech.utils.literal.ExceptionMessageText;
+import com.itech.utils.literal.LogMessageText;
+import com.itech.utils.literal.PropertySourceClasspath;
 import com.itech.utils.mapper.account.AccountDtoMapper;
 import com.itech.utils.mapper.request.RequestDtoMapper;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +45,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Log4j2
-@PropertySource("classpath:properties/mail.properties")
+@PropertySource(PropertySourceClasspath.MAIL_PROPERTIES_CLASSPATH)
 @RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
 
@@ -73,7 +75,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public List<AccountDto> findAllAccounts() {
 
-        User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.AUTHENTICATED_USER_NOT_FOUND));
+        User authenticatedUser = getLoggedUser();
         List<Account> accounts;
 
         if (authenticatedUser.getRole().equals(Role.USER)) {
@@ -87,8 +89,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public AccountDto findAccountByAccountId(Long accountId) {
-        User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.AUTHENTICATED_USER_NOT_FOUND));
-
+        User authenticatedUser = getLoggedUser();
         Optional<Account> foundAccount;
 
         if (authenticatedUser.getRole().equals(Role.USER)) {
@@ -97,66 +98,76 @@ public class AccountServiceImpl implements AccountService {
             foundAccount = accountRepository.findAccountById(accountId);
         }
 
-        return accountDtoMapper.toDto(foundAccount.orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.ACCOUNT_NOT_FOUND)));
+        if (foundAccount.isPresent()) {
+            return accountDtoMapper.toDto(foundAccount.get());
+        } else {
+            log.error(String.format(LogMessageText.ACCOUNT_WITH_ID_NOT_FOUND_LOG, accountId));
+            throw new EntityNotFoundException(ExceptionMessageText.ACCOUNT_NOT_FOUND);
+        }
     }
 
     @Override
     public Long createAccount(AccountCreateDto accountChangeDto) {
-        User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.AUTHENTICATED_USER_NOT_FOUND));
+        User authenticatedUser = getLoggedUser();
 
         CreationRequest accountCreatingRequest = new CreationRequest();
-        log.debug("CreationRequest empty object created.");
 
         accountCreatingRequest.setStatus(Status.IN_PROGRESS);
-        log.debug("CreationRequest status set.");
-
         accountCreatingRequest.setCreationType(CreationType.ACCOUNT);
-        log.debug("CreationRequest type set.");
-
         accountCreatingRequest.setPayload(serializer.serializeObjectToJson(accountChangeDto));
-        log.debug("CreationRequest payload set.");
-
         accountCreatingRequest.setIssuedAt(LocalDateTime.now());
-        log.debug("CreationRequest issuedAt time set.");
-
         accountCreatingRequest.setUser(authenticatedUser);
-        log.debug("CreationRequest user set.");
 
-        log.info("Account was created successfully!");
-        return creationRequestRepository.save(accountCreatingRequest).getId();
+        Long createdAccountCreationRequestId = creationRequestRepository.save(accountCreatingRequest).getId();
+        log.info(String.format(LogMessageText.ACCOUNT_CREATION_REQUEST_CREATED_LOG, createdAccountCreationRequestId));
+        return createdAccountCreationRequestId;
     }
 
     @Override
     public AccountDto updateAccount(AccountUpdateDto accountUpdateDto, Long accountId) {
-        User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.AUTHENTICATED_USER_NOT_FOUND));
+        User authenticatedUser = getLoggedUser();
 
-        Account accountToUpdate = accountRepository.findAccountById(accountId).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.ACCOUNT_NOT_FOUND));
+        Optional<Account> accountToUpdateOptional = accountRepository.findAccountById(accountId);
+        Account accountToUpdate;
+        if(!accountToUpdateOptional.isPresent()){
+            log.error(String.format(LogMessageText.ACCOUNT_WITH_ID_NOT_FOUND_LOG, accountId));
+            throw new EntityNotFoundException(ExceptionMessageText.ACCOUNT_NOT_FOUND);
+        } else {
+            accountToUpdate = accountToUpdateOptional.get();
+            accountToUpdate.setAmount(accountUpdateDto.getAmount());
 
-        accountToUpdate.setAmount(accountUpdateDto.getAmount());
-
-        if (authenticatedUser.getRole().equals(Role.USER) && !authenticatedUser.getId().equals(accountToUpdate.getUser().getId())) {
-            throw new ValidationException(ExceptionMessageText.ID_OF_LOGGED_USER_NOT_EQUALS_ID_OF_ACCOUNT);
+            if (authenticatedUser.getRole().equals(Role.USER) && !authenticatedUser.getId().equals(accountToUpdate.getUser().getId())) {
+                log.error(String.format(LogMessageText.ID_OF_LOGGED_USER_NOT_EQUALS_ID_OF_ACCOUNT_LOG, authenticatedUser.getId(), accountToUpdate.getUser().getId()));
+                throw new ValidationException(ExceptionMessageText.ID_OF_LOGGED_USER_NOT_EQUALS_ID_OF_ACCOUNT);
+            }
+            else {
+                return accountDtoMapper.toDto(accountRepository.save(accountToUpdate));
+            }
         }
-
-        return accountDtoMapper.toDto(accountRepository.save(accountToUpdate));
     }
 
     @Override
     public void deleteAccountByAccountId(Long accountId) {
-        User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.AUTHENTICATED_USER_NOT_FOUND));
+        User authenticatedUser = getLoggedUser();
+        Optional<Account> accountToDeleteOptional = accountRepository.findAccountById(accountId);
 
-        Account foundAccountToDelete = accountRepository.findAccountById(accountId).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.ACCOUNT_NOT_FOUND));
-
-        if (authenticatedUser.getRole().equals(Role.USER) && !authenticatedUser.getId().equals(foundAccountToDelete.getId())) {
-            throw new ValidationException(ExceptionMessageText.ID_OF_LOGGED_USER_NOT_EQUALS_ID_OF_ACCOUNT);
+        if(!accountToDeleteOptional.isPresent()){
+            log.error(String.format(LogMessageText.ACCOUNT_WITH_ID_NOT_FOUND_LOG, accountId));
+            throw new EntityNotFoundException(ExceptionMessageText.ACCOUNT_NOT_FOUND);
         } else {
-            accountRepository.deleteById(foundAccountToDelete.getId());
+            Account accountToDelete = accountToDeleteOptional.get();
+            if (authenticatedUser.getRole().equals(Role.USER) && !authenticatedUser.getId().equals(accountToDelete.getId())) {
+                log.error(String.format(LogMessageText.ID_OF_LOGGED_USER_NOT_EQUALS_ID_OF_ACCOUNT_LOG, authenticatedUser.getId(), accountToDelete.getUser().getId()));
+                throw new ValidationException(ExceptionMessageText.ID_OF_LOGGED_USER_NOT_EQUALS_ID_OF_ACCOUNT);
+            } else {
+                accountRepository.deleteById(accountToDelete.getId());
+            }
         }
     }
 
     @Override
     public CreationRequestDto findAccountCreationRequestById(Long creationRequestId) {
-        User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.AUTHENTICATED_USER_NOT_FOUND));
+        User authenticatedUser = getLoggedUser();
 
         if (authenticatedUser.getRole().equals(Role.USER)) {
             return requestDtoMapper.toDto(creationRequestRepository.findCreationRequestsByCreationTypeAndIdAndUser(CreationType.ACCOUNT, creationRequestId, authenticatedUser).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.ACCOUNT_CREATION_REQUEST_WITH_ID_NOT_FOUND)));
@@ -167,7 +178,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public List<CreationRequestDto> findAccountCreationRequests() {
-        User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.AUTHENTICATED_USER_NOT_FOUND));
+        User authenticatedUser = getLoggedUser();
 
         List<CreationRequest> creationRequests;
 
@@ -234,7 +245,7 @@ public class AccountServiceImpl implements AccountService {
             emailService.sendEmail(userEmail, rejectedMessageTitleText,
                     rejectMessage);
         } else {
-            throw new EntityNotFoundException(ExceptionMessageText.USER_EMAIL_NOT_FOUND);
+            log.warn(String.format(LogMessageText.EMAIL_NOT_FOUND_LOG, accountCreationRequestUser.getId()));
         }
     }
 
@@ -249,6 +260,17 @@ public class AccountServiceImpl implements AccountService {
                 creationRequestRepository.save(accountCreationRequest);
                 log.info(String.format("Expired account creation request id: %d", accountCreationRequest.getId()));
             }
+        }
+    }
+
+    private User getLoggedUser() {
+        Optional<User> authenticatedUserOptional = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser());
+
+        if (authenticatedUserOptional.isPresent()) {
+            return authenticatedUserOptional.get();
+        } else {
+            log.error(LogMessageText.AUTHENTICATED_USER_NOT_FOUND_LOG);
+            throw new EntityNotFoundException(ExceptionMessageText.AUTHENTICATED_USER_NOT_FOUND);
         }
     }
 }

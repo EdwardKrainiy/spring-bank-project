@@ -2,6 +2,7 @@ package com.itech.model.entity;
 
 import com.itech.model.enumeration.CreationType;
 import com.itech.model.enumeration.Status;
+import com.itech.utils.literal.JpaMappingDetails;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,33 +20,33 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
-@Table(name = "creation_request")
+@Table(name = JpaMappingDetails.CREATION_REQUEST_TABLE)
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreationRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(name = JpaMappingDetails.ID, nullable = false)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = JpaMappingDetails.USER_ID)
     private User user;
 
-    @Column(name = "payload")
+    @Column(name = JpaMappingDetails.PAYLOAD)
     private String payload;
 
-    @Column(name = "status")
+    @Column(name = JpaMappingDetails.STATUS)
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @Column(name = "created_id")
+    @Column(name = JpaMappingDetails.CREATED_ID)
     private Long createdId;
 
-    @Column(name = "issued_at")
+    @Column(name = JpaMappingDetails.ISSUED_AT)
     private LocalDateTime issuedAt;
 
-    @Column(name = "creation_type")
+    @Column(name = JpaMappingDetails.CREATION_TYPE)
     @Enumerated(EnumType.STRING)
     private CreationType creationType;
 

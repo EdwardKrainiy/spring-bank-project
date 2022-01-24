@@ -1,6 +1,7 @@
 package com.itech.model.entity;
 
 import com.itech.model.enumeration.Status;
+import com.itech.utils.literal.JpaMappingDetails;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,26 +19,26 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-@Table(name = "transactions")
+@Table(name = JpaMappingDetails.TRANSACTIONS_TABLE)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(name = JpaMappingDetails.ID, nullable = false)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE})
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = JpaMappingDetails.USER_ID)
     private User user;
 
-    @Column(name = "issued_at")
+    @Column(name = JpaMappingDetails.ISSUED_AT)
     private LocalDateTime issuedAt;
 
-    @Column(name = "status")
+    @Column(name = JpaMappingDetails.STATUS)
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "transaction")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = JpaMappingDetails.TRANSACTION)
     private Set<Operation> operations;
 }

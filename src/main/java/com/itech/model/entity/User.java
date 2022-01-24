@@ -1,6 +1,7 @@
 package com.itech.model.entity;
 
 import com.itech.model.enumeration.Role;
+import com.itech.utils.literal.JpaMappingDetails;
 import lombok.*;
 
 import javax.persistence.*;
@@ -15,35 +16,35 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-@Table(name = "users")
+@Table(name = JpaMappingDetails.USERS_TABLE)
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(name = JpaMappingDetails.ID, nullable = false)
     private Long id;
 
-    @Column(name = "username")
+    @Column(name = JpaMappingDetails.USERNAME)
     private String username;
 
-    @Column(name = "password")
+    @Column(name = JpaMappingDetails.PASSWORD)
     private String password;
 
-    @Column(name = "email")
+    @Column(name = JpaMappingDetails.EMAIL)
     private String email;
 
-    @Column(name = "confirmation_token")
+    @Column(name = JpaMappingDetails.CONFIRMATION_TOKEN)
     private String confirmationToken;
 
-    @Column(name = "role")
+    @Column(name = JpaMappingDetails.ROLE)
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Column(name = "activated")
+    @Column(name = JpaMappingDetails.ACTIVATED)
     private boolean activated;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = JpaMappingDetails.USER)
     private Set<Account> accounts;
 
     public User(String username, String password, String email, Role role) {

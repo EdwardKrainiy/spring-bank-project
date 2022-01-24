@@ -1,6 +1,7 @@
 package com.itech.config;
 
 import com.itech.service.account.AccountService;
+import com.itech.utils.literal.PropertySourceClasspath;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -13,7 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 @Configuration
 @EnableScheduling
-@PropertySource("classpath:properties/scheduler.properties")
+@PropertySource(PropertySourceClasspath.SCHEDULER_PROPERTIES_CLASSPATH)
 @RequiredArgsConstructor
 public class SchedulerConfig {
 

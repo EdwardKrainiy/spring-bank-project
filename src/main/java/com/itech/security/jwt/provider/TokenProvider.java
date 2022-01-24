@@ -26,9 +26,12 @@ import java.util.stream.Collectors;
 @Component
 @PropertySource("classpath:properties/jwt.properties")
 public class TokenProvider implements Serializable {
-    private static final String DELIMITER = ",";
-    private static final int AUTH_TOKEN_EXPIRATION_TIME_MULTIPLICATOR = 1000;
-    private static final int CONFIRM_TOKEN_EXPIRATION_TIME_MULTIPLICATOR = 100;
+    @Value("${jwt.delimiter}")
+    private String delimiter;
+    @Value("${jwt.auth.token.expiration.time.multiplicator}")
+    private int authTokenExpirationTimeMultiplicator;
+    @Value("${jwt.confirm.token.expiration.time.multiplicator}")
+    private int confirmTokenExpirationTimeMultiplicator;
     @Value("${jwt.authorities.key}")
     private String authoritiesKey;
     @Value("${jwt.token.validity}")
@@ -108,14 +111,14 @@ public class TokenProvider implements Serializable {
     public String generateAuthToken(Authentication authentication) {
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(DELIMITER));
+                .collect(Collectors.joining(delimiter));
 
         return Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim(authoritiesKey, authorities)
-                .setIssuedAt(new Date(System.currentTimeMillis())) // Дата создания токена
-                .setExpiration(new Date(System.currentTimeMillis() + tokenValidity * AUTH_TOKEN_EXPIRATION_TIME_MULTIPLICATOR)) //Дата истечения токена
-                .signWith(SignatureAlgorithm.HS256, signingKey) //Ключ расшифровки
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + tokenValidity * authTokenExpirationTimeMultiplicator))
+                .signWith(SignatureAlgorithm.HS256, signingKey)
                 .compact();
     }
 
@@ -129,7 +132,7 @@ public class TokenProvider implements Serializable {
         return Jwts.builder()
                 .setSubject(userId.toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + tokenValidity * CONFIRM_TOKEN_EXPIRATION_TIME_MULTIPLICATOR))
+                .setExpiration(new Date(System.currentTimeMillis() + tokenValidity * confirmTokenExpirationTimeMultiplicator))
                 .signWith(SignatureAlgorithm.HS256, confirmationKey)
                 .compact();
     }
@@ -163,7 +166,7 @@ public class TokenProvider implements Serializable {
         final Claims claims = claimsJws.getBody();
 
         final Collection<? extends GrantedAuthority> authorities =
-                Arrays.stream(claims.get(authoritiesKey).toString().split(DELIMITER))
+                Arrays.stream(claims.get(authoritiesKey).toString().split(delimiter))
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
