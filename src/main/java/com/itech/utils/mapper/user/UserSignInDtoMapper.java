@@ -19,12 +19,4 @@ public interface UserSignInDtoMapper {
    * @return UserDto Obtained UserDto.
    */
   UserSignInDto toDto(User user);
-
-  /**
-   * DtoUserToUser method. Converts UserDto to User object.
-   *
-   * @param userSignInDto UserDto we need to convert.
-   * @return User Obtained User object.
-   */
-  User toEntity(UserSignInDto userSignInDto);
 }

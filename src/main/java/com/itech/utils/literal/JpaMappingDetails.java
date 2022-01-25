@@ -1,5 +1,10 @@
 package com.itech.utils.literal;
 
+/**
+ * JpaMappingDetails class. Contains all necessary strings needed for JPA mapping.
+ *
+ * @author Edvard Krainiy on 01/25/2022
+ */
 public class JpaMappingDetails {
   public static final String ACCOUNTS_TABLE = "accounts";
   public static final String CREATION_REQUEST_TABLE = "creation_request";

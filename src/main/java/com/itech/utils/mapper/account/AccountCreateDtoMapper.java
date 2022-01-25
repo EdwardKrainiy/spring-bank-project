@@ -12,13 +12,6 @@ import org.mapstruct.Mapper;
  */
 @Mapper(componentModel = "spring")
 public interface AccountCreateDtoMapper {
-  /**
-   * toEntity method. Converts AccountCreateDto object to Account.
-   *
-   * @param accountCreateDto AccountCreateDto object we need to convert.
-   * @return Account Obtained Account entity.
-   */
-  Account toEntity(AccountCreateDto accountCreateDto);
 
   /**
    * toDto method. Converts Account object to AccountCreateDto.

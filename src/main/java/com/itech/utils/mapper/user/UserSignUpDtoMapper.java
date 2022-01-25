@@ -23,7 +23,7 @@ public interface UserSignUpDtoMapper {
   /**
    * DtoUserToUser method. Converts UserDto to User object.
    *
-   * @param userSignInDto UserDto we need to convert.
+   * @param userSignUpDto UserDto we need to convert.
    * @return User Obtained User object.
    */
   User toEntity(UserSignUpDto userSignUpDto);

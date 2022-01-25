@@ -1,5 +1,10 @@
 package com.itech.utils.literal;
 
+/**
+ * ExceptionMessageText class. Contains all necessary messages of exceptions.
+ *
+ * @author Edvard Krainiy on 01/25/2022
+ */
 public class ExceptionMessageText {
   public static final String ACCOUNT_NOT_FOUND = "Account not found!";
   public static final String ACCOUNT_CREATION_REQUEST_NOT_FOUND =

@@ -1,5 +1,10 @@
 package com.itech.utils.literal;
 
+/**
+ * LogMessageText class. Contains all necessary messages of logs.
+ *
+ * @author Edvard Krainiy on 01/25/2022
+ */
 public class LogMessageText {
   public static final String METHOD_ARGUMENT_NOT_VALID_LOG =
       "MethodArgumentNotValidException was caught and successfully handled. Name of object: %s. List of all validation errors: %s";

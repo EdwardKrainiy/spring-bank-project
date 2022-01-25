@@ -1,5 +1,10 @@
 package com.itech.utils.literal;
 
+/**
+ * ValidationMessageText class. Contains all necessary Validation Exception messages.
+ *
+ * @author Edvard Krainiy on 01/25/2022
+ */
 public class ValidationMessageText {
   public static final String INCORRECT_CURRENCY_EXCEPTION_MESSAGE = "Incorrect Currency!";
   public static final String AMOUNT_MUST_BE_GREATER_THAN_ZERO_EXCEPTION_MESSAGE =
