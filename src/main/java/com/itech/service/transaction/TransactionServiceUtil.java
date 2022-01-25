@@ -8,7 +8,9 @@ import com.itech.repository.TransactionRepository;
 import com.itech.utils.exception.ChangeAccountAmountException;
 import com.itech.utils.exception.ValidationException;
 import com.itech.utils.literal.ExceptionMessageText;
+import com.itech.utils.literal.LogMessageText;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +25,7 @@ import java.util.Set;
  */
 @Component
 @RequiredArgsConstructor
+@Log4j2
 public class TransactionServiceUtil {
     private final TransactionRepository transactionRepository;
 
@@ -41,6 +44,7 @@ public class TransactionServiceUtil {
             } else if (operation.getOperationType().equals(OperationType.DEBIT)) {
                 operation.getAccount().setAmount(operation.getAccount().getAmount() + operation.getAmount());
             } else {
+                log.error(String.format(LogMessageText.CREDIT_IS_MORE_THAN_STORED_ON_ACCOUNT_LOG, operation.getAccount().getId()));
                 throw new ChangeAccountAmountException(ExceptionMessageText.CREDIT_IS_MORE_THAN_STORED_ON_ACCOUNT);
             }
         }
@@ -59,6 +63,7 @@ public class TransactionServiceUtil {
         if (date.isBefore(LocalDate.now().minusDays(1))) {
             transaction.setStatus(Status.EXPIRED);
             transactionRepository.save(transaction);
+            log.error(String.format(LogMessageText.TRANSACTION_CREATION_REQUEST_EXPIRED_LOG, transaction.getId()));
             throw new ValidationException(ExceptionMessageText.CREATION_REQUEST_EXPIRED);
         }
 

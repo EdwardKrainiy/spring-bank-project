@@ -71,7 +71,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         if (!foundTransaction.isPresent()) {
             log.error(String.format(LogMessageText.TRANSACTION_NOT_FOUND_LOG, transactionId));
-            throw new EntityNotFoundException(ExceptionMessageText.TRANSACTION_CREATION_REQUEST_NOT_FOUND);
+            throw new EntityNotFoundException(ExceptionMessageText.TRANSACTION_NOT_FOUND);
         } else {
             return transactionDtoMapper.toDto(foundTransaction.get());
         }

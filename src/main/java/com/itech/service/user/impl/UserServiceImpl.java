@@ -14,6 +14,7 @@ import com.itech.utils.exception.EntityNotFoundException;
 import com.itech.utils.exception.IncorrectPasswordException;
 import com.itech.utils.exception.ValidationException;
 import com.itech.utils.literal.ExceptionMessageText;
+import com.itech.utils.literal.LogMessageText;
 import com.itech.utils.literal.PropertySourceClasspath;
 import com.itech.utils.mapper.user.UserSignUpDtoMapper;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 /**
  * Implementation of UserService interface. Provides us different methods of Service layer to work with Repository layer of User objects.
@@ -57,8 +60,10 @@ public class UserServiceImpl implements UserService {
 
         User mappedUser = userSignUpDtoMapper.toEntity(userDto);
 
-        if (userRepository.findUserByUsername(mappedUser.getUsername()).isPresent() || userRepository.findUserByEmail(mappedUser.getEmail()).isPresent())
+        if (userRepository.findUserByUsername(mappedUser.getUsername()).isPresent() || userRepository.findUserByEmail(mappedUser.getEmail()).isPresent()){
+            log.error(LogMessageText.USER_IS_ALREADY_EXISTS);
             throw new ValidationException(ExceptionMessageText.USER_IS_ALREADY_EXISTS);
+        }
 
         User createdUser = new User(mappedUser.getUsername(), encoder.encode(mappedUser.getPassword()), mappedUser.getEmail(), Role.USER);
 
@@ -70,11 +75,17 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(createdUser);
 
-        emailService.sendEmail(userRepository.findUserByRole(Role.MANAGER).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.USER_NOT_FOUND)).getEmail(),
-                String.format(userConfirmationMessageTitleText, mappedUser.getUsername()),
-                String.format(("%s%s"), confirmMessage, confirmationToken));
+        Optional<User> managerUserOptional = userRepository.findUserByRole(Role.MANAGER);
+        if(!managerUserOptional.isPresent()){
+            log.error(LogMessageText.MANAGER_USER_NOT_EXISTS);
+            throw new EntityNotFoundException(ExceptionMessageText.USER_NOT_FOUND);
+        } else {
+            emailService.sendEmail(managerUserOptional.get().getEmail(),
+                    String.format(userConfirmationMessageTitleText, mappedUser.getUsername()),
+                    String.format(("%s%s"), confirmMessage, confirmationToken));
 
-        log.info("Mail with confirmation link was sent to manager's email.");
+            log.info(String.format(LogMessageText.MESSAGE_SENT_LOG, managerUserOptional.get().getEmail()));
+        }
     }
 
     @Override
@@ -109,7 +120,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(activatedUser);
 
         emailService.sendEmail(activatedUser.getEmail(), successfulConfirmationTitle, successfulConfirmationMessage);
-        log.info("Mail about confirmation was sent.");
+        log.info(String.format(LogMessageText.MESSAGE_SENT_LOG, activatedUser.getEmail()));
     }
 
     public boolean isUserActivated(User user) {

@@ -212,12 +212,21 @@ public class AccountServiceImpl implements AccountService {
 
         String accountNumber = ibanGenerator.generateIban(accountToCreate.getCurrency().getCountryCode());
 
-        while (accountRepository.findAccountByAccountNumber(accountNumber).isPresent()) {
+        if (accountRepository.findAccountByAccountNumber(accountNumber).isPresent()) {
             accountNumber = ibanGenerator.generateIban(accountToCreate.getCurrency().getCountryCode());
+            accountToCreate.setAccountNumber(accountNumber);
         }
-        accountToCreate.setAccountNumber(accountNumber);
 
-        Long createdAccountId = accountRepository.save(accountToCreate).getId();
+        accountRepository.save(accountToCreate);
+        Long createdAccountId;
+        Optional<Account> createdAccountOptional = accountRepository.findAccountByAccountNumber(accountNumber);
+        if (!createdAccountOptional.isPresent()) {
+            log.error(String.format(LogMessageText.ACCOUNT_WITH_NUMBER_NOT_FOUND_LOG, accountNumber));
+            throw new EntityNotFoundException(ExceptionMessageText.ACCOUNT_NOT_FOUND);
+        } else {
+            createdAccountId = createdAccountOptional.get().getId();
+        }
+
         log.info(String.format(LogMessageText.ACCOUNT_CREATED_LOG, createdAccountId));
 
         accountCreationRequest.setStatus(Status.CREATED);

@@ -19,7 +19,6 @@ public interface UserService {
      * createUser method. Saves our user on DB.
      *
      * @param userDto User transfer object, which we need to save. This one will be converted into User object, passed some checks and will be saved on DB.
-     * @return ResponseEntity Response, which contains message and HTTP code. If something will be wrong, it will throw different Exceptions, which will tell about mistakes and errors.
      * @throws EntityNotFoundException If user wasn't found.
      * @throws EntityExistsException   if user already exists.
      */
@@ -64,8 +63,8 @@ public interface UserService {
 
     /**
      * authenticateUser method. Checks potential user and authenticate him. If this user is not activated or not exists, Exception will be thrown.
+     *
      * @param userSignInDto UserSignInDto object, which contains all necessary information to signing in.
-     * @return
      */
     ResponseEntity<String> authenticateUser(UserSignInDto userSignInDto);
 }

@@ -41,6 +41,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/api/auth/*").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/auth/email-confirmation").hasAuthority(Role.MANAGER.name())
+                .antMatchers("/api/accounts").hasAnyAuthority(Role.USER.name(), Role.MANAGER.name())
+                .antMatchers("/api/transactions").hasAnyAuthority(Role.MANAGER.name(), Role.USER.name())
                 .antMatchers("/api/accounts/*").hasAnyAuthority(Role.USER.name(), Role.MANAGER.name())
                 .antMatchers("/api/transactions/*").hasAnyAuthority(Role.MANAGER.name(), Role.USER.name())
                 .antMatchers(HttpMethod.GET, "/api/*/creation-requests/*").hasAnyAuthority(Role.USER.name(), Role.MANAGER.name())

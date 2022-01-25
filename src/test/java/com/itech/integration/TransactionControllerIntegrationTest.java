@@ -18,8 +18,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -47,7 +47,7 @@ class TransactionControllerIntegrationTest {
                 .build();
     }
 
-    @WithMockUser(username = "EdvardKrainiy")
+    @WithMockUser(username = "EdvardKrainiy", authorities = "MANAGER")
     @Test
     @Sql(value = "classpath:db/test/create_users.sql")
     @Sql(value = "classpath:db/test/create_transactions.sql")
@@ -63,41 +63,24 @@ class TransactionControllerIntegrationTest {
                 .andExpect(result -> assertEquals(expectedJson, result.getResponse().getContentAsString()));
     }
 
-    @WithMockUser(username = "EdvardKrainiy")
-    @Test
-    @Sql(value = "classpath:db/test/create_users.sql")
-    void emptyTransactions_whenGetTransactions_thenStatus404() throws Exception {
-
-        String expectedJson = "{\"Code\":404," +
-                "\"Errors\":[\"Transaction not found!\"]}";
-
-        mockMvc.perform(get("/api/transactions").contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(result -> assertEquals(HttpStatus.NOT_FOUND.value(), result.getResponse().getStatus()))
-                .andExpect(result -> assertEquals(expectedJson, result.getResponse().getContentAsString()));
-    }
-
     @Test
     @Sql(value = "classpath:db/test/create_users.sql")
     @Sql(value = "classpath:db/test/create_transactions.sql")
     void unauthorizedUser_whenGetTransactions_thenStatus403() throws Exception {
 
-        String expectedErrorMessage = "Access Denied";
-
         mockMvc.perform(get("/api/transactions").contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .andExpect(result -> assertEquals(HttpStatus.FORBIDDEN.value(), result.getResponse().getStatus()))
-                .andExpect(result -> assertEquals(expectedErrorMessage, result.getResponse().getErrorMessage()));
+                .andExpect(result -> assertEquals(HttpStatus.FORBIDDEN.value(), result.getResponse().getStatus()));
     }
 
-    @WithMockUser(username = "EdvardKrainiy")
+    @WithMockUser(username = "EdvardKrainiy", authorities = "MANAGER")
     @Test
     @Sql(value = "classpath:db/test/create_users.sql")
     @Sql(value = "classpath:db/test/create_transactions.sql")
     void givenTransactions_whenGetTransactionById_thenStatus200() throws Exception {
 
         String expectedJson = "{\"Id\":1,\"UserId\":1,\"IssuedAt\":\"2022-01-11T23:58:07.858+00:00\",\"Status\":\"REJECTED\",\"Operations\":[]}";
-        mockMvc.perform(get("/api/transactions/1/").contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/transactions/1").contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(result -> assertEquals(HttpStatus.OK.value(), result.getResponse().getStatus()))
                 .andExpect(result -> assertEquals(expectedJson, result.getResponse().getContentAsString()));
@@ -108,41 +91,38 @@ class TransactionControllerIntegrationTest {
     @Sql(value = "classpath:db/test/create_transactions.sql")
     void unauthorizedUser_whenGetTransactionById_thenStatus403() throws Exception {
 
-        String expectedErrorMessage = "Access Denied";
-        mockMvc.perform(get("/api/transactions/1/").contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/transactions/1").contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .andExpect(result -> assertEquals(HttpStatus.FORBIDDEN.value(), result.getResponse().getStatus()))
-                .andExpect(result -> assertEquals(expectedErrorMessage, result.getResponse().getErrorMessage()));
-    }
+                .andExpect(result -> assertEquals(HttpStatus.FORBIDDEN.value(), result.getResponse().getStatus()));}
 
-    @WithMockUser(username = "EdvardKrainiy")
+    @WithMockUser(username = "EdvardKrainiy", authorities = "MANAGER")
     @Test
     @Sql(value = "classpath:db/test/create_users.sql")
     @Sql(value = "classpath:db/test/create_transactions.sql")
     void givenTransactions_whenGetTransactionById_andTransactionWithIdNotExists_thenStatus404() throws Exception {
 
-        String expectedJson = "{\"Code\":404," +
-                "\"Errors\":[\"Transaction not found!\"]}";
-        mockMvc.perform(get("/api/transactions/4/").contentType(MediaType.APPLICATION_JSON))
+        String expectedExceptionMessage  = "Transaction not found!";
+
+        mockMvc.perform(get("/api/transactions/400").contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(result -> assertEquals(HttpStatus.NOT_FOUND.value(), result.getResponse().getStatus()))
-                .andExpect(result -> assertEquals(expectedJson, result.getResponse().getContentAsString()));
+                .andExpect(result -> assertTrue(result.getResponse().getContentAsString().contains(expectedExceptionMessage)));
     }
 
-    @WithMockUser(username = "EdvardKrainiy")
+    @WithMockUser(username = "EdvardKrainiy", authorities = "MANAGER")
     @Test
     @Sql(value = "classpath:db/test/create_users.sql")
     void emptyTransactions_whenGetTransactionById_thenStatus404() throws Exception {
 
         String expectedJson = "{\"Code\":404," +
                 "\"Errors\":[\"Transaction not found!\"]}";
-        mockMvc.perform(get("/api/transactions/3/").contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/transactions/3").contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(result -> assertEquals(HttpStatus.NOT_FOUND.value(), result.getResponse().getStatus()))
                 .andExpect(result -> assertEquals(expectedJson, result.getResponse().getContentAsString()));
     }
 
-    @WithMockUser(username = "EdvardKrainiy")
+    @WithMockUser(username = "EdvardKrainiy", authorities = "MANAGER")
     @Test
     @Sql(value = "classpath:db/test/create_users.sql")
     @Sql(value = "classpath:db/test/create_accounts.sql")
@@ -157,7 +137,7 @@ class TransactionControllerIntegrationTest {
                 .andExpect(result -> assertEquals(HttpStatus.BAD_REQUEST.value(), result.getResponse().getStatus()));
     }
 
-    @WithMockUser(username = "EdvardKrainiy")
+    @WithMockUser(username = "EdvardKrainiy", authorities = "MANAGER")
     @Test
     @Sql(value = "classpath:db/test/create_users.sql")
     void authorizedUser_whenCreateTransactionCreationRequest_thenStatus201() throws Exception {
@@ -176,14 +156,11 @@ class TransactionControllerIntegrationTest {
     void unauthorizedUser_whenCreateTransactionCreationRequest_thenStatus403() throws Exception {
         String expectedCreatedTransactionRequest = "{\"Operations\":[{\"AccountNumber\":\"test2\",\"Amount\":\"1\",\"OperationType\":\"DEBIT\"},{\"AccountNumber\":\"test1\",\"Amount\":\"1\",\"OperationType\":\"CREDIT\"}]}";
 
-        String expectedErrorMessage = "Access Denied";
-
         mockMvc.perform(post("/api/transactions").contentType(MediaType.APPLICATION_JSON)
                         .content(expectedCreatedTransactionRequest)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .andExpect(result -> assertEquals(HttpStatus.FORBIDDEN.value(), result.getResponse().getStatus()))
-                .andExpect(result -> assertEquals(expectedErrorMessage, result.getResponse().getErrorMessage()));
+                .andExpect(result -> assertEquals(HttpStatus.FORBIDDEN.value(), result.getResponse().getStatus()));
     }
 }

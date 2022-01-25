@@ -10,6 +10,7 @@ import com.itech.model.enumeration.Currency;
 import com.itech.model.enumeration.Role;
 import com.itech.model.enumeration.Status;
 import com.itech.repository.*;
+import com.itech.security.jwt.authentication.JwtAuthenticationByUserDetails;
 import com.itech.security.jwt.provider.TokenProvider;
 import com.itech.service.mail.impl.EmailServiceImpl;
 import com.itech.service.transaction.TransactionService;
@@ -37,7 +38,10 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -61,7 +65,9 @@ import static org.mockito.Mockito.when;
         TokenProvider.class,
         JavaMailSenderImpl.class,
         UserSignUpDtoMapperImpl.class,
-        UserRepository.class
+        UserRepository.class,
+        JwtAuthenticationByUserDetails.class,
+        TokenProvider.class
 })
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(locations = "classpath:properties/jwt.properties")

@@ -5,6 +5,7 @@ import com.itech.model.dto.user.UserSignUpDto;
 import com.itech.model.entity.User;
 import com.itech.model.enumeration.Role;
 import com.itech.repository.UserRepository;
+import com.itech.security.jwt.authentication.JwtAuthenticationByUserDetails;
 import com.itech.security.jwt.provider.TokenProvider;
 import com.itech.service.mail.EmailService;
 import com.itech.service.mail.impl.EmailServiceImpl;
@@ -47,7 +48,9 @@ import static org.mockito.Mockito.*;
         JwtDecoder.class,
         JavaMailSenderImpl.class,
         UserSignUpDtoMapperImpl.class,
-        UserRepository.class})
+        UserRepository.class,
+        TokenProvider.class,
+        JwtAuthenticationByUserDetails.class})
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(locations = "classpath:properties/jwt.properties")
 @TestPropertySource(locations = "classpath:properties/mail.properties")

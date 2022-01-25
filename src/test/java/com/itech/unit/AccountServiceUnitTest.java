@@ -15,6 +15,7 @@ import com.itech.model.enumeration.Status;
 import com.itech.repository.AccountRepository;
 import com.itech.repository.CreationRequestRepository;
 import com.itech.repository.UserRepository;
+import com.itech.security.jwt.authentication.JwtAuthenticationByUserDetails;
 import com.itech.security.jwt.provider.TokenProvider;
 import com.itech.service.account.AccountService;
 import com.itech.service.account.impl.AccountServiceImpl;
@@ -45,7 +46,10 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -67,7 +71,8 @@ import static org.mockito.Mockito.*;
         SecurityConfig.class,
         TokenProvider.class,
         UserSignUpDtoMapperImpl.class,
-        UserRepository.class})
+        UserRepository.class,
+        JwtAuthenticationByUserDetails.class})
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(locations = "classpath:properties/jwt.properties")
 @TestPropertySource(locations = "classpath:properties/mail.properties")
@@ -81,20 +86,20 @@ class AccountServiceUnitTest {
     ArgumentCaptor<String> titleCaptor;
     @Captor
     ArgumentCaptor<String> messageCaptor;
-    @Value("${mail.approve.message}")
-    private String approveMessage;
     @Value("${mail.rejected.message.title}")
     private String rejectedMessageTitleText;
     @Value("${mail.reject.message}")
     private String rejectMessage;
+    @Value("${mail.approve.message}")
+    private String approveMessage;
     @MockBean
     private AccountRepository accountRepository;
 
     @MockBean
-    private IbanGenerator ibanGenerator;
+    private UserRepository userRepository;
 
     @MockBean
-    private UserRepository userRepository;
+    private IbanGenerator ibanGenerator;
 
     @MockBean
     private EmailService emailService;
@@ -306,8 +311,9 @@ class AccountServiceUnitTest {
                 Optional.of(new CreationRequest(1L, anyUser, "{\"Amount\":200.0,\"Currency\":\"EUR\"}", Status.IN_PROGRESS, null, LocalDateTime.now(), CreationType.ACCOUNT)));
         when(ibanGenerator.generateIban(Currency.EUR.getCountryCode())).thenReturn("number1");
         String accountNumber = ibanGenerator.generateIban(Currency.EUR.getCountryCode());
-        Account accountToSave = new Account(1L, anyUser, 0, Currency.PLN, accountNumber);
-        when(accountRepository.save(any(Account.class))).thenAnswer(i -> i.getArguments()[0]);
+        when(accountRepository.findAccountByAccountNumber("number1")).thenReturn(Optional.empty());
+        Account accountToSave = new Account(1L, anyUser, 200, Currency.EUR, accountNumber);
+        when(accountRepository.save(accountToSave)).thenReturn(accountToSave);
         when(accountRepository.findAccountByAccountNumber(accountNumber)).thenReturn(Optional.of(accountToSave));
         doNothing().when(emailService).sendEmail("ekrayniy@inbox.ru", "Request approved. Id of created account: 1", approveMessage);
 
@@ -327,40 +333,11 @@ class AccountServiceUnitTest {
 
         when(creationRequestRepository.findCreationRequestsByIdAndStatusAndCreationType(1L, Status.IN_PROGRESS, CreationType.ACCOUNT)).thenReturn(
                 Optional.of(new CreationRequest(1L, anyUser, "{\"Amount\":200.0,\"Currency\":\"EUR\"}", Status.IN_PROGRESS, null, LocalDateTime.now(), CreationType.ACCOUNT)));
-        when(ibanGenerator.generateIban(Currency.EUR.getCountryCode())).thenReturn("number1");
-        String accountNumber = ibanGenerator.generateIban(Currency.EUR.getCountryCode());
-        Account accountToSave = new Account(1L, anyUser, 0, Currency.PLN, accountNumber);
-        when(accountRepository.save(any(Account.class))).thenAnswer(i -> i.getArguments()[0]);
-        when(accountRepository.findAccountByAccountNumber(accountNumber)).thenReturn(Optional.empty()).thenReturn(Optional.of(accountToSave));
-        doNothing().when(emailService).sendEmail("ekrayniy@inbox.ru", "Request approved. Id of created account: 1", approveMessage);
-
-        accountService.approveAccountCreationRequest(1L);
-        verify(emailService).sendEmail(emailCaptor.capture(), titleCaptor.capture(), messageCaptor.capture());
-
-        assertThat(emailCaptor.getValue()).isEqualTo("ekrayniy@inbox.ru");
-        assertThat(titleCaptor.getValue()).isEqualTo("Request approved. Id of created account: 1");
-        assertThat(messageCaptor.getValue()).isEqualTo(approveMessage);
-    }
-
-    @WithMockUser(username = "user")
-    @Test
-    void givenAccountCreationRequests_andManagerRole_whenApproveAccountCreationRequest_andUserEmailNotExists_thenThrowsEntityNotFoundException() {
-        User anyUser = new User("user", "user", null, Role.USER);
-        anyUser.setId(1L);
-
-        when(creationRequestRepository.findCreationRequestsByIdAndStatusAndCreationType(1L, Status.IN_PROGRESS, CreationType.ACCOUNT)).thenReturn(
-                Optional.of(new CreationRequest(1L, anyUser, "{\"Amount\":200.0,\"Currency\":\"EUR\"}", Status.IN_PROGRESS, null, LocalDateTime.now(), CreationType.ACCOUNT)));
-        when(ibanGenerator.generateIban(Currency.EUR.getCountryCode())).thenReturn("number1");
-        String accountNumber = ibanGenerator.generateIban(Currency.EUR.getCountryCode());
-        Account accountToSave = new Account(1L, anyUser, 0, Currency.PLN, accountNumber);
-        when(accountRepository.save(any(Account.class))).thenAnswer(i -> i.getArguments()[0]);
-        when(accountRepository.findAccountByAccountNumber(accountNumber)).thenReturn(Optional.empty()).thenReturn(Optional.of(accountToSave));
-        doNothing().when(emailService).sendEmail("ekrayniy@inbox.ru", "Request approved. Id of created account: 1", approveMessage);
 
         Exception exception = assertThrows(EntityNotFoundException.class, () ->
-                accountService.approveAccountCreationRequest(1L));
+                accountService.approveAccountCreationRequest(3L));
 
-        String expectedMessage = ExceptionMessageText.USER_EMAIL_NOT_FOUND;
+        String expectedMessage = ExceptionMessageText.ACCOUNT_CREATION_REQUEST_NOT_FOUND;
         String actualMessage = exception.getMessage();
 
         assertTrue(actualMessage.contains(expectedMessage));
@@ -397,25 +374,6 @@ class AccountServiceUnitTest {
         assertThat(emailCaptor.getValue()).isEqualTo("ekrayniy@inbox.ru");
         assertThat(titleCaptor.getValue()).isEqualTo(rejectedMessageTitleText);
         assertThat(messageCaptor.getValue()).isEqualTo(rejectMessage);
-    }
-
-    @WithMockUser(username = "user")
-    @Test
-    void givenAccountCreationRequests_andManagerRole_whenRejectAccountCreationRequest_andUserEmailNotExists_thenThrowsEntityNotFoundException() {
-        User anyUser = new User("user", "user", null, Role.USER);
-        anyUser.setId(1L);
-
-        when(creationRequestRepository.findCreationRequestsByIdAndStatusAndCreationType(1L, Status.IN_PROGRESS, CreationType.ACCOUNT)).thenReturn(
-                Optional.of(new CreationRequest(1L, anyUser, "{\"Amount\":200.0,\"Currency\":\"EUR\"}", Status.IN_PROGRESS, null, LocalDateTime.now(), CreationType.ACCOUNT)));
-        doNothing().when(emailService).sendEmail("ekrayniy@inbox.ru", rejectedMessageTitleText, rejectMessage);
-
-        Exception exception = assertThrows(EntityNotFoundException.class, () ->
-                accountService.rejectAccountCreationRequest(1L));
-
-        String expectedMessage = ExceptionMessageText.USER_EMAIL_NOT_FOUND;
-        String actualMessage = exception.getMessage();
-
-        assertTrue(actualMessage.contains(expectedMessage));
     }
 
     @WithMockUser(username = "user")

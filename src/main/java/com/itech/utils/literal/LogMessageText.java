@@ -5,6 +5,7 @@ public class LogMessageText {
     public static final String DEBUG_REQUEST_BODY_LOG = "Request body: {%s}";
     public static final String AUTHENTICATED_USER_NOT_FOUND_LOG = "Authenticated user not found.";
     public static final String ACCOUNT_NOT_FOUND_LOG = "Account not found. Id of requested account: %d";
+    public static final String ACCOUNT_WITH_NUMBER_NOT_FOUND_LOG = "Account not found. Number of requested account: %s";
     public static final String ACCOUNT_CREATION_REQUEST_CREATED_LOG = "Account creation request created. Id of Creation Request: %d";
     public static final String TRANSACTION_CREATION_REQUEST_CREATED_LOG = "Transaction creation request created. Id of Creation Request: %d";
     public static final String ACCOUNT_CREATION_REQUEST_UPDATED_LOG = "Account creation request updated. Id of Creation Request: %d";
@@ -22,6 +23,10 @@ public class LogMessageText {
     public static final String TRANSACTION_REJECTED_LOG = "Transaction was rejected. Id of rejected transaction: %d";
     public static final String TRANSACTION_CREATED_LOG = "Transaction was created successfully! Id of created transaction: %d";
     public static final String TRANSACTION_CREATION_REQUEST_NOT_FOUND_LOG = "Transaction creation request not found. Id of requested transaction creation request: %d";
+    public static final String CREDIT_IS_MORE_THAN_STORED_ON_ACCOUNT_LOG = "Transaction creation request was rejected. CREDIT amount is more than stored in this account. Id of account, which not have enough amount: %d";
+    public static final String TRANSACTION_CREATION_REQUEST_EXPIRED_LOG = "Transaction creation request expired. Id of request %d";
+    public static final String USER_IS_ALREADY_EXISTS = "User is already exists.";
+    public static final String MANAGER_USER_NOT_EXISTS = "Manager user not exists, and confirmation message cannot be sent.";
 
     private LogMessageText() {
     }

@@ -8,7 +8,6 @@ import com.itech.model.enumeration.CreationType;
 import com.itech.model.enumeration.Status;
 import com.itech.rabbit.RabbitMqPublisher;
 import com.itech.repository.CreationRequestRepository;
-import com.itech.repository.UserRepository;
 import com.itech.service.request.RequestService;
 import com.itech.utils.JsonEntitySerializer;
 import com.itech.utils.JwtDecoder;
