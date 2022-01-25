@@ -22,10 +22,7 @@ public class EnumValueValidator implements ConstraintValidator<EnumValue, CharSe
 
     @Override
     public boolean isValid(CharSequence value, ConstraintValidatorContext context) {
-        if (value == null) {
-            return false;
-
-        }
+        if (value == null) return false;
         return enumValues.contains(value.toString().toUpperCase(Locale.ROOT));
     }
 }

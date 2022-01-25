@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
         User mappedUser = userSignUpDtoMapper.toEntity(userDto);
 
         if (userRepository.findUserByUsername(mappedUser.getUsername()).isPresent() || userRepository.findUserByEmail(mappedUser.getEmail()).isPresent()){
-            log.error(LogMessageText.USER_IS_ALREADY_EXISTS);
+            log.error(LogMessageText.USER_IS_ALREADY_EXISTS_LOG);
             throw new ValidationException(ExceptionMessageText.USER_IS_ALREADY_EXISTS);
         }
 
@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService {
 
         Optional<User> managerUserOptional = userRepository.findUserByRole(Role.MANAGER);
         if(!managerUserOptional.isPresent()){
-            log.error(LogMessageText.MANAGER_USER_NOT_EXISTS);
+            log.error(LogMessageText.MANAGER_USER_NOT_EXISTS_LOG);
             throw new EntityNotFoundException(ExceptionMessageText.USER_NOT_FOUND);
         } else {
             emailService.sendEmail(managerUserOptional.get().getEmail(),

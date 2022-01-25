@@ -19,14 +19,16 @@ public class LogMessageText {
     public static final String MESSAGE_SENT_LOG = "Message was successfully sent to email: %s";
     public static final String MESSAGE_SENT_TO_QUEUE_LOG = "Message was successfully sent to queue.";
     public static final String USER_NOT_FOUND_LOG = "User not found. Id of requested user: %d";
-    public static final String TRANSACTION_CREATION_REQUEST_REJECTED_LOG = "Transaction creation request was rejected. Id of rejected request: %d";
     public static final String TRANSACTION_REJECTED_LOG = "Transaction was rejected. Id of rejected transaction: %d";
     public static final String TRANSACTION_CREATED_LOG = "Transaction was created successfully! Id of created transaction: %d";
     public static final String TRANSACTION_CREATION_REQUEST_NOT_FOUND_LOG = "Transaction creation request not found. Id of requested transaction creation request: %d";
     public static final String CREDIT_IS_MORE_THAN_STORED_ON_ACCOUNT_LOG = "Transaction creation request was rejected. CREDIT amount is more than stored in this account. Id of account, which not have enough amount: %d";
     public static final String TRANSACTION_CREATION_REQUEST_EXPIRED_LOG = "Transaction creation request expired. Id of request %d";
-    public static final String USER_IS_ALREADY_EXISTS = "User is already exists.";
-    public static final String MANAGER_USER_NOT_EXISTS = "Manager user not exists, and confirmation message cannot be sent.";
+    public static final String USER_IS_ALREADY_EXISTS_LOG = "User is already exists.";
+    public static final String MANAGER_USER_NOT_EXISTS_LOG = "Manager user not exists, and confirmation message cannot be sent.";
+    public static final String USER_AUTHENTICATED_LOG = "User was authenticated. Username: %s Password: %s Token: %s";
+    public static final String OPERATIONS_ARE_EMPTY_LOG = "Operations are empty!";
+
 
     private LogMessageText() {
     }

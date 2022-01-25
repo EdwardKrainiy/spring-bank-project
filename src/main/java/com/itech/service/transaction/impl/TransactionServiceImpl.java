@@ -102,7 +102,7 @@ public class TransactionServiceImpl implements TransactionService {
         CreationRequest requestToReject;
 
         if (!requestToRejectOptional.isPresent()) {
-            log.error(String.format(LogMessageText.TRANSACTION_NOT_FOUND_LOG, creationRequestDto.getId()));
+            log.error(String.format(LogMessageText.TRANSACTION_CREATION_REQUEST_NOT_FOUND_LOG, creationRequestDto.getId()));
             throw new EntityNotFoundException(ExceptionMessageText.TRANSACTION_CREATION_REQUEST_NOT_FOUND);
         } else {
             requestToReject = requestToRejectOptional.get();
@@ -176,7 +176,6 @@ public class TransactionServiceImpl implements TransactionService {
         requestToReject.setStatus(Status.REJECTED);
         requestToReject.setCreatedId(transaction.getId());
         creationRequestRepository.save(requestToReject);
-        log.error(String.format(LogMessageText.TRANSACTION_CREATION_REQUEST_REJECTED_LOG, requestToReject.getId()));
 
         transaction.setStatus(Status.REJECTED);
         transactionRepository.save(transaction);

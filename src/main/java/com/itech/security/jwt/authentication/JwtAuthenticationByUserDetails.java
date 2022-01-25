@@ -2,7 +2,9 @@ package com.itech.security.jwt.authentication;
 
 import com.itech.model.dto.user.UserSignInDto;
 import com.itech.security.jwt.provider.TokenProvider;
+import com.itech.utils.literal.LogMessageText;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Log4j2
 public class JwtAuthenticationByUserDetails {
 
     private final AuthenticationManager authenticationManager;
@@ -40,6 +43,7 @@ public class JwtAuthenticationByUserDetails {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         final String token = jwtTokenUtil.generateAuthToken(authentication);
+        log.info(String.format(LogMessageText.USER_AUTHENTICATED_LOG, userDto.getUsername(), userDto.getPassword(), token));
         return ResponseEntity.ok(token);
     }
 }

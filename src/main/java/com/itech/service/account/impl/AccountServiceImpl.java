@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -208,7 +209,7 @@ public class AccountServiceImpl implements AccountService {
         Account accountToCreate = new Account();
         accountToCreate.setUser(accountCreationRequestUser);
         accountToCreate.setAmount(accountChangeDtoFromCreationRequest.getAmount());
-        accountToCreate.setCurrency(Currency.valueOf(accountChangeDtoFromCreationRequest.getCurrency()));
+        accountToCreate.setCurrency(Currency.valueOf(accountChangeDtoFromCreationRequest.getCurrency().toUpperCase(Locale.ROOT)));
 
         String accountNumber = ibanGenerator.generateIban(accountToCreate.getCurrency().getCountryCode());
 
