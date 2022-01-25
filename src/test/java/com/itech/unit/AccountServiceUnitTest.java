@@ -311,10 +311,9 @@ class AccountServiceUnitTest {
                 Optional.of(new CreationRequest(1L, anyUser, "{\"Amount\":200.0,\"Currency\":\"EUR\"}", Status.IN_PROGRESS, null, LocalDateTime.now(), CreationType.ACCOUNT)));
         when(ibanGenerator.generateIban(Currency.EUR.getCountryCode())).thenReturn("number1");
         String accountNumber = ibanGenerator.generateIban(Currency.EUR.getCountryCode());
-        when(accountRepository.findAccountByAccountNumber("number1")).thenReturn(Optional.empty());
         Account accountToSave = new Account(1L, anyUser, 200, Currency.EUR, accountNumber);
         when(accountRepository.save(accountToSave)).thenReturn(accountToSave);
-        when(accountRepository.findAccountByAccountNumber(accountNumber)).thenReturn(Optional.of(accountToSave));
+        when(accountRepository.findAccountByAccountNumber(accountNumber)).thenReturn(Optional.empty()).thenReturn(Optional.of(accountToSave));
         doNothing().when(emailService).sendEmail("ekrayniy@inbox.ru", "Request approved. Id of created account: 1", approveMessage);
 
         accountService.approveAccountCreationRequest(1L);

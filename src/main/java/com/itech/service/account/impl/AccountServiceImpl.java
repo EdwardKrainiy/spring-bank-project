@@ -212,10 +212,11 @@ public class AccountServiceImpl implements AccountService {
 
         String accountNumber = ibanGenerator.generateIban(accountToCreate.getCurrency().getCountryCode());
 
-        if (accountRepository.findAccountByAccountNumber(accountNumber).isPresent()) {
+        while (accountRepository.findAccountByAccountNumber(accountNumber).isPresent()) {
             accountNumber = ibanGenerator.generateIban(accountToCreate.getCurrency().getCountryCode());
-            accountToCreate.setAccountNumber(accountNumber);
         }
+
+        accountToCreate.setAccountNumber(accountNumber);
 
         accountRepository.save(accountToCreate);
         Long createdAccountId;
