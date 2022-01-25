@@ -11,11 +11,11 @@ import org.mapstruct.Mapper;
  */
 @Mapper(componentModel = "spring")
 public interface AccountUpdateDtoMapper {
-    /**
-     * toEntity method. Converts AccountUpdateDto object to Account.
-     *
-     * @param accountUpdateDto AccountUpdateDto object we need to convert.
-     * @return Account Obtained Account entity.
-     */
-    Account toEntity(AccountUpdateDto accountUpdateDto);
+  /**
+   * toEntity method. Converts AccountUpdateDto object to Account.
+   *
+   * @param accountUpdateDto AccountUpdateDto object we need to convert.
+   * @return Account Obtained Account entity.
+   */
+  Account toEntity(AccountUpdateDto accountUpdateDto);
 }

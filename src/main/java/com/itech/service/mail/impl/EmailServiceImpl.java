@@ -11,19 +11,18 @@ import org.springframework.stereotype.Service;
  *
  * @author Edvard Krainiy on 12/9/2021
  */
-
 @Service
 @RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
 
-    private final JavaMailSender emailSender;
+  private final JavaMailSender emailSender;
 
-    @Override
-    public void sendEmail(String toAddress, String subject, String message) {
-        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-        simpleMailMessage.setTo(toAddress);
-        simpleMailMessage.setSubject(subject);
-        simpleMailMessage.setText(message);
-        emailSender.send(simpleMailMessage);
-    }
+  @Override
+  public void sendEmail(String toAddress, String subject, String message) {
+    SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+    simpleMailMessage.setTo(toAddress);
+    simpleMailMessage.setSubject(subject);
+    simpleMailMessage.setText(message);
+    emailSender.send(simpleMailMessage);
+  }
 }

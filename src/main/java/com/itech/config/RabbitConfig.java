@@ -12,11 +12,11 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class RabbitConfig {
-    @Value("${spring.rabbit.mq.queuename}")
-    private String queueName;
+  @Value("${spring.rabbit.mq.queuename}")
+  private String queueName;
 
-    @Bean
-    public Queue createBankAppQueue() {
-        return new Queue(queueName);
-    }
+  @Bean
+  public Queue createBankAppQueue() {
+    return new Queue(queueName);
+  }
 }

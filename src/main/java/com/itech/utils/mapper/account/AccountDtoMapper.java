@@ -13,16 +13,16 @@ import org.mapstruct.Mappings;
  */
 @Mapper(componentModel = "spring")
 public interface AccountDtoMapper {
-    /**
-     * toDto method. Converts Account object to AccountDto.
-     *
-     * @param account Account object we need to convert.
-     * @return AccountDto Obtained AccountDto entity.
-     */
-    @Mappings({
-            @Mapping(source = "account.user.username", target = "username"),
-            @Mapping(source = "account.currency", target = "currency"),
-            @Mapping(source = "account.accountNumber", target = "iban")
-    })
-    AccountDto toDto(Account account);
+  /**
+   * toDto method. Converts Account object to AccountDto.
+   *
+   * @param account Account object we need to convert.
+   * @return AccountDto Obtained AccountDto entity.
+   */
+  @Mappings({
+    @Mapping(source = "account.user.username", target = "username"),
+    @Mapping(source = "account.currency", target = "currency"),
+    @Mapping(source = "account.accountNumber", target = "iban")
+  })
+  AccountDto toDto(Account account);
 }

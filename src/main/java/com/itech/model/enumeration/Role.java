@@ -5,8 +5,7 @@ package com.itech.model.enumeration;
  *
  * @author Edvard Krainiy on 12/3/2021
  */
-
 public enum Role {
-    USER,
-    MANAGER
+  USER,
+  MANAGER
 }

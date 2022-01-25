@@ -17,29 +17,31 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  *
  * @author Edvard Krainiy on 12/6/2021
  */
-
 @Configuration
 @EnableSwagger2
 @Import({BeanValidatorPluginsConfiguration.class, SpringDataRestConfiguration.class})
 public class SwaggerConfig {
 
-    /**
-     * Builds and provides us swagger-ui.html file via adding configured api bean.
-     */
-    @Bean
-    public Docket api() {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .apiInfo(new ApiInfoBuilder()
-                        .title("Bank web application")
-                        .description("Free to use")
-                        .contact(new springfox.documentation.service.Contact("Krainiy Edvard", "https://www.linkedin.com/in/edvard-krainiy-5b2b13221/", "a@b.com"))
-                        .version("1.0")
-                        .license("API License")
-                        .build())
-                .useDefaultResponseMessages(false)
-                .select()
-                .apis(RequestHandlerSelectors.basePackage("com.itech"))
-                .paths(PathSelectors.any())
-                .build();
-    }
+  /** Builds and provides us swagger-ui.html file via adding configured api bean. */
+  @Bean
+  public Docket api() {
+    return new Docket(DocumentationType.SWAGGER_2)
+        .apiInfo(
+            new ApiInfoBuilder()
+                .title("Bank web application")
+                .description("Free to use")
+                .contact(
+                    new springfox.documentation.service.Contact(
+                        "Krainiy Edvard",
+                        "https://www.linkedin.com/in/edvard-krainiy-5b2b13221/",
+                        "a@b.com"))
+                .version("1.0")
+                .license("API License")
+                .build())
+        .useDefaultResponseMessages(false)
+        .select()
+        .apis(RequestHandlerSelectors.basePackage("com.itech"))
+        .paths(PathSelectors.any())
+        .build();
+  }
 }

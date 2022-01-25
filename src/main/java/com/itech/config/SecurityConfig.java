@@ -24,63 +24,77 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  *
  * @author Edvard Krainiy on 12/6/2021
  */
-
 @Configuration
 @EnableWebSecurity
-@PropertySource({PropertySourceClasspath.SECURITY_PROPERTIES_CLASSPATH, PropertySourceClasspath.JWT_PROPERTIES_CLASSPATH})
+@PropertySource({
+  PropertySourceClasspath.SECURITY_PROPERTIES_CLASSPATH,
+  PropertySourceClasspath.JWT_PROPERTIES_CLASSPATH
+})
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    private final UserDetailsService customUserDetailsService;
-    @Value("${encrypt.rounds}")
-    private int encryptRounds;
+  private final UserDetailsService customUserDetailsService;
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-                .csrf().disable()
-                .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/api/auth/*").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/auth/email-confirmation").hasAuthority(Role.MANAGER.name())
-                .antMatchers("/api/accounts").hasAnyAuthority(Role.USER.name(), Role.MANAGER.name())
-                .antMatchers("/api/transactions").hasAnyAuthority(Role.MANAGER.name(), Role.USER.name())
-                .antMatchers("/api/accounts/*").hasAnyAuthority(Role.USER.name(), Role.MANAGER.name())
-                .antMatchers("/api/transactions/*").hasAnyAuthority(Role.MANAGER.name(), Role.USER.name())
-                .antMatchers(HttpMethod.GET, "/api/*/creation-requests/*").hasAnyAuthority(Role.USER.name(), Role.MANAGER.name())
-                .antMatchers(HttpMethod.GET, "/api/accounts/creation-requests/{\\\\d+}/**").hasAuthority(Role.MANAGER.name())
-                .antMatchers("/*").permitAll()
-                .anyRequest().permitAll();
+  @Value("${encrypt.rounds}")
+  private int encryptRounds;
 
-        http.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
-    }
+  @Override
+  protected void configure(HttpSecurity http) throws Exception {
+    http.csrf()
+        .disable()
+        .authorizeRequests()
+        .antMatchers(HttpMethod.POST, "/api/auth/*")
+        .permitAll()
+        .antMatchers(HttpMethod.GET, "/api/auth/email-confirmation")
+        .hasAuthority(Role.MANAGER.name())
+        .antMatchers("/api/accounts")
+        .hasAnyAuthority(Role.USER.name(), Role.MANAGER.name())
+        .antMatchers("/api/transactions")
+        .hasAnyAuthority(Role.MANAGER.name(), Role.USER.name())
+        .antMatchers("/api/accounts/*")
+        .hasAnyAuthority(Role.USER.name(), Role.MANAGER.name())
+        .antMatchers("/api/transactions/*")
+        .hasAnyAuthority(Role.MANAGER.name(), Role.USER.name())
+        .antMatchers(HttpMethod.GET, "/api/*/creation-requests/*")
+        .hasAnyAuthority(Role.USER.name(), Role.MANAGER.name())
+        .antMatchers(HttpMethod.GET, "/api/accounts/creation-requests/{\\\\d+}/**")
+        .hasAuthority(Role.MANAGER.name())
+        .antMatchers("/*")
+        .permitAll()
+        .anyRequest()
+        .permitAll();
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(customUserDetailsService).passwordEncoder(encoder());
-    }
+    http.addFilterBefore(
+        authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
+  }
 
-    @Bean
-    protected PasswordEncoder encoder() {
-        return new BCryptPasswordEncoder(encryptRounds);
-    }
+  @Override
+  protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    auth.userDetailsService(customUserDetailsService).passwordEncoder(encoder());
+  }
 
-    /**
-     * Returns authenticationManagerBean() and adds this one to Application context.
-     *
-     * @return authenticationManagerBean
-     */
-    @Override
-    @Bean
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
+  @Bean
+  protected PasswordEncoder encoder() {
+    return new BCryptPasswordEncoder(encryptRounds);
+  }
 
-    /**
-     * Returns authenticationTokenFilterBean() and adds this one to Application context.
-     *
-     * @return JwtAuthenticationFilterBean
-     */
-    @Bean
-    public JwtAuthenticationFilter authenticationTokenFilterBean() {
-        return new JwtAuthenticationFilter();
-    }
+  /**
+   * Returns authenticationManagerBean() and adds this one to Application context.
+   *
+   * @return authenticationManagerBean
+   */
+  @Override
+  @Bean
+  public AuthenticationManager authenticationManagerBean() throws Exception {
+    return super.authenticationManagerBean();
+  }
+
+  /**
+   * Returns authenticationTokenFilterBean() and adds this one to Application context.
+   *
+   * @return JwtAuthenticationFilterBean
+   */
+  @Bean
+  public JwtAuthenticationFilter authenticationTokenFilterBean() {
+    return new JwtAuthenticationFilter();
+  }
 }

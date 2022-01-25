@@ -9,14 +9,13 @@ import com.itech.utils.exception.ChangeAccountAmountException;
 import com.itech.utils.exception.ValidationException;
 import com.itech.utils.literal.ExceptionMessageText;
 import com.itech.utils.literal.LogMessageText;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Set;
 
 /**
  * This class contains additional required methods to create Transaction.
@@ -27,76 +26,85 @@ import java.util.Set;
 @RequiredArgsConstructor
 @Log4j2
 public class TransactionServiceUtil {
-    private final TransactionRepository transactionRepository;
+  private final TransactionRepository transactionRepository;
 
-    /**
-     * changeAccountAmount method. Changes amount on all accounts.
-     *
-     * @param operations Set of operations, which are required to obtain Account objects.
-     * @throws ValidationException If isDtoValid is false.
-     */
+  /**
+   * changeAccountAmount method. Changes amount on all accounts.
+   *
+   * @param operations Set of operations, which are required to obtain Account objects.
+   * @throws ValidationException If isDtoValid is false.
+   */
+  @Transactional
+  public void changeAccountAmount(Set<Operation> operations) throws ChangeAccountAmountException {
+    for (Operation operation : operations) {
+      if (operation.getOperationType().equals(OperationType.CREDIT)
+          && operation.getAccount().getAmount() - operation.getAmount() >= 0) {
+        operation
+            .getAccount()
+            .setAmount(operation.getAccount().getAmount() - operation.getAmount());
+      } else if (operation.getOperationType().equals(OperationType.DEBIT)) {
+        operation
+            .getAccount()
+            .setAmount(operation.getAccount().getAmount() + operation.getAmount());
+      } else {
+        log.error(
+            String.format(
+                LogMessageText.CREDIT_IS_MORE_THAN_STORED_ON_ACCOUNT_LOG,
+                operation.getAccount().getId()));
+        throw new ChangeAccountAmountException(
+            ExceptionMessageText.CREDIT_IS_MORE_THAN_STORED_ON_ACCOUNT);
+      }
+    }
+  }
 
-    @Transactional
-    public void changeAccountAmount(Set<Operation> operations) throws ChangeAccountAmountException {
-        for (Operation operation : operations) {
-            if (operation.getOperationType().equals(OperationType.CREDIT) && operation.getAccount().getAmount() - operation.getAmount() >= 0) {
-                operation.getAccount().setAmount(operation.getAccount().getAmount() - operation.getAmount());
-            } else if (operation.getOperationType().equals(OperationType.DEBIT)) {
-                operation.getAccount().setAmount(operation.getAccount().getAmount() + operation.getAmount());
-            } else {
-                log.error(String.format(LogMessageText.CREDIT_IS_MORE_THAN_STORED_ON_ACCOUNT_LOG, operation.getAccount().getId()));
-                throw new ChangeAccountAmountException(ExceptionMessageText.CREDIT_IS_MORE_THAN_STORED_ON_ACCOUNT);
-            }
-        }
+  /**
+   * checkRequestDtoValidity method.
+   *
+   * @param operations Set of operations, which are required to obtain Account objects.
+   * @param transaction Transaction object, which we need to write in DB.
+   * @return Boolean Is dto valid flag.
+   */
+  public boolean checkRequestDtoValidity(Set<Operation> operations, Transaction transaction) {
+    LocalDate date = transaction.getIssuedAt().atZone(ZoneId.systemDefault()).toLocalDate();
+    if (date.isBefore(LocalDate.now().minusDays(1))) {
+      transaction.setStatus(Status.EXPIRED);
+      transactionRepository.save(transaction);
+      log.error(
+          String.format(
+              LogMessageText.TRANSACTION_CREATION_REQUEST_EXPIRED_LOG, transaction.getId()));
+      throw new ValidationException(ExceptionMessageText.CREATION_REQUEST_EXPIRED);
     }
 
-    /**
-     * checkRequestDtoValidity method.
-     *
-     * @param operations  Set of operations, which are required to obtain Account objects.
-     * @param transaction Transaction object, which we need to write in DB.
-     * @return Boolean Is dto valid flag.
-     */
+    boolean areOperationTypesCorrect = checkOperationTypes(operations);
+    boolean isSumOfAmountsEqualsZero = checkSumOfOperationAmounts(operations);
 
-    public boolean checkRequestDtoValidity(Set<Operation> operations, Transaction transaction) {
-        LocalDate date = transaction.getIssuedAt().atZone(ZoneId.systemDefault()).toLocalDate();
-        if (date.isBefore(LocalDate.now().minusDays(1))) {
-            transaction.setStatus(Status.EXPIRED);
-            transactionRepository.save(transaction);
-            log.error(String.format(LogMessageText.TRANSACTION_CREATION_REQUEST_EXPIRED_LOG, transaction.getId()));
-            throw new ValidationException(ExceptionMessageText.CREATION_REQUEST_EXPIRED);
-        }
+    return areOperationTypesCorrect && isSumOfAmountsEqualsZero;
+  }
 
-        boolean areOperationTypesCorrect = checkOperationTypes(operations);
-        boolean isSumOfAmountsEqualsZero = checkSumOfOperationAmounts(operations);
+  private boolean checkOperationTypes(Set<Operation> operations) {
+    boolean isDebitOperationsExists = false;
+    boolean isCreditOperationsExists = false;
 
-        return areOperationTypesCorrect && isSumOfAmountsEqualsZero;
+    for (Operation operation : operations) {
+      if (operation.getOperationType().equals(OperationType.CREDIT)) {
+        isCreditOperationsExists = true;
+      } else {
+        isDebitOperationsExists = true;
+      }
     }
+    return (isCreditOperationsExists && isDebitOperationsExists);
+  }
 
-    private boolean checkOperationTypes(Set<Operation> operations) {
-        boolean isDebitOperationsExists = false;
-        boolean isCreditOperationsExists = false;
+  private boolean checkSumOfOperationAmounts(Set<Operation> operations) {
+    double sumOfAmounts = 0;
 
-        for (Operation operation : operations) {
-            if (operation.getOperationType().equals(OperationType.CREDIT)) {
-                isCreditOperationsExists = true;
-            } else {
-                isDebitOperationsExists = true;
-            }
-        }
-        return (isCreditOperationsExists && isDebitOperationsExists);
+    for (Operation operation : operations) {
+      if (operation.getOperationType().equals(OperationType.CREDIT)) {
+        sumOfAmounts -= operation.getAmount();
+      } else {
+        sumOfAmounts += operation.getAmount();
+      }
     }
-
-    private boolean checkSumOfOperationAmounts(Set<Operation> operations) {
-        double sumOfAmounts = 0;
-
-        for (Operation operation : operations) {
-            if (operation.getOperationType().equals(OperationType.CREDIT)) {
-                sumOfAmounts -= operation.getAmount();
-            } else {
-                sumOfAmounts += operation.getAmount();
-            }
-        }
-        return sumOfAmounts == 0;
-    }
+    return sumOfAmounts == 0;
+  }
 }

@@ -13,17 +13,17 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class RabbitMqPublisher {
-    private final AmqpTemplate template;
-    @Value("${spring.rabbit.mq.queuename}")
-    private String queueName;
+  private final AmqpTemplate template;
 
-    /**
-     * sendMessageToQueue method. Sends message to queue.
-     *
-     * @param message Message, that we will send to queue.
-     */
+  @Value("${spring.rabbit.mq.queuename}")
+  private String queueName;
 
-    public void sendMessageToQueue(String message) {
-        template.convertAndSend(queueName, message);
-    }
+  /**
+   * sendMessageToQueue method. Sends message to queue.
+   *
+   * @param message Message, that we will send to queue.
+   */
+  public void sendMessageToQueue(String message) {
+    template.convertAndSend(queueName, message);
+  }
 }

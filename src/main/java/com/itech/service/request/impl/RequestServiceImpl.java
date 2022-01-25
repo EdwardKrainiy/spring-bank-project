@@ -13,14 +13,14 @@ import com.itech.utils.JsonEntitySerializer;
 import com.itech.utils.JwtDecoder;
 import com.itech.utils.literal.LogMessageText;
 import com.itech.utils.mapper.request.RequestDtoMapper;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-
 /**
- * Implementation of RequestService interface. Provides us different methods of Service layer to work with Repository layer of CreationRequest objects.
+ * Implementation of RequestService interface. Provides us different methods of Service layer to
+ * work with Repository layer of CreationRequest objects.
  *
  * @author Edvard Krainiy on 01/05/2022
  */
@@ -29,34 +29,36 @@ import java.time.LocalDateTime;
 @Log4j2
 public class RequestServiceImpl implements RequestService {
 
-    private final CreationRequestRepository creationRequestRepository;
+  private final CreationRequestRepository creationRequestRepository;
 
-    private final RabbitMqPublisher publisher;
+  private final RabbitMqPublisher publisher;
 
-    private final JwtDecoder jwtDecoder;
+  private final JwtDecoder jwtDecoder;
 
-    private final JsonEntitySerializer serializer;
+  private final JsonEntitySerializer serializer;
 
-    private final RequestDtoMapper requestDtoMapper;
+  private final RequestDtoMapper requestDtoMapper;
 
-    private CreationRequest saveRequest(TransactionCreateDto transactionCreateDto) {
-        User loggedUser = jwtDecoder.getLoggedUser();
+  private CreationRequest saveRequest(TransactionCreateDto transactionCreateDto) {
+    User loggedUser = jwtDecoder.getLoggedUser();
 
-        CreationRequest creationRequest = new CreationRequest();
-        creationRequest.setUser(loggedUser);
-        creationRequest.setCreationType(CreationType.TRANSACTION);
-        creationRequest.setStatus(Status.IN_PROGRESS);
-        creationRequest.setIssuedAt(LocalDateTime.now());
-        creationRequest.setPayload(serializer.serializeObjectToJson(transactionCreateDto));
+    CreationRequest creationRequest = new CreationRequest();
+    creationRequest.setUser(loggedUser);
+    creationRequest.setCreationType(CreationType.TRANSACTION);
+    creationRequest.setStatus(Status.IN_PROGRESS);
+    creationRequest.setIssuedAt(LocalDateTime.now());
+    creationRequest.setPayload(serializer.serializeObjectToJson(transactionCreateDto));
 
-        return creationRequestRepository.save(creationRequest);
-    }
+    return creationRequestRepository.save(creationRequest);
+  }
 
-    @Override
-    public CreationRequestDto processCreationRequestMessage(TransactionCreateDto transactionCreateDto) {
-        CreationRequestDto creationRequestDto = requestDtoMapper.toDto(saveRequest(transactionCreateDto));
-        publisher.sendMessageToQueue(serializer.serializeObjectToJson(creationRequestDto));
-        log.info(LogMessageText.MESSAGE_SENT_TO_QUEUE_LOG);
-        return creationRequestDto;
-    }
+  @Override
+  public CreationRequestDto processCreationRequestMessage(
+      TransactionCreateDto transactionCreateDto) {
+    CreationRequestDto creationRequestDto =
+        requestDtoMapper.toDto(saveRequest(transactionCreateDto));
+    publisher.sendMessageToQueue(serializer.serializeObjectToJson(creationRequestDto));
+    log.info(LogMessageText.MESSAGE_SENT_TO_QUEUE_LOG);
+    return creationRequestDto;
+  }
 }

@@ -7,29 +7,32 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 
 /**
+ * JsonEntitySerializer class. Provides us methods for mapping JSON string from object and obtain
+ * object from JSON string.
+ *
  * @author Edvard Krainiy on 12/30/2021
  */
 @Component
 @Log4j2
 @RequiredArgsConstructor
 public class JsonEntitySerializer {
-    private final ObjectMapper objectMapper;
+  private final ObjectMapper objectMapper;
 
-    public <T> String serializeObjectToJson(T object) {
-        try {
-            return objectMapper.writeValueAsString(object);
-        } catch (JsonProcessingException exception) {
-            log.error("JsonProcessingException caught!");
-            return "";
-        }
+  public <T> String serializeObjectToJson(T object) {
+    try {
+      return objectMapper.writeValueAsString(object);
+    } catch (JsonProcessingException exception) {
+      log.error("JsonProcessingException caught!");
+      return "";
     }
+  }
 
-    public <T> T serializeJsonToObject(String json, Class<T> tClass) {
-        try {
-            return objectMapper.readValue(json, tClass);
-        } catch (JsonProcessingException exception) {
-            log.error("JsonProcessingException caught!");
-            return null;
-        }
+  public <T> T serializeJsonToObject(String json, Class<T> tClass) {
+    try {
+      return objectMapper.readValue(json, tClass);
+    } catch (JsonProcessingException exception) {
+      log.error("JsonProcessingException caught!");
+      return null;
     }
+  }
 }

@@ -12,15 +12,15 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class RabbitMqProcessor {
-    private final TransactionService transactionService;
+  private final TransactionService transactionService;
 
-    /**
-     * processTransactionMessage method. Processes message in queue. In our case this message is creationRequestDto object in JSON format.
-     *
-     * @param creationRequestDtoJson JSON of creationRequestDto object.
-     */
-
-    public void processTransactionMessage(String creationRequestDtoJson) {
-        transactionService.createTransaction(creationRequestDtoJson);
-    }
+  /**
+   * processTransactionMessage method. Processes message in queue. In our case this message is
+   * creationRequestDto object in JSON format.
+   *
+   * @param creationRequestDtoJson JSON of creationRequestDto object.
+   */
+  public void processTransactionMessage(String creationRequestDtoJson) {
+    transactionService.createTransaction(creationRequestDtoJson);
+  }
 }

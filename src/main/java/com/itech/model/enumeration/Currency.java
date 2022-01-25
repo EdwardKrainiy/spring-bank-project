@@ -12,10 +12,9 @@ import org.iban4j.CountryCode;
 @RequiredArgsConstructor
 @Getter
 public enum Currency {
-    PLN(CountryCode.PL),
-    GBP(CountryCode.GB),
-    EUR(CountryCode.DE);
+  PLN(CountryCode.PL),
+  GBP(CountryCode.GB),
+  EUR(CountryCode.DE);
 
-    private final CountryCode countryCode;
+  private final CountryCode countryCode;
 }
-

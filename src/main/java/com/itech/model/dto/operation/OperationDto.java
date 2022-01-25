@@ -17,23 +17,23 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Schema(description = "Operation data-transfer object to manipulate with DB.")
 public class OperationDto {
-    @JsonProperty(JsonPropertyText.ID)
-    @Schema(description = "Unique Id field of Operation.")
-    private Long id;
+  @JsonProperty(JsonPropertyText.ID)
+  @Schema(description = "Unique Id field of Operation.")
+  private Long id;
 
-    @JsonProperty(JsonPropertyText.ACCOUNT_ID)
-    @Schema(description = "AccountId field of Operation.")
-    private Long accountId;
+  @JsonProperty(JsonPropertyText.ACCOUNT_ID)
+  @Schema(description = "AccountId field of Operation.")
+  private Long accountId;
 
-    @JsonProperty(JsonPropertyText.TRANSACTION_ID)
-    @Schema(description = "TransactionId field of Operation.")
-    private Long transactionId;
+  @JsonProperty(JsonPropertyText.TRANSACTION_ID)
+  @Schema(description = "TransactionId field of Operation.")
+  private Long transactionId;
 
-    @JsonProperty(JsonPropertyText.AMOUNT)
-    @Schema(description = "Amount field of Operation.")
-    private Double amount;
+  @JsonProperty(JsonPropertyText.AMOUNT)
+  @Schema(description = "Amount field of Operation.")
+  private Double amount;
 
-    @JsonProperty(JsonPropertyText.OPERATION_TYPE)
-    @Schema(description = "OperationType field of Operation. Can be CREDIT or DEBIT.")
-    private String operationType;
+  @JsonProperty(JsonPropertyText.OPERATION_TYPE)
+  @Schema(description = "OperationType field of Operation. Can be CREDIT or DEBIT.")
+  private String operationType;
 }

@@ -16,15 +16,16 @@ import lombok.NoArgsConstructor;
  *
  * @author Edvard Krainiy on 12/18/2021
  */
-
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "Account data-transfer object to create new Account.")
 public class AccountCreateDto extends AccountUpdateDto {
-    @JsonProperty(JsonPropertyText.CURRENCY)
-    @EnumValue(enumClass = Currency.class, message = ValidationMessageText.INCORRECT_CURRENCY_EXCEPTION_MESSAGE)
-    @Schema(description = "Currency field to create unique IBAN.")
-    private String currency;
+  @JsonProperty(JsonPropertyText.CURRENCY)
+  @EnumValue(
+      enumClass = Currency.class,
+      message = ValidationMessageText.INCORRECT_CURRENCY_EXCEPTION_MESSAGE)
+  @Schema(description = "Currency field to create unique IBAN.")
+  private String currency;
 }

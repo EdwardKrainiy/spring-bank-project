@@ -6,14 +6,13 @@ import com.itech.utils.literal.JsonPropertyText;
 import com.itech.utils.literal.ValidationMessageText;
 import com.itech.validator.annotation.IsOperationCorrect;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import java.util.Set;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
-import java.util.Set;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Transaction data-transfer object to create Transaction.
@@ -25,10 +24,11 @@ import java.util.Set;
 @AllArgsConstructor
 @Schema(description = "Transaction data-transfer object to create new Transaction.")
 public class TransactionCreateDto {
-    @JsonProperty(JsonPropertyText.OPERATIONS)
-    @NotEmpty(message = ValidationMessageText.EMPTY_OPERATIONS_EXCEPTION_MESSAGE)
-    @Size(min = 2, message = ValidationMessageText.MINIMAL_OPERATIONS_SIZE_EXCEPTION_MESSAGE)
-    @IsOperationCorrect(message = ValidationMessageText.INCORRECT_STRUCTURE_OF_OPERATIONS_EXCEPTION_MESSAGE)
-    @Schema(description = "Set of operations of Transaction to create new Transaction.")
-    private Set<@Valid OperationCreateDto> operations;
+  @JsonProperty(JsonPropertyText.OPERATIONS)
+  @NotEmpty(message = ValidationMessageText.EMPTY_OPERATIONS_EXCEPTION_MESSAGE)
+  @Size(min = 2, message = ValidationMessageText.MINIMAL_OPERATIONS_SIZE_EXCEPTION_MESSAGE)
+  @IsOperationCorrect(
+      message = ValidationMessageText.INCORRECT_STRUCTURE_OF_OPERATIONS_EXCEPTION_MESSAGE)
+  @Schema(description = "Set of operations of Transaction to create new Transaction.")
+  private Set<@Valid OperationCreateDto> operations;
 }

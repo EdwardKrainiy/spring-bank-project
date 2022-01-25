@@ -1,1 +1,2 @@
-delete from creation_request;
+delete
+from creation_request;
