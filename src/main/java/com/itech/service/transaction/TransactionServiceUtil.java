@@ -33,6 +33,7 @@ public class TransactionServiceUtil {
    *
    * @param operations Set of operations, which are required to obtain Account objects.
    * @throws ValidationException If isDtoValid is false.
+   * @throws ChangeAccountAmountException If credit is more than stored on account.
    */
   @Transactional
   public void changeAccountAmount(Set<Operation> operations) throws ChangeAccountAmountException {

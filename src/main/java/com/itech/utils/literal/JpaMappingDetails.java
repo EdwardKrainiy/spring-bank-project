@@ -31,5 +31,6 @@ public class JpaMappingDetails {
   public static final String ROLE = "role";
   public static final String ACTIVATED = "activated";
   public static final String USER = "user";
+
   private JpaMappingDetails() {}
 }

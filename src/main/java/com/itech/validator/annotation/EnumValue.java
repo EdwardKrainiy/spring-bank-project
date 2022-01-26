@@ -21,7 +21,7 @@ import javax.validation.Payload;
 @Documented
 @Constraint(validatedBy = EnumValueValidator.class)
 public @interface EnumValue {
-  String message() default "Incorrect value of Enumeration!";
+  String message();
 
   Class<? extends Enum<?>> enumClass();
 

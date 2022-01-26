@@ -18,6 +18,13 @@ import org.springframework.stereotype.Component;
 public class JsonEntitySerializer {
   private final ObjectMapper objectMapper;
 
+  /**
+   * serializeObjectToJson method. Converts object of any class to JSON string and returns this one.
+   *
+   * @param object Object of class we need to convert to JSON string.
+   * @param <T> Generic class of object.
+   * @return String Obtained JSON String.
+   */
   public <T> String serializeObjectToJson(T object) {
     try {
       return objectMapper.writeValueAsString(object);
@@ -27,6 +34,14 @@ public class JsonEntitySerializer {
     }
   }
 
+  /**
+   * serializeJsonToObject method. Converts JSON string to Object and returns this one.
+   *
+   * @param json JSON String we want to convert to object.
+   * @param tClass Class of object we want to obtain.
+   * @param <T> Generic class of object.
+   * @return T Obtained object.
+   */
   public <T> T serializeJsonToObject(String json, Class<T> tClass) {
     try {
       return objectMapper.readValue(json, tClass);

@@ -8,7 +8,11 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
-/** @author Edvard Krainiy on 01/05/2022 */
+/**
+ * RequestDtoMapper interface, which contains method to transform Request to RequestDto.
+ *
+ * @author Edvard Krainiy on 01/05/2022
+ */
 @Mapper(
     componentModel = "spring",
     uses = {OperationDtoMapper.class, CreationRequestRepository.class})

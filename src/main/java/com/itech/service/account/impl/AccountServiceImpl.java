@@ -222,7 +222,7 @@ public class AccountServiceImpl implements AccountService {
 
   @Override
   public void approveAccountCreationRequest(Long accountCreationRequestId) {
-    CreationRequest accountCreationRequest = findAccountCreationRequest(accountCreationRequestId);
+    CreationRequest accountCreationRequest = obtainAccountCreationRequest(accountCreationRequestId);
 
     User accountCreationRequestUser = accountCreationRequest.getUser();
 
@@ -281,7 +281,7 @@ public class AccountServiceImpl implements AccountService {
   }
 
   public void rejectAccountCreationRequest(Long accountCreationRequestId) {
-    CreationRequest accountCreationRequest = findAccountCreationRequest(accountCreationRequestId);
+    CreationRequest accountCreationRequest = obtainAccountCreationRequest(accountCreationRequestId);
     User accountCreationRequestUser = accountCreationRequest.getUser();
 
     accountCreationRequest.setStatus(Status.REJECTED);
@@ -319,7 +319,7 @@ public class AccountServiceImpl implements AccountService {
     }
   }
 
-  private CreationRequest findAccountCreationRequest(Long accountCreationRequestId) {
+  private CreationRequest obtainAccountCreationRequest(Long accountCreationRequestId) {
     Optional<CreationRequest> accountCreationRequestOptional =
         creationRequestRepository.findCreationRequestsByIdAndStatusAndCreationType(
             accountCreationRequestId, Status.IN_PROGRESS, CreationType.ACCOUNT);

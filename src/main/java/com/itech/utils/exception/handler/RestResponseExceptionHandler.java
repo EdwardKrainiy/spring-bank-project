@@ -9,8 +9,8 @@ import com.itech.utils.exception.ValidationException;
 import com.itech.utils.literal.LogMessageText;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 import org.iban4j.IbanFormatException;
@@ -39,7 +39,7 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
       @NonNull HttpHeaders headers,
       @NonNull HttpStatus status,
       @NonNull WebRequest request) {
-    List<String> errors = new ArrayList<>();
+    Set<String> errors = new HashSet<>();
     ex.getBindingResult()
         .getAllErrors()
         .forEach(

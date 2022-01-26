@@ -26,6 +26,12 @@ public interface OperationDtoMapper {
   })
   OperationDto toDto(Operation operation);
 
+  /**
+   * toDtos method. Converts Set of Operation objects to Set of OperationDtos.
+   *
+   * @param operations Set of Operation objects, which we want to convert,
+   * @return Set Obtained Set of OperationDto objects.
+   */
   @Mappings({
     @Mapping(target = "accountId", source = "operation.account.id"),
     @Mapping(target = "transactionId", source = "operation.transaction.id")
