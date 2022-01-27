@@ -1,6 +1,7 @@
 package com.itech.security.jwt.filter;
 
 import com.itech.security.jwt.provider.TokenProvider;
+import com.itech.utils.literal.PropertySourceClasspath;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
 import java.io.IOException;
@@ -26,7 +27,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
  *
  * @author Edvard Krainiy on 12/10/2021
  */
-@PropertySource("classpath:properties/jwt.properties")
+@PropertySource(PropertySourceClasspath.JWT_PROPERTIES_CLASSPATH)
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   @Autowired private UserDetailsService customUserDetailsService;

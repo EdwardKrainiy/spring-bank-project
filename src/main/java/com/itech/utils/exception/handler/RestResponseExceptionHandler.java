@@ -6,7 +6,7 @@ import com.itech.utils.exception.EntityExistsException;
 import com.itech.utils.exception.EntityNotFoundException;
 import com.itech.utils.exception.IncorrectPasswordException;
 import com.itech.utils.exception.ValidationException;
-import com.itech.utils.literal.LogMessageText;
+import com.itech.utils.literal.LogMessage;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
 import java.util.HashSet;
@@ -49,7 +49,7 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
             });
 
     log.error(
-        String.format(LogMessageText.METHOD_ARGUMENT_NOT_VALID_LOG, ex.getObjectName(), errors));
+        String.format(LogMessage.METHOD_ARGUMENT_NOT_VALID_LOG, ex.getObjectName(), errors));
 
     ApiErrorDto error = new ApiErrorDto(HttpStatus.BAD_REQUEST.value(), errors);
 
@@ -115,11 +115,28 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
 
   @ExceptionHandler(
       value = {
-        IbanFormatException.class,
         InvalidCheckDigitException.class,
-        UnsupportedCountryException.class
       })
-  protected ResponseEntity<ApiErrorDto> handleIbanExceptions(RuntimeException ex) {
+  protected ResponseEntity<ApiErrorDto> handleInvalidCheckDigitException(
+      InvalidCheckDigitException ex) {
+    ApiErrorDto exceptionError = new ApiErrorDto(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+
+    return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(
+      value = {
+        IbanFormatException.class,
+      })
+  protected ResponseEntity<ApiErrorDto> handleIbanFormatException(IbanFormatException ex) {
+    ApiErrorDto exceptionError = new ApiErrorDto(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+
+    return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(value = {UnsupportedCountryException.class})
+  protected ResponseEntity<ApiErrorDto> handleUnsupportedCountryException(
+      UnsupportedCountryException ex) {
     ApiErrorDto exceptionError = new ApiErrorDto(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
 
     return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);

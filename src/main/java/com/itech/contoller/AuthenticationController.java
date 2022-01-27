@@ -4,7 +4,7 @@ import com.itech.model.dto.user.UserSignInDto;
 import com.itech.model.dto.user.UserSignUpDto;
 import com.itech.service.user.UserService;
 import com.itech.utils.JsonEntitySerializer;
-import com.itech.utils.literal.LogMessageText;
+import com.itech.utils.literal.LogMessage;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -66,7 +66,7 @@ public class AuthenticationController {
     if (log.isDebugEnabled()) {
       log.debug(
           String.format(
-              LogMessageText.DEBUG_REQUEST_BODY_LOG,
+              LogMessage.DEBUG_REQUEST_BODY_LOG,
               jsonEntitySerializer.serializeObjectToJson(userSignInDto)));
     }
     return userService.authenticateUser(userSignInDto);
@@ -97,7 +97,7 @@ public class AuthenticationController {
     if (log.isDebugEnabled()) {
       log.debug(
           String.format(
-              LogMessageText.DEBUG_REQUEST_BODY_LOG,
+              LogMessage.DEBUG_REQUEST_BODY_LOG,
               jsonEntitySerializer.serializeObjectToJson(userSignUpDto)));
     }
 

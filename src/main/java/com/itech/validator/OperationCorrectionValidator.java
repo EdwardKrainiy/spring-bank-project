@@ -3,8 +3,8 @@ package com.itech.validator;
 import com.itech.model.dto.operation.OperationCreateDto;
 import com.itech.model.enumeration.OperationType;
 import com.itech.utils.exception.EntityNotFoundException;
-import com.itech.utils.literal.ExceptionMessageText;
-import com.itech.utils.literal.LogMessageText;
+import com.itech.utils.literal.ExceptionMessage;
+import com.itech.utils.literal.LogMessage;
 import com.itech.validator.annotation.IsOperationCorrect;
 import java.util.Optional;
 import java.util.Set;
@@ -21,6 +21,13 @@ import lombok.extern.log4j.Log4j2;
 public class OperationCorrectionValidator
     implements ConstraintValidator<IsOperationCorrect, Set<OperationCreateDto>> {
 
+  /**
+   * isValid method. Checks validity of operations.
+   *
+   * @param dtoOperations Dto of operations we need to check.
+   * @param context ValidatorContext.
+   * @return Boolean value of method. FALSE - operations are not valid, TRUE - operations are valid.
+   */
   @Override
   public boolean isValid(
       Set<OperationCreateDto> dtoOperations, ConstraintValidatorContext context) {
@@ -31,8 +38,8 @@ public class OperationCorrectionValidator
     Optional<OperationCreateDto> firstOperationOptional = dtoOperations.stream().findFirst();
 
     if (!firstOperationOptional.isPresent()) {
-      log.error(LogMessageText.OPERATIONS_ARE_EMPTY_LOG);
-      throw new EntityNotFoundException(ExceptionMessageText.OPERATIONS_ARE_EMPTY);
+      log.error(LogMessage.OPERATIONS_ARE_EMPTY_LOG);
+      throw new EntityNotFoundException(ExceptionMessage.OPERATIONS_ARE_EMPTY);
     }
     accountNumberToCheck = firstOperationOptional.get().getAccountNumber();
 

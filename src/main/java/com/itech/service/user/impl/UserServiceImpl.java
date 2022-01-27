@@ -13,8 +13,8 @@ import com.itech.utils.JwtDecoder;
 import com.itech.utils.exception.EntityNotFoundException;
 import com.itech.utils.exception.IncorrectPasswordException;
 import com.itech.utils.exception.ValidationException;
-import com.itech.utils.literal.ExceptionMessageText;
-import com.itech.utils.literal.LogMessageText;
+import com.itech.utils.literal.ExceptionMessage;
+import com.itech.utils.literal.LogMessage;
 import com.itech.utils.literal.PropertySourceClasspath;
 import com.itech.utils.mapper.user.UserSignUpDtoMapper;
 import java.util.Optional;
@@ -65,8 +65,8 @@ public class UserServiceImpl implements UserService {
 
     if (userRepository.findUserByUsername(mappedUser.getUsername()).isPresent()
         || userRepository.findUserByEmail(mappedUser.getEmail()).isPresent()) {
-      log.error(LogMessageText.USER_IS_ALREADY_EXISTS_LOG);
-      throw new ValidationException(ExceptionMessageText.USER_IS_ALREADY_EXISTS);
+      log.error(LogMessage.USER_IS_ALREADY_EXISTS_LOG);
+      throw new ValidationException(ExceptionMessage.USER_IS_ALREADY_EXISTS);
     }
 
     User createdUser =
@@ -86,8 +86,8 @@ public class UserServiceImpl implements UserService {
 
     Optional<User> managerUserOptional = userRepository.findUserByRole(Role.MANAGER);
     if (!managerUserOptional.isPresent()) {
-      log.error(LogMessageText.MANAGER_USER_NOT_EXISTS_LOG);
-      throw new EntityNotFoundException(ExceptionMessageText.USER_NOT_FOUND);
+      log.error(LogMessage.MANAGER_USER_NOT_EXISTS_LOG);
+      throw new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND);
     } else {
       emailService.sendEmail(
           managerUserOptional.get().getEmail(),
@@ -95,7 +95,7 @@ public class UserServiceImpl implements UserService {
           String.format(("%s%s"), confirmMessage, confirmationToken));
 
       log.info(
-          String.format(LogMessageText.MESSAGE_SENT_LOG, managerUserOptional.get().getEmail()));
+          String.format(LogMessage.MESSAGE_SENT_LOG, managerUserOptional.get().getEmail()));
     }
   }
 
@@ -103,7 +103,7 @@ public class UserServiceImpl implements UserService {
   public User findUserByUsername(String username) {
     return userRepository
         .findUserByUsername(username)
-        .orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.USER_NOT_FOUND));
+        .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND));
   }
 
   @Override
@@ -112,7 +112,7 @@ public class UserServiceImpl implements UserService {
     User foundUser =
         userRepository
             .findUserByUsername(username)
-            .orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.USER_NOT_FOUND));
+            .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND));
 
     if (foundUser.getPassword().equals(password)) {
       return foundUser;
@@ -127,7 +127,7 @@ public class UserServiceImpl implements UserService {
     User activatedUser = userRepository.getById(userId);
 
     if (activatedUser.getConfirmationToken() == null) {
-      throw new ValidationException(ExceptionMessageText.USER_IS_ALREADY_ACTIVATED);
+      throw new ValidationException(ExceptionMessage.USER_IS_ALREADY_ACTIVATED);
     }
 
     activatedUser.setConfirmationToken(null);
@@ -137,7 +137,7 @@ public class UserServiceImpl implements UserService {
 
     emailService.sendEmail(
         activatedUser.getEmail(), successfulConfirmationTitle, successfulConfirmationMessage);
-    log.info(String.format(LogMessageText.MESSAGE_SENT_LOG, activatedUser.getEmail()));
+    log.info(String.format(LogMessage.MESSAGE_SENT_LOG, activatedUser.getEmail()));
   }
 
   public boolean isUserActivated(User user) {
@@ -149,9 +149,9 @@ public class UserServiceImpl implements UserService {
     User userToSignIn =
         userRepository
             .findUserByUsername(userSignInDto.getUsername())
-            .orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.USER_NOT_FOUND));
+            .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND));
     if (isUserActivated(userToSignIn)) {
       return jwtAuthenticationByUserDetails.authenticate(userSignInDto);
-    } else throw new ValidationException(ExceptionMessageText.USER_NOT_ACTIVATED);
+    } else throw new ValidationException(ExceptionMessage.USER_NOT_ACTIVATED);
   }
 }

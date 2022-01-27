@@ -16,6 +16,11 @@ import javax.validation.ConstraintValidatorContext;
 public class EnumValueValidator implements ConstraintValidator<EnumValue, CharSequence> {
   private List<String> enumValues;
 
+  /**
+   * initialize method. Converts Enum to list of Strings.
+   *
+   * @param annotation Enum we want to convert.
+   */
   @Override
   public void initialize(EnumValue annotation) {
     enumValues =
@@ -24,6 +29,13 @@ public class EnumValueValidator implements ConstraintValidator<EnumValue, CharSe
             .collect(Collectors.toList());
   }
 
+  /**
+   * isValid method. Compares our value with Strings of ENUMS and returns boolean value.
+   *
+   * @param value Value we need to compare.
+   * @param context ValidatorContext.
+   * @return Boolean value of method. FALSE - ENUM not contains value. TRUE - ENUM contains value.
+   */
   @Override
   public boolean isValid(CharSequence value, ConstraintValidatorContext context) {
     if (value == null) return false;

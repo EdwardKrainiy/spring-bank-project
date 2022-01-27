@@ -6,7 +6,7 @@ import com.itech.model.dto.transaction.TransactionDto;
 import com.itech.service.request.RequestService;
 import com.itech.service.transaction.TransactionService;
 import com.itech.utils.JsonEntitySerializer;
-import com.itech.utils.literal.LogMessageText;
+import com.itech.utils.literal.LogMessage;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -120,7 +120,7 @@ public class TransactionController {
     if (log.isDebugEnabled()) {
       log.debug(
           String.format(
-              LogMessageText.DEBUG_REQUEST_BODY_LOG,
+              LogMessage.DEBUG_REQUEST_BODY_LOG,
               jsonEntitySerializer.serializeObjectToJson(transactionCreateDto)));
     }
 

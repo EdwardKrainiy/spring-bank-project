@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
+import com.itech.utils.literal.PropertySourceClasspath;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,7 +30,7 @@ import org.springframework.web.context.WebApplicationContext;
 @ExtendWith(SpringExtension.class)
 @AutoConfigureTestDatabase
 @AutoConfigureMockMvc
-@TestPropertySource(locations = "classpath:application-integrationtest.properties")
+@TestPropertySource(locations = PropertySourceClasspath.APPLICATION_TEST_PROPERTIES_CLASSPATH)
 @Transactional
 class TransactionControllerIntegrationTest {
 
@@ -44,8 +45,8 @@ class TransactionControllerIntegrationTest {
 
   @WithMockUser(username = "EdvardKrainiy", authorities = "MANAGER")
   @Test
-  @Sql(value = "classpath:db/test/create_users.sql")
-  @Sql(value = "classpath:db/test/create_transactions.sql")
+  @Sql(value = PropertySourceClasspath.CREATE_USERS_SQL_CLASSPATH)
+  @Sql(value = PropertySourceClasspath.CREATE_TRANSACTIONS_SQL_CLASSPATH)
   void givenTransactions_whenGetTransactions_thenStatus200() throws Exception {
 
     String expectedJson =
@@ -61,8 +62,8 @@ class TransactionControllerIntegrationTest {
   }
 
   @Test
-  @Sql(value = "classpath:db/test/create_users.sql")
-  @Sql(value = "classpath:db/test/create_transactions.sql")
+  @Sql(value = PropertySourceClasspath.CREATE_USERS_SQL_CLASSPATH)
+  @Sql(value = PropertySourceClasspath.CREATE_TRANSACTIONS_SQL_CLASSPATH)
   void unauthorizedUser_whenGetTransactions_thenStatus403() throws Exception {
 
     mockMvc
@@ -74,8 +75,8 @@ class TransactionControllerIntegrationTest {
 
   @WithMockUser(username = "EdvardKrainiy", authorities = "MANAGER")
   @Test
-  @Sql(value = "classpath:db/test/create_users.sql")
-  @Sql(value = "classpath:db/test/create_transactions.sql")
+  @Sql(value = PropertySourceClasspath.CREATE_USERS_SQL_CLASSPATH)
+  @Sql(value = PropertySourceClasspath.CREATE_TRANSACTIONS_SQL_CLASSPATH)
   void givenTransactions_whenGetTransactionById_thenStatus200() throws Exception {
 
     String expectedJson =
@@ -88,8 +89,8 @@ class TransactionControllerIntegrationTest {
   }
 
   @Test
-  @Sql(value = "classpath:db/test/create_users.sql")
-  @Sql(value = "classpath:db/test/create_transactions.sql")
+  @Sql(value = PropertySourceClasspath.CREATE_USERS_SQL_CLASSPATH)
+  @Sql(value = PropertySourceClasspath.CREATE_TRANSACTIONS_SQL_CLASSPATH)
   void unauthorizedUser_whenGetTransactionById_thenStatus403() throws Exception {
 
     mockMvc
@@ -101,8 +102,8 @@ class TransactionControllerIntegrationTest {
 
   @WithMockUser(username = "EdvardKrainiy", authorities = "MANAGER")
   @Test
-  @Sql(value = "classpath:db/test/create_users.sql")
-  @Sql(value = "classpath:db/test/create_transactions.sql")
+  @Sql(value = PropertySourceClasspath.CREATE_USERS_SQL_CLASSPATH)
+  @Sql(value = PropertySourceClasspath.CREATE_TRANSACTIONS_SQL_CLASSPATH)
   void givenTransactions_whenGetTransactionById_andTransactionWithIdNotExists_thenStatus404()
       throws Exception {
 
@@ -121,7 +122,7 @@ class TransactionControllerIntegrationTest {
 
   @WithMockUser(username = "EdvardKrainiy", authorities = "MANAGER")
   @Test
-  @Sql(value = "classpath:db/test/create_users.sql")
+  @Sql(value = PropertySourceClasspath.CREATE_USERS_SQL_CLASSPATH)
   void emptyTransactions_whenGetTransactionById_thenStatus404() throws Exception {
 
     String expectedJson = "{\"Code\":404," + "\"Errors\":[\"Transaction not found!\"]}";
@@ -135,8 +136,8 @@ class TransactionControllerIntegrationTest {
 
   @WithMockUser(username = "EdvardKrainiy", authorities = "MANAGER")
   @Test
-  @Sql(value = "classpath:db/test/create_users.sql")
-  @Sql(value = "classpath:db/test/create_accounts.sql")
+  @Sql(value = PropertySourceClasspath.CREATE_USERS_SQL_CLASSPATH)
+  @Sql(value = PropertySourceClasspath.CREATE_ACCOUNTS_SQL_CLASSPATH)
   void authorizedUser_whenCreateTransactionCreationRequest_andValuesAreInvalid_thenStatus400()
       throws Exception {
     String expectedCreatedTransactionRequest =
@@ -157,7 +158,7 @@ class TransactionControllerIntegrationTest {
 
   @WithMockUser(username = "EdvardKrainiy", authorities = "MANAGER")
   @Test
-  @Sql(value = "classpath:db/test/create_users.sql")
+  @Sql(value = PropertySourceClasspath.CREATE_USERS_SQL_CLASSPATH)
   void authorizedUser_whenCreateTransactionCreationRequest_thenStatus201() throws Exception {
     String expectedCreatedTransactionRequest =
         "{\"Operations\":[{\"AccountNumber\":\"number1\",\"Amount\":\"1\",\"OperationType\":\"CREDIT\"},"
@@ -175,7 +176,7 @@ class TransactionControllerIntegrationTest {
   }
 
   @Test
-  @Sql(value = "classpath:db/test/create_users.sql")
+  @Sql(value = PropertySourceClasspath.CREATE_USERS_SQL_CLASSPATH)
   void unauthorizedUser_whenCreateTransactionCreationRequest_thenStatus403() throws Exception {
     String expectedCreatedTransactionRequest =
         "{\"Operations\":[{\"AccountNumber\":\"test2\",\"Amount\":\"1\",\"OperationType\":\"DEBIT\"},{\"AccountNumber\":\"test1\",\"Amount\":\"1\",\"OperationType\":\"CREDIT\"}]}";

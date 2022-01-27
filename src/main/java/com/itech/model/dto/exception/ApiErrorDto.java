@@ -1,7 +1,7 @@
 package com.itech.model.dto.exception;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.itech.utils.literal.JsonPropertyText;
+import com.itech.utils.literal.DtoJsonProperty;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,10 +16,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ApiErrorDto {
-  @JsonProperty(JsonPropertyText.CODE)
+  @JsonProperty(DtoJsonProperty.CODE)
   private int code;
 
-  @JsonProperty(JsonPropertyText.ERRORS)
+  @JsonProperty(DtoJsonProperty.ERRORS)
   private Set<String> errors;
 
   public ApiErrorDto(int code, String error) {

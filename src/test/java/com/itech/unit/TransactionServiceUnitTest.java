@@ -36,7 +36,8 @@ import com.itech.utils.JsonEntitySerializer;
 import com.itech.utils.JwtDecoder;
 import com.itech.utils.exception.EntityNotFoundException;
 import com.itech.utils.exception.ValidationException;
-import com.itech.utils.literal.ExceptionMessageText;
+import com.itech.utils.literal.ExceptionMessage;
+import com.itech.utils.literal.PropertySourceClasspath;
 import com.itech.utils.mapper.operation.OperationDtoMapperImpl;
 import com.itech.utils.mapper.request.RequestDtoMapperImpl;
 import com.itech.utils.mapper.transaction.TransactionDtoMapperImpl;
@@ -78,11 +79,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
       TokenProvider.class
     })
 @ExtendWith(SpringExtension.class)
-@TestPropertySource(locations = "classpath:properties/jwt.properties")
-@TestPropertySource(locations = "classpath:properties/mail.properties")
-@TestPropertySource(locations = "classpath:properties/scheduler.properties")
-@TestPropertySource(locations = "classpath:properties/security.properties")
-@TestPropertySource(locations = "classpath:application.properties")
+@TestPropertySource(locations = PropertySourceClasspath.JWT_PROPERTIES_CLASSPATH)
+@TestPropertySource(locations = PropertySourceClasspath.MAIL_PROPERTIES_CLASSPATH)
+@TestPropertySource(locations = PropertySourceClasspath.SCHEDULER_PROPERTIES_CLASSPATH)
+@TestPropertySource(locations = PropertySourceClasspath.SECURITY_PROPERTIES_CLASSPATH)
+@TestPropertySource(locations = PropertySourceClasspath.APPLICATION_PROPERTIES_CLASSPATH)
 class TransactionServiceUnitTest {
   @MockBean private AccountRepository accountRepository;
   @MockBean private CreationRequestRepository creationRequestRepository;
@@ -239,7 +240,7 @@ class TransactionServiceUnitTest {
             EntityNotFoundException.class,
             () -> transactionService.createTransaction(transactionCreationRequestJson));
 
-    String expectedMessage = ExceptionMessageText.ACCOUNTS_ARE_EMPTY;
+    String expectedMessage = ExceptionMessage.ACCOUNTS_ARE_EMPTY;
     String actualMessage = exception.getMessage();
 
     assertTrue(actualMessage.contains(expectedMessage));
@@ -295,7 +296,7 @@ class TransactionServiceUnitTest {
             EntityNotFoundException.class,
             () -> transactionService.createTransaction(transactionCreationRequestJson));
 
-    String expectedMessage = ExceptionMessageText.ACCOUNT_NOT_FOUND;
+    String expectedMessage = ExceptionMessage.ACCOUNT_NOT_FOUND;
     String actualMessage = exception.getMessage();
 
     assertTrue(actualMessage.contains(expectedMessage));
@@ -349,7 +350,7 @@ class TransactionServiceUnitTest {
             EntityNotFoundException.class,
             () -> transactionService.createTransaction(transactionCreationRequestJson));
 
-    String expectedMessage = ExceptionMessageText.OPERATIONS_ARE_EMPTY;
+    String expectedMessage = ExceptionMessage.OPERATIONS_ARE_EMPTY;
     String actualMessage = exception.getMessage();
 
     assertTrue(actualMessage.contains(expectedMessage));
@@ -406,7 +407,7 @@ class TransactionServiceUnitTest {
             EntityNotFoundException.class,
             () -> transactionService.createTransaction(transactionCreationRequestJson));
 
-    String expectedMessage = ExceptionMessageText.INCORRECT_REQUEST_STRUCTURE;
+    String expectedMessage = ExceptionMessage.INCORRECT_REQUEST_STRUCTURE;
     String actualMessage = exception.getMessage();
 
     assertTrue(actualMessage.contains(expectedMessage));
@@ -463,7 +464,7 @@ class TransactionServiceUnitTest {
             EntityNotFoundException.class,
             () -> transactionService.createTransaction(transactionCreationRequestJson));
 
-    String expectedMessage = ExceptionMessageText.CURRENCIES_ARE_NOT_SAME;
+    String expectedMessage = ExceptionMessage.CURRENCIES_ARE_NOT_SAME;
     String actualMessage = exception.getMessage();
 
     assertTrue(actualMessage.contains(expectedMessage));
@@ -520,7 +521,7 @@ class TransactionServiceUnitTest {
             EntityNotFoundException.class,
             () -> transactionService.createTransaction(transactionCreationRequestJson));
 
-    String expectedMessage = ExceptionMessageText.CREDIT_IS_MORE_THAN_STORED_ON_ACCOUNT;
+    String expectedMessage = ExceptionMessage.CREDIT_IS_MORE_THAN_STORED_ON_ACCOUNT;
     String actualMessage = exception.getMessage();
 
     assertTrue(actualMessage.contains(expectedMessage));
@@ -579,7 +580,7 @@ class TransactionServiceUnitTest {
             ValidationException.class,
             () -> transactionService.createTransaction(transactionCreationRequestJson));
 
-    String expectedMessage = ExceptionMessageText.CREATION_REQUEST_EXPIRED;
+    String expectedMessage = ExceptionMessage.CREATION_REQUEST_EXPIRED;
     String actualMessage = exception.getMessage();
 
     assertTrue(actualMessage.contains(expectedMessage));
@@ -697,7 +698,7 @@ class TransactionServiceUnitTest {
             EntityNotFoundException.class,
             () -> transactionService.findTransactionCreationRequestById(1L));
 
-    String expectedMessage = ExceptionMessageText.TRANSACTION_CREATION_REQUEST_NOT_FOUND;
+    String expectedMessage = ExceptionMessage.TRANSACTION_CREATION_REQUEST_NOT_FOUND;
     String actualMessage = exception.getMessage();
 
     assertTrue(actualMessage.contains(expectedMessage));

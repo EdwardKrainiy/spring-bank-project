@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
+import com.itech.utils.literal.PropertySourceClasspath;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,7 +31,7 @@ import org.springframework.web.context.WebApplicationContext;
 @ExtendWith(SpringExtension.class)
 @AutoConfigureTestDatabase
 @AutoConfigureMockMvc
-@TestPropertySource(locations = "classpath:application-integrationtest.properties")
+@TestPropertySource(locations = PropertySourceClasspath.APPLICATION_TEST_PROPERTIES_CLASSPATH)
 @Transactional
 class AccountControllerIntegrationTest {
 
@@ -45,12 +46,8 @@ class AccountControllerIntegrationTest {
 
   @WithMockUser(username = "EdvardKrainiy", authorities = "MANAGER")
   @Test
-  @Sql(
-      value = "classpath:db/test/create_users.sql",
-      executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-  @Sql(
-      value = "classpath:db/test/create_accounts.sql",
-      executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+  @Sql(value = PropertySourceClasspath.CREATE_USERS_SQL_CLASSPATH)
+  @Sql(value = PropertySourceClasspath.CREATE_ACCOUNTS_SQL_CLASSPATH)
   void givenAccounts_whenGetAccounts_thenStatus200() throws Exception {
 
     String expectedJson =
@@ -66,12 +63,8 @@ class AccountControllerIntegrationTest {
   }
 
   @Test
-  @Sql(
-      value = "classpath:db/test/create_users.sql",
-      executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-  @Sql(
-      value = "classpath:db/test/create_accounts.sql",
-      executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+  @Sql(value = PropertySourceClasspath.CREATE_USERS_SQL_CLASSPATH)
+  @Sql(value = PropertySourceClasspath.CREATE_ACCOUNTS_SQL_CLASSPATH)
   void unauthorizedUser_whenGetAccounts_thenStatus403() throws Exception {
 
     mockMvc
@@ -83,12 +76,8 @@ class AccountControllerIntegrationTest {
 
   @WithMockUser(username = "EdvardKrainiy", authorities = "MANAGER")
   @Test
-  @Sql(
-      value = "classpath:db/test/create_users.sql",
-      executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-  @Sql(
-      value = "classpath:db/test/create_accounts.sql",
-      executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+  @Sql(value = PropertySourceClasspath.CREATE_USERS_SQL_CLASSPATH)
+  @Sql(value = PropertySourceClasspath.CREATE_ACCOUNTS_SQL_CLASSPATH)
   void givenAccounts_whenGetAccountById_thenStatus200() throws Exception {
 
     String expectedJson =
@@ -103,9 +92,7 @@ class AccountControllerIntegrationTest {
 
   @WithMockUser(username = "EdvardKrainiy", authorities = "MANAGER")
   @Test
-  @Sql(
-      value = "classpath:db/test/create_users.sql",
-      executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+  @Sql(value = PropertySourceClasspath.CREATE_USERS_SQL_CLASSPATH)
   void emptyAccounts_whenGetAccountById_thenStatus404() throws Exception {
 
     String expectedJson = "{\"Code\":404," + "\"Errors\":[\"Account not found!\"]}";
@@ -120,12 +107,8 @@ class AccountControllerIntegrationTest {
 
   @WithMockUser(username = "EdvardKrainiy", authorities = "MANAGER")
   @Test
-  @Sql(
-      value = "classpath:db/test/create_users.sql",
-      executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-  @Sql(
-      value = "classpath:db/test/create_accounts.sql",
-      executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+  @Sql(value = PropertySourceClasspath.CREATE_USERS_SQL_CLASSPATH)
+  @Sql(value = PropertySourceClasspath.CREATE_ACCOUNTS_SQL_CLASSPATH)
   void emptyAccounts_whenGetAccountById_andAccountWithIdNotExists_thenStatus404() throws Exception {
 
     String expectedJson = "{\"Code\":404," + "\"Errors\":[\"Account not found!\"]}";
@@ -139,9 +122,7 @@ class AccountControllerIntegrationTest {
   }
 
   @Test
-  @Sql(
-      value = "classpath:db/test/create_users.sql",
-      executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+  @Sql(value = PropertySourceClasspath.CREATE_USERS_SQL_CLASSPATH)
   void unauthorizedUser_whenGetAccountById_thenStatus403() throws Exception {
 
     mockMvc
@@ -153,9 +134,7 @@ class AccountControllerIntegrationTest {
 
   @WithMockUser(username = "EdvardKrainiy", authorities = "MANAGER")
   @Test
-  @Sql(
-      value = "classpath:db/test/create_users.sql",
-      executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+  @Sql(value = PropertySourceClasspath.CREATE_USERS_SQL_CLASSPATH)
   void authorizedUser_whenCreateAccountCreationRequest_thenStatus201() throws Exception {
 
     String expectedCreatedUser = "{\"Amount\":100.0,\"Currency\":\"PLN\"}";
@@ -176,9 +155,7 @@ class AccountControllerIntegrationTest {
 
   @WithMockUser(username = "EdvardKrainiy", authorities = "MANAGER")
   @Test
-  @Sql(
-      value = "classpath:db/test/create_users.sql",
-      executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+  @Sql(value = PropertySourceClasspath.CREATE_USERS_SQL_CLASSPATH)
   void authorizedUser_whenCreateAccountCreationRequest_andFieldsAreInvalid_thenStatus400()
       throws Exception {
 
@@ -214,12 +191,8 @@ class AccountControllerIntegrationTest {
 
   @WithMockUser(username = "EdvardKrainiy", authorities = "MANAGER")
   @Test
-  @Sql(
-      value = "classpath:db/test/create_users.sql",
-      executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-  @Sql(
-      value = "classpath:db/test/create_accounts.sql",
-      executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+  @Sql(value = PropertySourceClasspath.CREATE_USERS_SQL_CLASSPATH)
+  @Sql(value = PropertySourceClasspath.CREATE_ACCOUNTS_SQL_CLASSPATH)
   void authorizedUser_whenUpdateAccount_thenStatus204() throws Exception {
 
     String expectedCreatedUser = "{\"Amount\":10.0,\"Currency\":\"EUR\"}";
@@ -241,12 +214,8 @@ class AccountControllerIntegrationTest {
 
   @WithMockUser(username = "EdvardKrainiy", authorities = "MANAGER")
   @Test
-  @Sql(
-      value = "classpath:db/test/create_users.sql",
-      executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-  @Sql(
-      value = "classpath:db/test/create_accounts.sql",
-      executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+  @Sql(value = PropertySourceClasspath.CREATE_USERS_SQL_CLASSPATH)
+  @Sql(value = PropertySourceClasspath.CREATE_ACCOUNTS_SQL_CLASSPATH)
   void authorizedUser_whenUpdateAccount_andFieldsAreInvalid_thenStatus400() throws Exception {
 
     String expectedCreatedUser = "{\"Amount\":test1,\"Currency\":\"test2\"}";
@@ -264,12 +233,8 @@ class AccountControllerIntegrationTest {
   }
 
   @Test
-  @Sql(
-      value = "classpath:db/test/create_users.sql",
-      executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-  @Sql(
-      value = "classpath:db/test/create_accounts.sql",
-      executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+  @Sql(value = PropertySourceClasspath.CREATE_USERS_SQL_CLASSPATH)
+  @Sql(value = PropertySourceClasspath.CREATE_ACCOUNTS_SQL_CLASSPATH)
   void unauthorizedUser_whenUpdateAccount_thenStatus403() throws Exception {
 
     String expectedCreatedUser = "{\"Amount\":4,\"Currency\":\"PLN\"}";
@@ -287,12 +252,8 @@ class AccountControllerIntegrationTest {
 
   @WithMockUser(username = "EdvardKrainiy", authorities = "MANAGER")
   @Test
-  @Sql(
-      value = "classpath:db/test/create_users.sql",
-      executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-  @Sql(
-      value = "classpath:db/test/create_accounts.sql",
-      executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+  @Sql(value = PropertySourceClasspath.CREATE_USERS_SQL_CLASSPATH)
+  @Sql(value = PropertySourceClasspath.CREATE_ACCOUNTS_SQL_CLASSPATH)
   void authorizedUser_whenUpdateAccount_andAccountWithIdNotExists_thenStatus404() throws Exception {
 
     String expectedCreatedUser = "{\"Amount\":4,\"Currency\":\"PLN\"}";
@@ -314,12 +275,8 @@ class AccountControllerIntegrationTest {
 
   @WithMockUser(username = "EdvardKrainiy", authorities = "MANAGER")
   @Test
-  @Sql(
-      value = "classpath:db/test/create_users.sql",
-      executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-  @Sql(
-      value = "classpath:db/test/create_accounts.sql",
-      executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+  @Sql(value = PropertySourceClasspath.CREATE_USERS_SQL_CLASSPATH)
+  @Sql(value = PropertySourceClasspath.CREATE_ACCOUNTS_SQL_CLASSPATH)
   void authorizedUser_whenDeleteAccount_thenStatus204() throws Exception {
     mockMvc
         .perform(delete("/api/accounts/3").contentType(MediaType.APPLICATION_JSON))
@@ -331,12 +288,8 @@ class AccountControllerIntegrationTest {
 
   @WithMockUser(username = "EdvardKrainiy", authorities = "MANAGER")
   @Test
-  @Sql(
-      value = "classpath:db/test/create_users.sql",
-      executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-  @Sql(
-      value = "classpath:db/test/create_accounts.sql",
-      executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+  @Sql(value = PropertySourceClasspath.CREATE_USERS_SQL_CLASSPATH)
+  @Sql(value = PropertySourceClasspath.CREATE_ACCOUNTS_SQL_CLASSPATH)
   void authorizedUser_whenDeleteAccount_andAccountWithIdNotExists_thenStatus404() throws Exception {
     String expectedErrorMessage = "{\"Code\":404,\"Errors\":[\"Account not found!\"]}";
 
@@ -351,12 +304,8 @@ class AccountControllerIntegrationTest {
   }
 
   @Test
-  @Sql(
-      value = "classpath:db/test/create_users.sql",
-      executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-  @Sql(
-      value = "classpath:db/test/create_accounts.sql",
-      executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+  @Sql(value = PropertySourceClasspath.CREATE_USERS_SQL_CLASSPATH)
+  @Sql(value = PropertySourceClasspath.CREATE_ACCOUNTS_SQL_CLASSPATH)
   void unauthorizedUser_whenDeleteAccount_thenStatus403() throws Exception {
 
     String expectedErrorMessage = "Access Denied";

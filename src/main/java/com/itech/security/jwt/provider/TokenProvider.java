@@ -1,5 +1,6 @@
 package com.itech.security.jwt.provider;
 
+import com.itech.utils.literal.PropertySourceClasspath;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtParser;
@@ -26,7 +27,7 @@ import org.springframework.stereotype.Component;
  * @author Edvard Krainiy on 12/10/2021
  */
 @Component
-@PropertySource("classpath:properties/jwt.properties")
+@PropertySource(PropertySourceClasspath.JWT_PROPERTIES_CLASSPATH)
 public class TokenProvider implements Serializable {
   @Value("${jwt.delimiter}")
   private String delimiter;

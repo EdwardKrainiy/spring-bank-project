@@ -25,13 +25,14 @@ import com.itech.utils.JsonEntitySerializer;
 import com.itech.utils.JwtDecoder;
 import com.itech.utils.exception.ChangeAccountAmountException;
 import com.itech.utils.exception.EntityNotFoundException;
-import com.itech.utils.literal.ExceptionMessageText;
-import com.itech.utils.literal.LogMessageText;
+import com.itech.utils.literal.ExceptionMessage;
+import com.itech.utils.literal.LogMessage;
 import com.itech.utils.mapper.request.RequestDtoMapper;
 import com.itech.utils.mapper.transaction.TransactionDtoMapper;
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -83,8 +84,8 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     if (!foundTransaction.isPresent()) {
-      log.error(String.format(LogMessageText.TRANSACTION_NOT_FOUND_LOG, transactionId));
-      throw new EntityNotFoundException(ExceptionMessageText.TRANSACTION_NOT_FOUND);
+      log.error(String.format(LogMessage.TRANSACTION_NOT_FOUND_LOG, transactionId));
+      throw new EntityNotFoundException(ExceptionMessage.TRANSACTION_NOT_FOUND);
     } else {
       return transactionDtoMapper.toDto(foundTransaction.get());
     }
@@ -120,10 +121,10 @@ public class TransactionServiceImpl implements TransactionService {
     if (!requestToRejectOptional.isPresent()) {
       log.error(
           String.format(
-              LogMessageText.TRANSACTION_CREATION_REQUEST_NOT_FOUND_LOG,
+              LogMessage.TRANSACTION_CREATION_REQUEST_NOT_FOUND_LOG,
               creationRequestDto.getId()));
       throw new EntityNotFoundException(
-          ExceptionMessageText.TRANSACTION_CREATION_REQUEST_NOT_FOUND);
+          ExceptionMessage.TRANSACTION_CREATION_REQUEST_NOT_FOUND);
     } else {
       requestToReject = requestToRejectOptional.get();
     }
@@ -131,8 +132,8 @@ public class TransactionServiceImpl implements TransactionService {
     Optional<User> foundUserOptional = userRepository.findById(creationRequestDto.getUserId());
     User foundUser;
     if (!foundUserOptional.isPresent()) {
-      log.error(String.format(LogMessageText.USER_NOT_FOUND_LOG, creationRequestDto.getId()));
-      throw new EntityNotFoundException(ExceptionMessageText.USER_NOT_FOUND);
+      log.error(String.format(LogMessage.USER_NOT_FOUND_LOG, creationRequestDto.getId()));
+      throw new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND);
     } else {
       foundUser = foundUserOptional.get();
     }
@@ -140,7 +141,7 @@ public class TransactionServiceImpl implements TransactionService {
     Transaction transaction = createAndSaveTransaction(foundUser);
 
     if (accountRepository.findAll().isEmpty()) {
-      rejectCreationRequest(requestToReject, transaction, ExceptionMessageText.ACCOUNTS_ARE_EMPTY);
+      rejectCreationRequest(requestToReject, transaction, ExceptionMessage.ACCOUNTS_ARE_EMPTY);
     }
 
     Set<Operation> operations = new LinkedHashSet<>();
@@ -157,11 +158,11 @@ public class TransactionServiceImpl implements TransactionService {
       if (expectedAccount.isPresent()) {
         currencyToCheck = expectedAccount.get().getCurrency();
       } else {
-        rejectCreationRequest(requestToReject, transaction, ExceptionMessageText.ACCOUNT_NOT_FOUND);
+        rejectCreationRequest(requestToReject, transaction, ExceptionMessage.ACCOUNT_NOT_FOUND);
       }
     } else {
       rejectCreationRequest(
-          requestToReject, transaction, ExceptionMessageText.OPERATIONS_ARE_EMPTY);
+          requestToReject, transaction, ExceptionMessage.OPERATIONS_ARE_EMPTY);
     }
 
     validateAndAddOperationsToSet(
@@ -169,7 +170,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     if (!transactionServiceUtil.checkRequestDtoValidity(operations, transaction)) {
       rejectCreationRequest(
-          requestToReject, transaction, ExceptionMessageText.INCORRECT_REQUEST_STRUCTURE);
+          requestToReject, transaction, ExceptionMessage.INCORRECT_REQUEST_STRUCTURE);
     }
 
     operationRepository.saveAll(operations);
@@ -210,7 +211,7 @@ public class TransactionServiceImpl implements TransactionService {
                       operations),
               () ->
                   rejectCreationRequest(
-                      requestToReject, transaction, ExceptionMessageText.ACCOUNT_NOT_FOUND));
+                      requestToReject, transaction, ExceptionMessage.ACCOUNT_NOT_FOUND));
     }
   }
 
@@ -222,7 +223,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     transaction.setStatus(Status.REJECTED);
     transactionRepository.save(transaction);
-    log.error(String.format(LogMessageText.TRANSACTION_REJECTED_LOG, transaction.getId()));
+    log.error(String.format(LogMessage.TRANSACTION_REJECTED_LOG, transaction.getId()));
 
     throw new EntityNotFoundException(exceptionMessage);
   }
@@ -238,13 +239,14 @@ public class TransactionServiceImpl implements TransactionService {
 
     if (!currencyToCheck.equals(account.getCurrency())) {
       rejectCreationRequest(
-          requestToReject, transaction, ExceptionMessageText.CURRENCIES_ARE_NOT_SAME);
+          requestToReject, transaction, ExceptionMessage.CURRENCIES_ARE_NOT_SAME);
     }
 
     operation.setAccount(account);
     operation.setTransaction(transaction);
 
-    operation.setOperationType(OperationType.valueOf(operationCreateDto.getOperationType()));
+    operation.setOperationType(OperationType.valueOf(operationCreateDto.getOperationType().toUpperCase(
+        Locale.ROOT)));
 
     operation.setAmount(operationCreateDto.getAmount());
     operations.add(operationRepository.save(operation));
@@ -258,7 +260,7 @@ public class TransactionServiceImpl implements TransactionService {
             .orElseThrow(
                 () ->
                     new EntityNotFoundException(
-                        ExceptionMessageText.TRANSACTION_CREATION_REQUEST_NOT_FOUND));
+                        ExceptionMessage.TRANSACTION_CREATION_REQUEST_NOT_FOUND));
 
     creationRequest.setStatus(Status.CREATED);
     transaction.setStatus(Status.CREATED);
@@ -268,7 +270,7 @@ public class TransactionServiceImpl implements TransactionService {
       transactionServiceUtil.changeAccountAmount(operations);
     } catch (ChangeAccountAmountException exception) {
       rejectCreationRequest(
-          creationRequest, transaction, ExceptionMessageText.CREDIT_IS_MORE_THAN_STORED_ON_ACCOUNT);
+          creationRequest, transaction, ExceptionMessage.CREDIT_IS_MORE_THAN_STORED_ON_ACCOUNT);
     }
 
     operationRepository.saveAll(transaction.getOperations());
@@ -276,10 +278,10 @@ public class TransactionServiceImpl implements TransactionService {
     creationRequestRepository.save(creationRequest);
     log.info(
         String.format(
-            LogMessageText.TRANSACTION_CREATION_REQUEST_CREATED_LOG, creationRequest.getId()));
+            LogMessage.TRANSACTION_CREATION_REQUEST_CREATED_LOG, creationRequest.getId()));
     Transaction createdTransaction = transactionRepository.save(transaction);
 
-    log.info(String.format(LogMessageText.TRANSACTION_CREATED_LOG, transaction.getId()));
+    log.info(String.format(LogMessage.TRANSACTION_CREATED_LOG, transaction.getId()));
     return transactionDtoMapper.toDto(createdTransaction);
   }
 
@@ -300,9 +302,9 @@ public class TransactionServiceImpl implements TransactionService {
     if (!foundCreationRequestOptional.isPresent()) {
       log.error(
           String.format(
-              LogMessageText.TRANSACTION_CREATION_REQUEST_NOT_FOUND_LOG, creationRequestId));
+              LogMessage.TRANSACTION_CREATION_REQUEST_NOT_FOUND_LOG, creationRequestId));
       throw new EntityNotFoundException(
-          ExceptionMessageText.TRANSACTION_CREATION_REQUEST_NOT_FOUND);
+          ExceptionMessage.TRANSACTION_CREATION_REQUEST_NOT_FOUND);
     } else {
       return requestDtoMapper.toDto(foundCreationRequestOptional.get());
     }

@@ -7,8 +7,8 @@ import com.itech.model.enumeration.Status;
 import com.itech.repository.TransactionRepository;
 import com.itech.utils.exception.ChangeAccountAmountException;
 import com.itech.utils.exception.ValidationException;
-import com.itech.utils.literal.ExceptionMessageText;
-import com.itech.utils.literal.LogMessageText;
+import com.itech.utils.literal.ExceptionMessage;
+import com.itech.utils.literal.LogMessage;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Set;
@@ -50,10 +50,10 @@ public class TransactionServiceUtil {
       } else {
         log.error(
             String.format(
-                LogMessageText.CREDIT_IS_MORE_THAN_STORED_ON_ACCOUNT_LOG,
+                LogMessage.CREDIT_IS_MORE_THAN_STORED_ON_ACCOUNT_LOG,
                 operation.getAccount().getId()));
         throw new ChangeAccountAmountException(
-            ExceptionMessageText.CREDIT_IS_MORE_THAN_STORED_ON_ACCOUNT);
+            ExceptionMessage.CREDIT_IS_MORE_THAN_STORED_ON_ACCOUNT);
       }
     }
   }
@@ -72,8 +72,8 @@ public class TransactionServiceUtil {
       transactionRepository.save(transaction);
       log.error(
           String.format(
-              LogMessageText.TRANSACTION_CREATION_REQUEST_EXPIRED_LOG, transaction.getId()));
-      throw new ValidationException(ExceptionMessageText.CREATION_REQUEST_EXPIRED);
+              LogMessage.TRANSACTION_CREATION_REQUEST_EXPIRED_LOG, transaction.getId()));
+      throw new ValidationException(ExceptionMessage.CREATION_REQUEST_EXPIRED);
     }
 
     boolean areOperationTypesCorrect = checkOperationTypes(operations);

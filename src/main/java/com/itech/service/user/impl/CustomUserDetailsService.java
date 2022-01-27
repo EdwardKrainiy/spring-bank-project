@@ -2,7 +2,7 @@ package com.itech.service.user.impl;
 
 import com.itech.repository.UserRepository;
 import com.itech.utils.exception.EntityNotFoundException;
-import com.itech.utils.literal.ExceptionMessageText;
+import com.itech.utils.literal.ExceptionMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,7 +32,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     com.itech.model.entity.User user =
         userRepository
             .findUserByUsername(username)
-            .orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.USER_NOT_FOUND));
+            .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND));
     return User.withUsername(user.getUsername())
         .password(user.getPassword())
         .authorities(user.getRole().name())

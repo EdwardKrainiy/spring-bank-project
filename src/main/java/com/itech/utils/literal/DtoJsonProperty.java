@@ -1,11 +1,11 @@
 package com.itech.utils.literal;
 
 /**
- * JsonPropertyText class. Contains all necessary JsonProperty strings.
+ * JsonProperty class. Contains all necessary JsonProperty strings.
  *
  * @author Edvard Krainiy on 01/25/2022
  */
-public class JsonPropertyText {
+public class DtoJsonProperty {
   public static final String CURRENCY = "Currency";
   public static final String ID = "Id";
   public static final String USERNAME = "Username";
@@ -27,5 +27,5 @@ public class JsonPropertyText {
   public static final String PASSWORD = "Password";
   public static final String EMAIL = "Email";
 
-  private JsonPropertyText() {}
+  private DtoJsonProperty() {}
 }

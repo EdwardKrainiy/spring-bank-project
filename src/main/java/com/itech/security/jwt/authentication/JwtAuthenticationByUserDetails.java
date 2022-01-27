@@ -2,7 +2,7 @@ package com.itech.security.jwt.authentication;
 
 import com.itech.model.dto.user.UserSignInDto;
 import com.itech.security.jwt.provider.TokenProvider;
-import com.itech.utils.literal.LogMessageText;
+import com.itech.utils.literal.LogMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +41,7 @@ public class JwtAuthenticationByUserDetails {
     final String token = jwtTokenUtil.generateAuthToken(authentication);
     log.info(
         String.format(
-            LogMessageText.USER_AUTHENTICATED_LOG,
+            LogMessage.USER_AUTHENTICATED_LOG,
             userDto.getUsername(),
             userDto.getPassword(),
             token));

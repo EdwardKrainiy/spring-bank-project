@@ -11,7 +11,7 @@ import com.itech.repository.CreationRequestRepository;
 import com.itech.service.request.RequestService;
 import com.itech.utils.JsonEntitySerializer;
 import com.itech.utils.JwtDecoder;
-import com.itech.utils.literal.LogMessageText;
+import com.itech.utils.literal.LogMessage;
 import com.itech.utils.mapper.request.RequestDtoMapper;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -58,7 +58,7 @@ public class RequestServiceImpl implements RequestService {
     CreationRequestDto creationRequestDto =
         requestDtoMapper.toDto(saveRequest(transactionCreateDto));
     publisher.sendMessageToQueue(serializer.serializeObjectToJson(creationRequestDto));
-    log.info(LogMessageText.MESSAGE_SENT_TO_QUEUE_LOG);
+    log.info(LogMessage.MESSAGE_SENT_TO_QUEUE_LOG);
     return creationRequestDto;
   }
 }

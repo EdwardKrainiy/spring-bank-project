@@ -3,8 +3,8 @@ package com.itech.utils;
 import com.itech.model.entity.User;
 import com.itech.repository.UserRepository;
 import com.itech.utils.exception.EntityNotFoundException;
-import com.itech.utils.literal.ExceptionMessageText;
-import com.itech.utils.literal.LogMessageText;
+import com.itech.utils.literal.ExceptionMessage;
+import com.itech.utils.literal.LogMessage;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -73,8 +73,8 @@ public class JwtDecoder {
     if (authenticatedUserOptional.isPresent()) {
       return authenticatedUserOptional.get();
     } else {
-      log.error(LogMessageText.AUTHENTICATED_USER_NOT_FOUND_LOG);
-      throw new EntityNotFoundException(ExceptionMessageText.AUTHENTICATED_USER_NOT_FOUND);
+      log.error(LogMessage.AUTHENTICATED_USER_NOT_FOUND_LOG);
+      throw new EntityNotFoundException(ExceptionMessage.AUTHENTICATED_USER_NOT_FOUND);
     }
   }
 }

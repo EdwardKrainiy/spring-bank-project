@@ -35,7 +35,8 @@ import com.itech.utils.JsonEntitySerializer;
 import com.itech.utils.JwtDecoder;
 import com.itech.utils.exception.EntityNotFoundException;
 import com.itech.utils.exception.ValidationException;
-import com.itech.utils.literal.ExceptionMessageText;
+import com.itech.utils.literal.ExceptionMessage;
+import com.itech.utils.literal.PropertySourceClasspath;
 import com.itech.utils.mapper.account.AccountDtoMapperImpl;
 import com.itech.utils.mapper.request.RequestDtoMapperImpl;
 import com.itech.utils.mapper.user.UserSignUpDtoMapperImpl;
@@ -78,11 +79,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
       JwtAuthenticationByUserDetails.class
     })
 @ExtendWith(SpringExtension.class)
-@TestPropertySource(locations = "classpath:properties/jwt.properties")
-@TestPropertySource(locations = "classpath:properties/mail.properties")
-@TestPropertySource(locations = "classpath:properties/scheduler.properties")
-@TestPropertySource(locations = "classpath:properties/security.properties")
-@TestPropertySource(locations = "classpath:application.properties")
+@TestPropertySource(locations = PropertySourceClasspath.JWT_PROPERTIES_CLASSPATH)
+@TestPropertySource(locations = PropertySourceClasspath.MAIL_PROPERTIES_CLASSPATH)
+@TestPropertySource(locations = PropertySourceClasspath.SCHEDULER_PROPERTIES_CLASSPATH)
+@TestPropertySource(locations = PropertySourceClasspath.SECURITY_PROPERTIES_CLASSPATH)
+@TestPropertySource(locations = PropertySourceClasspath.APPLICATION_PROPERTIES_CLASSPATH)
 class AccountServiceUnitTest {
   @Captor ArgumentCaptor<String> emailCaptor;
   @Captor ArgumentCaptor<String> titleCaptor;
@@ -171,7 +172,7 @@ class AccountServiceUnitTest {
         assertThrows(
             ValidationException.class, () -> accountService.updateAccount(accountToUpdate, 2L));
 
-    String expectedMessage = ExceptionMessageText.ID_OF_LOGGED_USER_NOT_EQUALS_ID_OF_ACCOUNT;
+    String expectedMessage = ExceptionMessage.ID_OF_LOGGED_USER_NOT_EQUALS_ID_OF_ACCOUNT;
     String actualMessage = exception.getMessage();
 
     assertTrue(actualMessage.contains(expectedMessage));
@@ -197,7 +198,7 @@ class AccountServiceUnitTest {
     Exception exception =
         assertThrows(ValidationException.class, () -> accountService.deleteAccountByAccountId(2L));
 
-    String expectedMessage = ExceptionMessageText.ID_OF_LOGGED_USER_NOT_EQUALS_ID_OF_ACCOUNT;
+    String expectedMessage = ExceptionMessage.ID_OF_LOGGED_USER_NOT_EQUALS_ID_OF_ACCOUNT;
     String actualMessage = exception.getMessage();
 
     assertTrue(actualMessage.contains(expectedMessage));
@@ -241,7 +242,7 @@ class AccountServiceUnitTest {
         assertThrows(
             EntityNotFoundException.class, () -> accountService.findAccountCreationRequestById(1L));
 
-    String expectedMessage = ExceptionMessageText.ACCOUNT_CREATION_REQUEST_NOT_FOUND;
+    String expectedMessage = ExceptionMessage.ACCOUNT_CREATION_REQUEST_NOT_FOUND;
     String actualMessage = exception.getMessage();
 
     assertTrue(actualMessage.contains(expectedMessage));
@@ -285,7 +286,7 @@ class AccountServiceUnitTest {
         assertThrows(
             EntityNotFoundException.class, () -> accountService.findAccountCreationRequestById(1L));
 
-    String expectedMessage = ExceptionMessageText.ACCOUNT_CREATION_REQUEST_NOT_FOUND;
+    String expectedMessage = ExceptionMessage.ACCOUNT_CREATION_REQUEST_NOT_FOUND;
     String actualMessage = exception.getMessage();
 
     assertTrue(actualMessage.contains(expectedMessage));
@@ -386,7 +387,7 @@ class AccountServiceUnitTest {
         assertThrows(
             EntityNotFoundException.class, () -> accountService.approveAccountCreationRequest(1L));
 
-    String expectedMessage = ExceptionMessageText.ACCOUNT_CREATION_REQUEST_NOT_FOUND;
+    String expectedMessage = ExceptionMessage.ACCOUNT_CREATION_REQUEST_NOT_FOUND;
     String actualMessage = exception.getMessage();
 
     assertTrue(actualMessage.contains(expectedMessage));
@@ -456,7 +457,7 @@ class AccountServiceUnitTest {
         assertThrows(
             EntityNotFoundException.class, () -> accountService.approveAccountCreationRequest(3L));
 
-    String expectedMessage = ExceptionMessageText.ACCOUNT_CREATION_REQUEST_NOT_FOUND;
+    String expectedMessage = ExceptionMessage.ACCOUNT_CREATION_REQUEST_NOT_FOUND;
     String actualMessage = exception.getMessage();
 
     assertTrue(actualMessage.contains(expectedMessage));
@@ -473,7 +474,7 @@ class AccountServiceUnitTest {
         assertThrows(
             EntityNotFoundException.class, () -> accountService.rejectAccountCreationRequest(1L));
 
-    String expectedMessage = ExceptionMessageText.ACCOUNT_CREATION_REQUEST_NOT_FOUND;
+    String expectedMessage = ExceptionMessage.ACCOUNT_CREATION_REQUEST_NOT_FOUND;
     String actualMessage = exception.getMessage();
 
     assertTrue(actualMessage.contains(expectedMessage));
