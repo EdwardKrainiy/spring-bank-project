@@ -34,6 +34,8 @@ public class LogMessage {
   public static final String MESSAGE_SENT_LOG = "Message was successfully sent to email: %s";
   public static final String MESSAGE_SENT_TO_QUEUE_LOG = "Message was successfully sent to queue.";
   public static final String USER_NOT_FOUND_LOG = "User not found. Id of requested user: %d";
+  public static final String USER_WITH_USERNAME_NOT_FOUND_LOG = "User not found. Username of requested user: %s";
+  public static final String USER_NOT_ACTIVATED_LOG = "User not activated. Username of requested user: %s";
   public static final String TRANSACTION_REJECTED_LOG =
       "Transaction was rejected. Id of rejected transaction: %d";
   public static final String TRANSACTION_CREATED_LOG =

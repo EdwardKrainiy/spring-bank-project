@@ -94,8 +94,7 @@ public class UserServiceImpl implements UserService {
           String.format(userConfirmationMessageTitleText, mappedUser.getUsername()),
           String.format(("%s%s"), confirmMessage, confirmationToken));
 
-      log.info(
-          String.format(LogMessage.MESSAGE_SENT_LOG, managerUserOptional.get().getEmail()));
+      log.info(String.format(LogMessage.MESSAGE_SENT_LOG, managerUserOptional.get().getEmail()));
     }
   }
 
@@ -146,12 +145,21 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public ResponseEntity<String> authenticateUser(UserSignInDto userSignInDto) {
-    User userToSignIn =
-        userRepository
-            .findUserByUsername(userSignInDto.getUsername())
-            .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND));
+    User userToSignIn;
+    Optional<User> userToSignInOptional =
+        userRepository.findUserByUsername(userSignInDto.getUsername());
+    if (!userToSignInOptional.isPresent()) {
+      log.error(
+          String.format(LogMessage.USER_WITH_USERNAME_NOT_FOUND_LOG, userSignInDto.getUsername()));
+      throw new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND);
+    } else {
+      userToSignIn = userToSignInOptional.get();
+    }
     if (isUserActivated(userToSignIn)) {
       return jwtAuthenticationByUserDetails.authenticate(userSignInDto);
-    } else throw new ValidationException(ExceptionMessage.USER_NOT_ACTIVATED);
+    } else {
+      log.error(String.format(LogMessage.USER_NOT_ACTIVATED_LOG, userToSignIn.getUsername()));
+      throw new ValidationException(ExceptionMessage.USER_NOT_ACTIVATED);
+    }
   }
 }

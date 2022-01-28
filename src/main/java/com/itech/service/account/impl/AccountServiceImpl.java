@@ -144,8 +144,7 @@ public class AccountServiceImpl implements AccountService {
                 LogMessage.ID_OF_LOGGED_USER_NOT_EQUALS_ID_OF_ACCOUNT_LOG,
                 authenticatedUser.getId(),
                 accountToUpdate.getUser().getId()));
-        throw new ValidationException(
-            ExceptionMessage.ID_OF_LOGGED_USER_NOT_EQUALS_ID_OF_ACCOUNT);
+        throw new ValidationException(ExceptionMessage.ID_OF_LOGGED_USER_NOT_EQUALS_ID_OF_ACCOUNT);
       } else {
         log.info(String.format(LogMessage.ACCOUNT_UPDATED_LOG, accountId));
         return accountDtoMapper.toDto(accountRepository.save(accountToUpdate));
@@ -170,8 +169,7 @@ public class AccountServiceImpl implements AccountService {
                 LogMessage.ID_OF_LOGGED_USER_NOT_EQUALS_ID_OF_ACCOUNT_LOG,
                 authenticatedUser.getId(),
                 accountToDelete.getUser().getId()));
-        throw new ValidationException(
-            ExceptionMessage.ID_OF_LOGGED_USER_NOT_EQUALS_ID_OF_ACCOUNT);
+        throw new ValidationException(ExceptionMessage.ID_OF_LOGGED_USER_NOT_EQUALS_ID_OF_ACCOUNT);
       } else {
         log.info(String.format(LogMessage.ACCOUNT_DELETED_LOG, accountId));
         accountRepository.deleteById(accountToDelete.getId());
@@ -275,8 +273,7 @@ public class AccountServiceImpl implements AccountService {
           approveMessage);
       log.info(String.format(LogMessage.MESSAGE_SENT_LOG, userEmail));
     } else {
-      log.warn(
-          String.format(LogMessage.EMAIL_NOT_FOUND_LOG, accountCreationRequestUser.getId()));
+      log.warn(String.format(LogMessage.EMAIL_NOT_FOUND_LOG, accountCreationRequestUser.getId()));
     }
   }
 
@@ -287,8 +284,7 @@ public class AccountServiceImpl implements AccountService {
     accountCreationRequest.setStatus(Status.REJECTED);
     creationRequestRepository.save(accountCreationRequest);
     log.info(
-        String.format(
-            LogMessage.ACCOUNT_CREATION_REQUEST_UPDATED_LOG, accountCreationRequestId));
+        String.format(LogMessage.ACCOUNT_CREATION_REQUEST_UPDATED_LOG, accountCreationRequestId));
 
     String userEmail = accountCreationRequestUser.getEmail();
 
@@ -296,8 +292,7 @@ public class AccountServiceImpl implements AccountService {
       emailService.sendEmail(userEmail, rejectedMessageTitleText, rejectMessage);
       log.info(String.format(LogMessage.MESSAGE_SENT_LOG, userEmail));
     } else {
-      log.warn(
-          String.format(LogMessage.EMAIL_NOT_FOUND_LOG, accountCreationRequestUser.getId()));
+      log.warn(String.format(LogMessage.EMAIL_NOT_FOUND_LOG, accountCreationRequestUser.getId()));
     }
   }
 
