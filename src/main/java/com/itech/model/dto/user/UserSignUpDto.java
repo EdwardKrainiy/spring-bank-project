@@ -1,24 +1,34 @@
 package com.itech.model.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.itech.utils.literal.DtoJsonProperty;
+import com.itech.utils.literal.RegexPattern;
+import com.itech.utils.literal.ValidationExceptionMessage;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
+/**
+ * User data-transfer object to create new User.
+ *
+ * @author Edvard Krainiy on 12/8/2021
+ */
+@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "User data-transfer object to sign up application.")
 public class UserSignUpDto extends UserSignInDto {
-    private static final String VALID_EMAIL_ADDRESS_REGEX = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$";
 
-    @JsonProperty("Email")
-    @Pattern(regexp = VALID_EMAIL_ADDRESS_REGEX, message = "Email is not valid!")
-    @NotBlank(message = "Email is empty!")
-    @Schema(description = "Unique Email field of User.")
-    private String email;
+  @JsonProperty(DtoJsonProperty.EMAIL)
+  @Pattern(
+      regexp = RegexPattern.VALID_EMAIL_ADDRESS_REGEX,
+      message = ValidationExceptionMessage.EMAIL_IS_NOT_VALID_EXCEPTION_MESSAGE_TEXT)
+  @NotBlank(message = ValidationExceptionMessage.EMAIL_IS_EMPTY_MESSAGE_TEXT)
+  @Schema(description = "Unique Email field of User.")
+  private String email;
 }

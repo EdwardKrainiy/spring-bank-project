@@ -9,25 +9,22 @@ import org.mapstruct.Mapper;
  *
  * @author Edvard Krainiy on 01/11/2022
  */
-
 @Mapper(componentModel = "spring")
 public interface UserSignUpDtoMapper {
 
-    /**
-     * UserToUserDto method. Converts User object to UserDto.
-     *
-     * @param user User object we need to convert.
-     * @return UserDto Obtained UserDto.
-     */
-    UserSignUpDto toDto(User user);
+  /**
+   * UserToUserDto method. Converts User object to UserDto.
+   *
+   * @param user User object we need to convert.
+   * @return UserDto Obtained UserDto.
+   */
+  UserSignUpDto toDto(User user);
 
-    /**
-     * DtoUserToUser method. Converts UserDto to User object.
-     *
-     * @param userSignInDto UserDto we need to convert.
-     * @return User Obtained User object.
-     */
-    User toEntity(UserSignUpDto userSignUpDto);
-
-
+  /**
+   * DtoUserToUser method. Converts UserDto to User object.
+   *
+   * @param userSignUpDto UserDto we need to convert.
+   * @return User Obtained User object.
+   */
+  User toEntity(UserSignUpDto userSignUpDto);
 }

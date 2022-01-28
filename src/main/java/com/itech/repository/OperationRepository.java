@@ -10,5 +10,4 @@ import org.springframework.stereotype.Repository;
  * @author Edvard Krainiy on 12/24/2021
  */
 @Repository
-public interface OperationRepository extends JpaRepository<Operation, Long> {
-}
+public interface OperationRepository extends JpaRepository<Operation, Long> {}

@@ -1,13 +1,17 @@
 package com.itech.utils.exception.handler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.itech.model.dto.exception.ApiErrorDto;
 import com.itech.utils.exception.EntityExistsException;
 import com.itech.utils.exception.EntityNotFoundException;
 import com.itech.utils.exception.IncorrectPasswordException;
 import com.itech.utils.exception.ValidationException;
-import com.itech.utils.exception.message.ExceptionMessageText;
+import com.itech.utils.literal.LogMessage;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
+import java.util.HashSet;
+import java.util.Set;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 import org.iban4j.IbanFormatException;
 import org.iban4j.InvalidCheckDigitException;
@@ -21,9 +25,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Exception handler class.
  *
@@ -32,108 +33,119 @@ import java.util.List;
 @ControllerAdvice
 @Log4j2
 public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler {
-    @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        log.error("MethodArgumentNotValidException was caught!");
+  @Override
+  protected @NonNull ResponseEntity<Object> handleMethodArgumentNotValid(
+      MethodArgumentNotValidException ex,
+      @NonNull HttpHeaders headers,
+      @NonNull HttpStatus status,
+      @NonNull WebRequest request) {
+    Set<String> errors = new HashSet<>();
+    ex.getBindingResult()
+        .getAllErrors()
+        .forEach(
+            error -> {
+              String errorMessage = error.getDefaultMessage();
+              errors.add(errorMessage);
+            });
 
-        List<String> errors = new ArrayList<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String errorMessage = error.getDefaultMessage();
-            errors.add(errorMessage);
-        });
+    log.error(
+        String.format(LogMessage.METHOD_ARGUMENT_NOT_VALID_LOG, ex.getObjectName(), errors));
 
-        ApiError error = new ApiError(HttpStatus.BAD_REQUEST.value(), errors);
+    ApiErrorDto error = new ApiErrorDto(HttpStatus.BAD_REQUEST.value(), errors);
 
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-    }
+    return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+  }
 
-    @ExceptionHandler(value = {IllegalArgumentException.class})
-    protected ResponseEntity<ApiError> handleException(RuntimeException ex) {
-        log.error("IllegalArgumentException was caught!");
+  @ExceptionHandler(value = {IllegalArgumentException.class})
+  protected ResponseEntity<ApiErrorDto> handleException(IllegalArgumentException ex) {
+    ApiErrorDto exceptionError = new ApiErrorDto(HttpStatus.UNAUTHORIZED.value(), ex.getMessage());
 
-        ApiError exceptionError = new ApiError(HttpStatus.UNAUTHORIZED.value(), ExceptionMessageText.FETCHING_EXCEPTION);
+    return new ResponseEntity<>(exceptionError, HttpStatus.UNAUTHORIZED);
+  }
 
-        return new ResponseEntity<>(exceptionError, HttpStatus.UNAUTHORIZED);
-    }
+  @ExceptionHandler(value = {ExpiredJwtException.class})
+  protected ResponseEntity<ApiErrorDto> handleExpiredJwtException(ExpiredJwtException ex) {
+    ApiErrorDto exceptionError = new ApiErrorDto(HttpStatus.UNAUTHORIZED.value(), ex.getMessage());
 
-    @ExceptionHandler(value = {ExpiredJwtException.class})
-    protected ResponseEntity<ApiError> handleExpiredJwtException(RuntimeException ex) {
-        log.error("ExpiredJwtException was caught!");
+    return new ResponseEntity<>(exceptionError, HttpStatus.UNAUTHORIZED);
+  }
 
-        ApiError exceptionError = new ApiError(HttpStatus.UNAUTHORIZED.value(), ExceptionMessageText.TOKEN_IS_EXPIRED);
+  @ExceptionHandler(value = {SignatureException.class})
+  protected ResponseEntity<ApiErrorDto> handleInvalidSignatureException(SignatureException ex) {
+    ApiErrorDto exceptionError = new ApiErrorDto(HttpStatus.UNAUTHORIZED.value(), ex.getMessage());
 
-        return new ResponseEntity<>(exceptionError, HttpStatus.UNAUTHORIZED);
-    }
+    return new ResponseEntity<>(exceptionError, HttpStatus.UNAUTHORIZED);
+  }
 
-    @ExceptionHandler(value = {SignatureException.class})
-    protected ResponseEntity<ApiError> handleInvalidSignatureException(RuntimeException ex) {
-        log.error("SignatureException was caught!");
+  @ExceptionHandler(value = {EntityExistsException.class})
+  protected ResponseEntity<ApiErrorDto> handleUserExistsException(EntityExistsException ex) {
+    ApiErrorDto exceptionError = new ApiErrorDto(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
 
-        ApiError exceptionError = new ApiError(HttpStatus.UNAUTHORIZED.value(), ExceptionMessageText.AUTHENTICATION_FAILED);
+    return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
+  }
 
-        return new ResponseEntity<>(exceptionError, HttpStatus.UNAUTHORIZED);
-    }
+  @ExceptionHandler(value = {IncorrectPasswordException.class})
+  protected ResponseEntity<ApiErrorDto> handleIncorrectPasswordException(
+      IncorrectPasswordException ex) {
+    ApiErrorDto exceptionError = new ApiErrorDto(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
 
-    @ExceptionHandler(value = {EntityExistsException.class})
-    protected ResponseEntity<ApiError> handleUserExistsException(EntityExistsException ex) {
-        log.error("EntityExistsException was caught!");
+    return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
+  }
 
-        ApiError exceptionError = new ApiError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+  @ExceptionHandler(value = {NullPointerException.class})
+  protected ResponseEntity<ApiErrorDto> handleNullPointerException(NullPointerException ex) {
+    ApiErrorDto exceptionError = new ApiErrorDto(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
 
-        return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
-    }
+    return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
+  }
 
-    @ExceptionHandler(value = {IncorrectPasswordException.class})
-    protected ResponseEntity<ApiError> handleIncorrectPasswordException(IncorrectPasswordException ex) {
-        log.error("IncorrectPasswordException was caught!");
+  @ExceptionHandler(value = {EntityNotFoundException.class})
+  protected ResponseEntity<ApiErrorDto> handleEntityNotFoundException(EntityNotFoundException ex) {
+    ApiErrorDto exceptionError = new ApiErrorDto(HttpStatus.NOT_FOUND.value(), ex.getMessage());
 
-        ApiError exceptionError = new ApiError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+    return new ResponseEntity<>(exceptionError, HttpStatus.NOT_FOUND);
+  }
 
-        return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
-    }
+  @ExceptionHandler(value = {ValidationException.class})
+  protected ResponseEntity<ApiErrorDto> handleValidationException(ValidationException ex) {
+    ApiErrorDto exceptionError = new ApiErrorDto(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
 
-    @ExceptionHandler(value = {NullPointerException.class})
-    protected ResponseEntity<ApiError> handleNullPointerException(RuntimeException ex) {
-        log.error("NullPointerException was caught!");
+    return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
+  }
 
-        ApiError exceptionError = new ApiError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+  @ExceptionHandler(
+      value = {
+        InvalidCheckDigitException.class,
+      })
+  protected ResponseEntity<ApiErrorDto> handleInvalidCheckDigitException(
+      InvalidCheckDigitException ex) {
+    ApiErrorDto exceptionError = new ApiErrorDto(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
 
-        return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
-    }
+    return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
+  }
 
-    @ExceptionHandler(value = {EntityNotFoundException.class})
-    protected ResponseEntity<ApiError> handleEntityNotFoundException(RuntimeException ex) {
-        log.error("EntityNotFoundException was caught!");
+  @ExceptionHandler(
+      value = {
+        IbanFormatException.class,
+      })
+  protected ResponseEntity<ApiErrorDto> handleIbanFormatException(IbanFormatException ex) {
+    ApiErrorDto exceptionError = new ApiErrorDto(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
 
-        ApiError exceptionError = new ApiError(HttpStatus.NOT_FOUND.value(), ex.getMessage());
+    return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
+  }
 
-        return new ResponseEntity<>(exceptionError, HttpStatus.NOT_FOUND);
-    }
+  @ExceptionHandler(value = {UnsupportedCountryException.class})
+  protected ResponseEntity<ApiErrorDto> handleUnsupportedCountryException(
+      UnsupportedCountryException ex) {
+    ApiErrorDto exceptionError = new ApiErrorDto(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
 
-    @ExceptionHandler(value = {ValidationException.class})
-    protected ResponseEntity<ApiError> handleValidationException(RuntimeException ex) {
-        log.error("ValidationException was caught!");
+    return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
+  }
 
-        ApiError exceptionError = new ApiError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+  @ExceptionHandler(value = {JsonProcessingException.class})
+  protected ResponseEntity<ApiErrorDto> handleJsonProcessingException(JsonProcessingException ex) {
+    ApiErrorDto exceptionError = new ApiErrorDto(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
 
-        return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(value = {IbanFormatException.class, InvalidCheckDigitException.class, UnsupportedCountryException.class})
-    protected ResponseEntity<ApiError> handleIbanExceptions(RuntimeException ex) {
-        log.error("IbanException was caught!");
-
-        ApiError exceptionError = new ApiError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
-
-        return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(value = {JsonProcessingException.class})
-    protected ResponseEntity<ApiError> handleJsonProcessingException(RuntimeException ex) {
-        log.error("JsonProcessingException was caught!");
-
-        ApiError exceptionError = new ApiError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
-
-        return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
-    }
+    return new ResponseEntity<>(exceptionError, HttpStatus.BAD_REQUEST);
+  }
 }

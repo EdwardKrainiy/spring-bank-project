@@ -12,18 +12,17 @@ import org.mapstruct.Mappings;
  *
  * @author Edvard Krainiy on 12/23/2021
  */
-
 @Mapper(componentModel = "spring", uses = OperationDtoMapper.class)
 public interface TransactionDtoMapper {
-    /**
-     * toDto method. Converts Transaction object to TransactionDto.
-     *
-     * @param transaction Transaction object we need to convert.
-     * @return TransactionDto Obtained TransactionDto entity.
-     */
-    @Mappings({
-            @Mapping(source = "transaction.user.id", target = "userId"),
-            @Mapping(source = "transaction.issuedAt", target = "issuedAt")
-    })
-    TransactionDto toDto(Transaction transaction);
+  /**
+   * toDto method. Converts Transaction object to TransactionDto.
+   *
+   * @param transaction Transaction object we need to convert.
+   * @return TransactionDto Obtained TransactionDto entity.
+   */
+  @Mappings({
+    @Mapping(source = "transaction.user.id", target = "userId"),
+    @Mapping(source = "transaction.issuedAt", target = "issuedAt")
+  })
+  TransactionDto toDto(Transaction transaction);
 }

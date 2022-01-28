@@ -4,35 +4,45 @@ import com.itech.model.dto.operation.OperationCreateDto;
 import com.itech.model.dto.request.CreationRequestDto;
 import com.itech.model.dto.transaction.TransactionCreateDto;
 import com.itech.model.dto.transaction.TransactionDto;
-import com.itech.model.entity.*;
-import com.itech.model.enumeration.*;
-import com.itech.repository.*;
+import com.itech.model.entity.Account;
+import com.itech.model.entity.CreationRequest;
+import com.itech.model.entity.Operation;
+import com.itech.model.entity.Transaction;
+import com.itech.model.entity.User;
+import com.itech.model.enumeration.CreationType;
+import com.itech.model.enumeration.Currency;
+import com.itech.model.enumeration.OperationType;
+import com.itech.model.enumeration.Role;
+import com.itech.model.enumeration.Status;
+import com.itech.repository.AccountRepository;
+import com.itech.repository.CreationRequestRepository;
+import com.itech.repository.OperationRepository;
+import com.itech.repository.TransactionRepository;
+import com.itech.repository.UserRepository;
 import com.itech.service.transaction.TransactionService;
 import com.itech.service.transaction.TransactionServiceUtil;
-import com.itech.service.user.UserService;
 import com.itech.utils.JsonEntitySerializer;
 import com.itech.utils.JwtDecoder;
 import com.itech.utils.exception.ChangeAccountAmountException;
 import com.itech.utils.exception.EntityNotFoundException;
-import com.itech.utils.exception.ValidationException;
-import com.itech.utils.exception.message.ExceptionMessageText;
+import com.itech.utils.literal.ExceptionMessage;
+import com.itech.utils.literal.LogMessage;
 import com.itech.utils.mapper.request.RequestDtoMapper;
 import com.itech.utils.mapper.transaction.TransactionDtoMapper;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Service;
 
 /**
- * Implementation of TransactionService interface. Provides us different methods of Service layer to work with Repository layer of Transaction objects.
+ * Implementation of TransactionService interface. Provides us different methods of Service layer to
+ * work with Repository layer of Transaction objects.
  *
  * @author Edvard Krainiy on 12/23/2021
  */
@@ -40,198 +50,281 @@ import java.util.stream.Collectors;
 @Log4j2
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
-    private final TransactionRepository transactionRepository;
+  private final TransactionRepository transactionRepository;
 
-    private final TransactionDtoMapper transactionDtoMapper;
+  private final TransactionDtoMapper transactionDtoMapper;
 
-    private final AccountRepository accountRepository;
+  private final AccountRepository accountRepository;
 
-    private final UserRepository userRepository;
+  private final UserRepository userRepository;
 
-    private final OperationRepository operationRepository;
+  private final OperationRepository operationRepository;
 
-    private final TransactionServiceUtil transactionServiceUtil;
+  private final TransactionServiceUtil transactionServiceUtil;
 
-    private final UserService userService;
+  private final JsonEntitySerializer serializer;
 
-    private final JsonEntitySerializer serializer;
+  private final CreationRequestRepository creationRequestRepository;
 
-    private final CreationRequestRepository creationRequestRepository;
+  private final RequestDtoMapper requestDtoMapper;
 
-    private final RequestDtoMapper requestDtoMapper;
+  private final JwtDecoder jwtDecoder;
 
-    private final JwtDecoder jwtDecoder;
+  @Override
+  public TransactionDto findTransactionById(Long transactionId) {
+    User authenticatedUser = jwtDecoder.getLoggedUser();
 
-    @Override
-    public TransactionDto findTransactionById(Long transactionId) {
-        User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.AUTHENTICATED_USER_NOT_FOUND));
+    Optional<Transaction> foundTransaction;
 
-        Optional<Transaction> foundTransaction;
-
-        if (authenticatedUser.getRole().equals(Role.USER)) {
-            foundTransaction = transactionRepository.findTransactionByIdAndUser(transactionId, authenticatedUser);
-        } else {
-            foundTransaction = transactionRepository.findTransactionById(transactionId);
-        }
-
-        return transactionDtoMapper.toDto(foundTransaction.orElseThrow(() -> new EntityNotFoundException("Transaction not found!")));
+    if (authenticatedUser.getRole().equals(Role.USER)) {
+      foundTransaction =
+          transactionRepository.findTransactionByIdAndUser(transactionId, authenticatedUser);
+    } else {
+      foundTransaction = transactionRepository.findTransactionById(transactionId);
     }
 
-    @Override
-    public List<TransactionDto> findAllTransactions() {
-        User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.AUTHENTICATED_USER_NOT_FOUND));
+    if (!foundTransaction.isPresent()) {
+      log.error(String.format(LogMessage.TRANSACTION_NOT_FOUND_LOG, transactionId));
+      throw new EntityNotFoundException(ExceptionMessage.TRANSACTION_NOT_FOUND);
+    } else {
+      return transactionDtoMapper.toDto(foundTransaction.get());
+    }
+  }
 
-        List<Transaction> transactions;
+  @Override
+  public List<TransactionDto> findAllTransactions() {
+    User authenticatedUser = jwtDecoder.getLoggedUser();
 
-        if (authenticatedUser.getRole().equals(Role.USER)) {
-            transactions = transactionRepository.findTransactionsByUser(authenticatedUser);
-        } else {
-            transactions = transactionRepository.findAll();
-        }
+    List<Transaction> transactions;
 
-        if (transactions.isEmpty()) throw new EntityNotFoundException(ExceptionMessageText.TRANSACTION_CREATION_REQUESTS_NOT_FOUND);
-
-        return transactions.stream().map(transactionDtoMapper::toDto).collect(Collectors.toList());
-
+    if (authenticatedUser.getRole().equals(Role.USER)) {
+      transactions = transactionRepository.findTransactionsByUser(authenticatedUser);
+    } else {
+      transactions = transactionRepository.findAll();
     }
 
-    @Override
-    public TransactionDto createTransaction(String creationRequestDtoJson) {
-        CreationRequestDto creationRequestDto = serializer.serializeJsonToObject(creationRequestDtoJson, CreationRequestDto.class);
-        TransactionCreateDto transactionCreateDto = serializer.serializeJsonToObject(creationRequestDto.getPayload(), TransactionCreateDto.class);
-        CreationRequest requestToReject = creationRequestRepository.findCreationRequestById(creationRequestDto.getId()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.TRANSACTION_CREATION_REQUEST_WITH_ID_NOT_FOUND));
-        User foundUser = userRepository.findById(creationRequestDto.getUserId()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.USER_NOT_FOUND));
+    return transactions.stream().map(transactionDtoMapper::toDto).collect(Collectors.toList());
+  }
 
-        if (!userService.isUserActivated(foundUser)) throw new ValidationException(ExceptionMessageText.USER_NOT_ACTIVATED);
+  @Override
+  public TransactionDto createTransaction(String creationRequestDtoJson) {
+    CreationRequestDto creationRequestDto =
+        serializer.serializeJsonToObject(creationRequestDtoJson, CreationRequestDto.class);
+    TransactionCreateDto transactionCreateDto =
+        serializer.serializeJsonToObject(
+            creationRequestDto.getPayload(), TransactionCreateDto.class);
 
-        Transaction transaction = createAndSaveTransaction(foundUser);
+    Optional<CreationRequest> requestToRejectOptional =
+        creationRequestRepository.findCreationRequestById(creationRequestDto.getId());
+    CreationRequest requestToReject;
 
-        if (accountRepository.findAll().isEmpty()) {
-            rejectCreationRequest(requestToReject, transaction, ExceptionMessageText.ACCOUNTS_ARE_EMPTY);
-        }
-
-        Set<Operation> operations = new LinkedHashSet<>();
-        Set<OperationCreateDto> dtoOperations = transactionCreateDto.getOperations();
-
-        Optional<OperationCreateDto> firstOperation = dtoOperations.stream().findFirst();
-
-        Currency currencyToCheck = null;
-
-        if (firstOperation.isPresent()) {
-            Optional<Account> expectedAccount = accountRepository.findAccountByAccountNumber(firstOperation.get().getAccountNumber());
-
-            if (expectedAccount.isPresent()) {
-                currencyToCheck = expectedAccount.get().getCurrency();
-            } else {
-                rejectCreationRequest(requestToReject, transaction, ExceptionMessageText.ACCOUNT_NOT_FOUND);
-            }
-        } else {
-            rejectCreationRequest(requestToReject, transaction, ExceptionMessageText.OPERATIONS_ARE_EMPTY);
-        }
-
-        validateAndAddOperationsToSet(dtoOperations, requestToReject, transaction, currencyToCheck, operations);
-
-        if (!transactionServiceUtil.checkRequestDtoValidity(operations, transaction)) {
-            rejectCreationRequest(requestToReject, transaction, ExceptionMessageText.INCORRECT_REQUEST_STRUCTURE);
-        }
-
-        operationRepository.saveAll(operations);
-
-        transaction.setOperations(operations);
-
-        return completeTransaction(transaction, operations, creationRequestDto);
+    if (!requestToRejectOptional.isPresent()) {
+      log.error(
+          String.format(
+              LogMessage.TRANSACTION_CREATION_REQUEST_NOT_FOUND_LOG,
+              creationRequestDto.getId()));
+      throw new EntityNotFoundException(
+          ExceptionMessage.TRANSACTION_CREATION_REQUEST_NOT_FOUND);
+    } else {
+      requestToReject = requestToRejectOptional.get();
     }
 
-    private Transaction createAndSaveTransaction(User foundUser) {
-        LocalDateTime currentDate = LocalDateTime.now();
-        Transaction transaction = new Transaction();
-
-        transaction.setUser(foundUser);
-        transaction.setIssuedAt(currentDate);
-        transaction.setStatus(Status.IN_PROGRESS);
-
-        return transactionRepository.save(transaction);
+    Optional<User> foundUserOptional = userRepository.findById(creationRequestDto.getUserId());
+    User foundUser;
+    if (!foundUserOptional.isPresent()) {
+      log.error(String.format(LogMessage.USER_NOT_FOUND_LOG, creationRequestDto.getId()));
+      throw new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND);
+    } else {
+      foundUser = foundUserOptional.get();
     }
 
-    private void validateAndAddOperationsToSet(Set<OperationCreateDto> dtoOperations, CreationRequest requestToReject, Transaction transaction, Currency currencyToCheck, Set<Operation> operations) {
-        for (OperationCreateDto operationCreateDto : dtoOperations) {
-            accountRepository.findAccountByAccountNumber(operationCreateDto.getAccountNumber()).ifPresentOrElse(foundAccount -> completeOperationAdding(foundAccount, currencyToCheck, requestToReject, transaction, operationCreateDto, operations), () -> rejectCreationRequest(requestToReject, transaction, ExceptionMessageText.ACCOUNT_NOT_FOUND));
-        }
+    Transaction transaction = createAndSaveTransaction(foundUser);
+
+    if (accountRepository.findAll().isEmpty()) {
+      rejectCreationRequest(requestToReject, transaction, ExceptionMessage.ACCOUNTS_ARE_EMPTY);
     }
 
-    private void rejectCreationRequest(CreationRequest requestToReject, Transaction transaction, String exceptionMessage) {
-        requestToReject.setStatus(Status.REJECTED);
-        requestToReject.setCreatedId(transaction.getId());
-        creationRequestRepository.save(requestToReject);
+    Set<Operation> operations = new LinkedHashSet<>();
+    Set<OperationCreateDto> dtoOperations = transactionCreateDto.getOperations();
 
-        transaction.setStatus(Status.REJECTED);
-        transactionRepository.save(transaction);
-        throw new EntityNotFoundException(exceptionMessage);
+    Optional<OperationCreateDto> firstOperation = dtoOperations.stream().findFirst();
+
+    Currency currencyToCheck = null;
+
+    if (firstOperation.isPresent()) {
+      Optional<Account> expectedAccount =
+          accountRepository.findAccountByAccountNumber(firstOperation.get().getAccountNumber());
+
+      if (expectedAccount.isPresent()) {
+        currencyToCheck = expectedAccount.get().getCurrency();
+      } else {
+        rejectCreationRequest(requestToReject, transaction, ExceptionMessage.ACCOUNT_NOT_FOUND);
+      }
+    } else {
+      rejectCreationRequest(
+          requestToReject, transaction, ExceptionMessage.OPERATIONS_ARE_EMPTY);
     }
 
-    private void completeOperationAdding(Account account, Currency currencyToCheck, CreationRequest requestToReject, Transaction transaction, OperationCreateDto operationCreateDto, Set<Operation> operations) {
-        Operation operation = new Operation();
+    validateAndAddOperationsToSet(
+        dtoOperations, requestToReject, transaction, currencyToCheck, operations);
 
-        if (!currencyToCheck.equals(account.getCurrency())) {
-            rejectCreationRequest(requestToReject, transaction, ExceptionMessageText.CURRENCIES_ARE_NOT_SAME);
-        }
-
-        operation.setAccount(account);
-        operation.setTransaction(transaction);
-
-        operation.setOperationType(OperationType.valueOf(operationCreateDto.getOperationType()));
-
-        operation.setAmount(operationCreateDto.getAmount());
-        operations.add(operationRepository.save(operation));
+    if (!transactionServiceUtil.checkRequestDtoValidity(operations, transaction)) {
+      rejectCreationRequest(
+          requestToReject, transaction, ExceptionMessage.INCORRECT_REQUEST_STRUCTURE);
     }
 
-    private TransactionDto completeTransaction(Transaction transaction, Set<Operation> operations, CreationRequestDto creationRequestDto) {
-        CreationRequest creationRequest = creationRequestRepository.findCreationRequestById(creationRequestDto.getId()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.TRANSACTION_CREATION_REQUEST_WITH_ID_NOT_FOUND));
+    operationRepository.saveAll(operations);
 
-        creationRequest.setStatus(Status.CREATED);
-        transaction.setStatus(Status.CREATED);
-        creationRequest.setCreatedId(transaction.getId());
+    transaction.setOperations(operations);
 
-        try {
-            transactionServiceUtil.changeAccountAmount(operations);
-        } catch (ChangeAccountAmountException exception) {
-            rejectCreationRequest(creationRequest, transaction, ExceptionMessageText.CREDIT_IS_MORE_THAN_STORED_ON_ACCOUNT);
-        }
+    return completeTransaction(transaction, operations, creationRequestDto);
+  }
 
-        operationRepository.saveAll(transaction.getOperations());
+  private Transaction createAndSaveTransaction(User foundUser) {
+    LocalDateTime currentDate = LocalDateTime.now();
+    Transaction transaction = new Transaction();
 
-        creationRequestRepository.save(creationRequest);
-        Transaction createdTransaction = transactionRepository.save(transaction);
+    transaction.setUser(foundUser);
+    transaction.setIssuedAt(currentDate);
+    transaction.setStatus(Status.IN_PROGRESS);
 
-        log.info("Transaction was created successfully!");
-        return transactionDtoMapper.toDto(createdTransaction);
+    return transactionRepository.save(transaction);
+  }
+
+  private void validateAndAddOperationsToSet(
+      Set<OperationCreateDto> dtoOperations,
+      CreationRequest requestToReject,
+      Transaction transaction,
+      Currency currencyToCheck,
+      Set<Operation> operations) {
+    for (OperationCreateDto operationCreateDto : dtoOperations) {
+      accountRepository
+          .findAccountByAccountNumber(operationCreateDto.getAccountNumber())
+          .ifPresentOrElse(
+              foundAccount ->
+                  completeOperationAdding(
+                      foundAccount,
+                      currencyToCheck,
+                      requestToReject,
+                      transaction,
+                      operationCreateDto,
+                      operations),
+              () ->
+                  rejectCreationRequest(
+                      requestToReject, transaction, ExceptionMessage.ACCOUNT_NOT_FOUND));
+    }
+  }
+
+  private void rejectCreationRequest(
+      CreationRequest requestToReject, Transaction transaction, String exceptionMessage) {
+    requestToReject.setStatus(Status.REJECTED);
+    requestToReject.setCreatedId(transaction.getId());
+    creationRequestRepository.save(requestToReject);
+
+    transaction.setStatus(Status.REJECTED);
+    transactionRepository.save(transaction);
+    log.error(String.format(LogMessage.TRANSACTION_REJECTED_LOG, transaction.getId()));
+
+    throw new EntityNotFoundException(exceptionMessage);
+  }
+
+  private void completeOperationAdding(
+      Account account,
+      Currency currencyToCheck,
+      CreationRequest requestToReject,
+      Transaction transaction,
+      OperationCreateDto operationCreateDto,
+      Set<Operation> operations) {
+    Operation operation = new Operation();
+
+    if (!currencyToCheck.equals(account.getCurrency())) {
+      rejectCreationRequest(
+          requestToReject, transaction, ExceptionMessage.CURRENCIES_ARE_NOT_SAME);
     }
 
-    @Override
-    public CreationRequestDto findTransactionCreationRequestById(Long creationRequestId) {
-        User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.AUTHENTICATED_USER_NOT_FOUND));
+    operation.setAccount(account);
+    operation.setTransaction(transaction);
 
-        if (authenticatedUser.getRole().equals(Role.USER)) {
-            return requestDtoMapper.toDto(creationRequestRepository.findCreationRequestsByCreationTypeAndIdAndUser(CreationType.TRANSACTION, creationRequestId, authenticatedUser).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.TRANSACTION_CREATION_REQUEST_WITH_ID_NOT_FOUND)));
-        } else {
-            return requestDtoMapper.toDto(creationRequestRepository.findCreationRequestsByCreationTypeAndId(CreationType.TRANSACTION, creationRequestId).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.TRANSACTION_CREATION_REQUEST_WITH_ID_NOT_FOUND)));
-        }
+    operation.setOperationType(OperationType.valueOf(operationCreateDto.getOperationType().toUpperCase(
+        Locale.ROOT)));
+
+    operation.setAmount(operationCreateDto.getAmount());
+    operations.add(operationRepository.save(operation));
+  }
+
+  private TransactionDto completeTransaction(
+      Transaction transaction, Set<Operation> operations, CreationRequestDto creationRequestDto) {
+    CreationRequest creationRequest =
+        creationRequestRepository
+            .findCreationRequestById(creationRequestDto.getId())
+            .orElseThrow(
+                () ->
+                    new EntityNotFoundException(
+                        ExceptionMessage.TRANSACTION_CREATION_REQUEST_NOT_FOUND));
+
+    creationRequest.setStatus(Status.CREATED);
+    transaction.setStatus(Status.CREATED);
+    creationRequest.setCreatedId(transaction.getId());
+
+    try {
+      transactionServiceUtil.changeAccountAmount(operations);
+    } catch (ChangeAccountAmountException exception) {
+      rejectCreationRequest(
+          creationRequest, transaction, ExceptionMessage.CREDIT_IS_MORE_THAN_STORED_ON_ACCOUNT);
     }
 
-    @Override
-    public List<CreationRequestDto> findTransactionCreationRequests() {
-        User authenticatedUser = userRepository.findUserByUsername(jwtDecoder.getUsernameOfLoggedUser()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessageText.AUTHENTICATED_USER_NOT_FOUND));
+    operationRepository.saveAll(transaction.getOperations());
 
-        List<CreationRequest> creationRequests;
+    creationRequestRepository.save(creationRequest);
+    log.info(
+        String.format(
+            LogMessage.TRANSACTION_CREATION_REQUEST_CREATED_LOG, creationRequest.getId()));
+    Transaction createdTransaction = transactionRepository.save(transaction);
 
-        if (authenticatedUser.getRole().equals(Role.USER)) {
-            creationRequests = creationRequestRepository.findCreationRequestsByCreationTypeAndUser(CreationType.TRANSACTION, authenticatedUser);
-        } else {
-            creationRequests = creationRequestRepository.findCreationRequestsByCreationType(CreationType.TRANSACTION);
-        }
+    log.info(String.format(LogMessage.TRANSACTION_CREATED_LOG, transaction.getId()));
+    return transactionDtoMapper.toDto(createdTransaction);
+  }
 
-        if (creationRequests.isEmpty()) throw new EntityNotFoundException(ExceptionMessageText.TRANSACTION_CREATION_REQUESTS_NOT_FOUND);
+  @Override
+  public CreationRequestDto findTransactionCreationRequestById(Long creationRequestId) {
+    User authenticatedUser = jwtDecoder.getLoggedUser();
+    Optional<CreationRequest> foundCreationRequestOptional;
 
-        return creationRequests.stream().map(requestDtoMapper::toDto).collect(Collectors.toList());
+    if (authenticatedUser.getRole().equals(Role.USER)) {
+      foundCreationRequestOptional =
+          creationRequestRepository.findCreationRequestsByCreationTypeAndIdAndUser(
+              CreationType.TRANSACTION, creationRequestId, authenticatedUser);
+    } else {
+      foundCreationRequestOptional =
+          creationRequestRepository.findCreationRequestsByCreationTypeAndId(
+              CreationType.TRANSACTION, creationRequestId);
     }
+    if (!foundCreationRequestOptional.isPresent()) {
+      log.error(
+          String.format(
+              LogMessage.TRANSACTION_CREATION_REQUEST_NOT_FOUND_LOG, creationRequestId));
+      throw new EntityNotFoundException(
+          ExceptionMessage.TRANSACTION_CREATION_REQUEST_NOT_FOUND);
+    } else {
+      return requestDtoMapper.toDto(foundCreationRequestOptional.get());
+    }
+  }
+
+  @Override
+  public List<CreationRequestDto> findTransactionCreationRequests() {
+    User authenticatedUser = jwtDecoder.getLoggedUser();
+
+    List<CreationRequest> creationRequests;
+
+    if (authenticatedUser.getRole().equals(Role.USER)) {
+      creationRequests =
+          creationRequestRepository.findCreationRequestsByCreationTypeAndUser(
+              CreationType.TRANSACTION, authenticatedUser);
+    } else {
+      creationRequests =
+          creationRequestRepository.findCreationRequestsByCreationType(CreationType.TRANSACTION);
+    }
+
+    return creationRequests.stream().map(requestDtoMapper::toDto).collect(Collectors.toList());
+  }
 }

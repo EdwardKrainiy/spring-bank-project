@@ -1,42 +1,53 @@
 package com.itech.model.entity;
 
 import com.itech.model.enumeration.Currency;
-import lombok.*;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import com.itech.utils.literal.JpaMappingDetails;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Basic Account class.
  *
  * @author Edvard Krainiy on 12/16/2021
  */
-
 @Entity
 @Getter
 @Setter
-@Table(name = "accounts")
+@Table(name = JpaMappingDetails.ACCOUNTS_TABLE)
 @NoArgsConstructor
 @AllArgsConstructor
-public class Account{
+public class Account {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = JpaMappingDetails.ID, nullable = false)
+  private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-    @JoinColumn(name = "user_id")
-    private User user;
+  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+  @JoinColumn(name = JpaMappingDetails.USER_ID)
+  private User user;
 
-    @Column(name = "amount")
-    private double amount;
+  @Column(name = JpaMappingDetails.AMOUNT)
+  private double amount;
 
-    @NotNull(message = "Missing currency!")
-    @Column(name = "currency")
-    @Enumerated(EnumType.STRING)
-    private Currency currency;
+  @Column(name = JpaMappingDetails.CURRENCY)
+  @Enumerated(EnumType.STRING)
+  private Currency currency;
 
-    @Column(name = "account_number")
-    private String accountNumber;
+  @Column(name = JpaMappingDetails.ACCOUNT_NUMBER)
+  private String accountNumber;
 }
